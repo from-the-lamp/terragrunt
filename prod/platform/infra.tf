@@ -1,10 +1,12 @@
 provider "oci" {
-  region = "eu-frankfurt-1"
+  region = var.region
 }
 
 module "vcn" {
   source  = "oracle-terraform-modules/vcn/oci"
   version = "3.1.0"
+  compartment_id = var.compartment_ocid
+  region         = var.region
   internet_gateway_route_rules = null
   local_peering_gateways       = null
   nat_gateway_route_rules      = null
