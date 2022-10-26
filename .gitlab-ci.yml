@@ -1,0 +1,23 @@
+include:
+  - project: "infra154/ci-cd-includes"
+    file: "functions/tf_custom.yml"
+
+0-prod-platform:
+  extends: .plan
+  variables:
+    FOLDER: prod/platform
+
+1-prod-platform:
+  extends: .apply
+  variables:
+    FOLDER: prod/platform
+
+0-prod-resources:
+  extends: .plan
+  variables:
+    FOLDER: prod/resources
+
+1-prod-resources:
+  extends: .apply
+  variables:
+    FOLDER: prod/resources

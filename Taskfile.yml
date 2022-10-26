@@ -1,0 +1,22 @@
+version: "3"
+
+dotenv: [".env"]
+vars:
+  DOCKER_CI_CD_IMAGE: registry.gitlab.com/infra154/docker-images/cicd:latest
+
+silent: true
+tasks:
+  oci:
+    cmds:
+      - docker pull {{ .DOCKER_CI_CD_IMAGE }}
+      - >
+        docker run -it --rm  \
+                    -v /home/$(whoami)/.ssh/id_rsa:/root/.ssh/id_rsa \
+                    -v /home/$(whoami)/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub \
+                    -v $(pwd)/config:/root/.oci/config \
+                    -v $(pwd)/.env:/workdir/.env \
+                    -v $(pwd)/Taskfile.yml:/workdir/Taskfile.yml {{ .DOCKER_CI_CD_IMAGE }} task oci:setup:config
+
+  oci:setup:config:
+      cmds:
+      - /root/bin/oci setup config
