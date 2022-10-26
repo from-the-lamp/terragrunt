@@ -5,8 +5,6 @@ provider "oci" {
 module "vcn" {
   source  = "oracle-terraform-modules/vcn/oci"
   version = "3.1.0"
-  compartment_id = var.compartment_id
-  region         = var.region
   internet_gateway_route_rules = null
   local_peering_gateways       = null
   nat_gateway_route_rules      = null

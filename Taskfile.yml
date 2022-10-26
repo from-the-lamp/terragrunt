@@ -18,5 +18,26 @@ tasks:
                     -v $(pwd)/Taskfile.yml:/workdir/Taskfile.yml {{ .DOCKER_CI_CD_IMAGE }} task oci:setup:config
 
   oci:setup:config:
-      cmds:
+    cmds:
       - /root/bin/oci setup config
+
+  plan:platform:
+    dir: prod/platform
+    cmds:
+      - terraform plan
+
+  plan:resources:
+    dir: prod/resources
+    cmds:
+      - terraform plan
+
+  apply:platform:
+    dir: prod/platform
+    cmds:
+      - terraform apply -auto-aprove
+
+  apply:resources:
+    dir: prod/resources
+    cmds:
+      - terraform apply -auto-aprove
+      
