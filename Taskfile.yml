@@ -15,11 +15,11 @@ tasks:
                     -v /home/$(whoami)/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub \
                     -v $(pwd)/config:/root/.oci/config \
                     -v $(pwd)/.env:/workdir/.env \
-                    -v $(pwd)/Taskfile.yml:/workdir/Taskfile.yml {{ .DOCKER_CI_CD_IMAGE }} task oci:setup:config
+                    -v $(pwd)/Taskfile.yml:/workdir/Taskfile.yml {{ .DOCKER_CI_CD_IMAGE }} task bash
 
-  oci:setup:config:
+  bash:
     cmds:
-      - /root/bin/oci setup config
+      - bash
 
   plan:platform:
     dir: prod/platform
