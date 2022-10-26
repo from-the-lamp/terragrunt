@@ -1,4 +1,5 @@
 provider "oci" {
+  auth = "APIKey"
   region = var.region
 }
 
