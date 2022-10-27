@@ -10,4 +10,3 @@ variable "cluster_name" {}
 variable "environment" {}
 variable "os_image_id" {}
 variable "availability_domain" {}
-
