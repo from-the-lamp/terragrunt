@@ -91,13 +91,13 @@ tasks:
     dir: "{{ .ENV }}/{{ .DIR }}"
     cmds:
       - task: init
-      - terraform plan
+      - terraform plan -out=.terraform/plan.out
 
   apply:
     dir: "{{ .ENV }}/{{ .DIR }}"
     cmds:
       - task: init
-      - terraform apply -auto-approve
+      - terraform apply -auto-approve .terraform/plan.out
 
   destroy:
     dir: "{{ .ENV }}/{{ .DIR }}"
