@@ -11,6 +11,9 @@ module "k3s_cluster" {
   k3s_load_balancer_name    = "k3s-internal"
   public_load_balancer_name = "k3s-public"
   install_nginx_ingress     = true
+  install_certmanager       = false
+  install_argocd            = false
+  install_longhorn          = false
   expose_kubeapi            = true
 }
 

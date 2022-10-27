@@ -1,23 +1,27 @@
 include:
   - project: "infra154/ci-cd-includes"
-    file: "functions/tf_custom.yml"
+    file: "functions/tf_oracle.yml"
 
 0-prod-platform:
   extends: .plan
   variables:
-    FOLDER: prod/platform
+    ENV: prod
+    DIR: platform
 
 1-prod-platform:
   extends: .apply
   variables:
-    FOLDER: prod/platform
+    ENV: prod
+    DIR: platform
 
 0-prod-resources:
   extends: .plan
   variables:
-    FOLDER: prod/resources
+    ENV: prod
+    DIR: resources
 
 1-prod-resources:
   extends: .apply
   variables:
-    FOLDER: prod/resources
+    ENV: prod
+    DIR: resources
