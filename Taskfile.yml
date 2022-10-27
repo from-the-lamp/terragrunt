@@ -3,7 +3,12 @@ version: "3"
 dotenv: [".env"]
 vars:
   DOCKER_CI_CD_IMAGE: registry.gitlab.com/infra154/docker-images/cicd:latest
-  
+  HOST: 1.2.3.4 # task docker:ssh
+env:
+  OCI_REGION: eu-frankfurt-1
+  TF_VAR_private_key_path: /root/.oci/oci_api_key.pem
+  TF_VAR_ssh_public_key: /root/.ssh/id_rsa.pub
+
 silent: true
 tasks:
   docker:plan:
@@ -27,9 +32,7 @@ tasks:
   docker:ssh:
     cmds:
       - task: oci
-        vars:
-          ACTION: ssh
-          HOST: "152.70.180.3"
+        vars: {ACTION: ssh}
 
   docker:availability:
     cmds:
@@ -68,8 +71,8 @@ tasks:
     dir: "{{ .ENV }}/{{ .DIR }}"
     cmds:
       - mkdir -p /root/.ssh
-      - echo $TF_VAR_admin_id_rsa | base64 -d > /root/.ssh/id_rsa
-      - echo $TF_VAR_admin_id_rsa_pub | base64 -d > /root/.ssh/id_rsa.pub
+      - echo $TF_VAR_admin_id_rsa_base64 | base64 -d > /root/.ssh/id_rsa
+      - echo $TF_VAR_admin_id_rsa_pub_base64 | base64 -d > /root/.ssh/id_rsa.pub
       - chmod 0700 /root/.ssh && chmod 0600 /root/.ssh/id_rsa
       - mkdir -p /root/.oci
       - echo $TF_VAR_private_key_base64 | base64 -d > /root/.oci/oci_api_key.pem

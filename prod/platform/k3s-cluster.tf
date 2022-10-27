@@ -11,6 +11,7 @@ module "k3s_cluster" {
   k3s_load_balancer_name    = "k3s-internal"
   public_load_balancer_name = "k3s-public"
   install_nginx_ingress     = true
+  expose_kubeapi            = true
 }
 
 output "k3s_servers_ips" {
