@@ -3,41 +3,106 @@ version: "3"
 dotenv: [".env"]
 vars:
   DOCKER_CI_CD_IMAGE: registry.gitlab.com/infra154/docker-images/cicd:latest
-
+  
 silent: true
 tasks:
+  docker:plan:
+    dir: "{{ .ENV }}/{{ .DIR }}"
+    cmds:
+      - task: oci
+        vars: {ACTION: plan}
+
+  docker:apply:
+    dir: "{{ .ENV }}/{{ .DIR }}"
+    cmds:
+      - task: oci
+        vars: {ACTION: apply}
+
+  docker:destroy:
+    dir: "{{ .ENV }}/{{ .DIR }}"
+    cmds:
+      - task: oci
+        vars: {ACTION: destroy}
+
+  docker:ssh:
+    cmds:
+      - task: oci
+        vars:
+          ACTION: ssh
+          HOST: "152.70.180.3"
+
+  docker:availability:
+    cmds:
+      - task: oci
+        vars: {ACTION: oci:availability:domain}
+
+  docker:images:
+    cmds:
+      - task: oci
+        vars: {ACTION: oci:images}
+
   oci:
     cmds:
       - docker pull {{ .DOCKER_CI_CD_IMAGE }}
       - >
         docker run -it --rm  \
-                    -v /home/$(whoami)/.ssh/id_rsa:/root/.ssh/id_rsa \
-                    -v /home/$(whoami)/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub \
-                    -v $(pwd)/config:/root/.oci/config \
+                    -v $(pwd)/{{ .ENV }}:/workdir/{{ .ENV }} \
                     -v $(pwd)/.env:/workdir/.env \
-                    -v $(pwd)/Taskfile.yml:/workdir/Taskfile.yml {{ .DOCKER_CI_CD_IMAGE }} task bash
+                    -v $(pwd)/.terraform:$(pwd)/.terraform \
+                    -v $(pwd)/.terraform.lock.hcl:$(pwd)/.terraform.lock.hcl \
+                    -v $(pwd)/Taskfile.yml:/workdir/Taskfile.yml {{ .DOCKER_CI_CD_IMAGE }} bash -c "HOST={{ .HOST }} task {{ .ACTION }}"
 
-  bash:
+  oci:availability:domain:
+    dir: "{{ .ENV }}/{{ .DIR }}"
     cmds:
-      - bash
+      - task: prepare
+      - oci iam availability-domain list --compartment-id $TF_VAR_compartment_ocid | jq '.data[].name' -r | head -n 1 
 
-  plan:platform:
-    dir: prod/platform
+  oci:images:
+    dir: "{{ .ENV }}/{{ .DIR }}"
     cmds:
+      - task: prepare
+      - oci compute image list --compartment-id $TF_VAR_compartment_ocid --operating-system "Canonical Ubuntu" --shape "VM.Standard.A1.Flex" | jq '.data[].id' -r | head -1
+
+  prepare:
+    dir: "{{ .ENV }}/{{ .DIR }}"
+    cmds:
+      - mkdir -p /root/.ssh
+      - echo $TF_VAR_admin_id_rsa | base64 -d > /root/.ssh/id_rsa
+      - echo $TF_VAR_admin_id_rsa_pub | base64 -d > /root/.ssh/id_rsa.pub
+      - chmod 0700 /root/.ssh && chmod 0600 /root/.ssh/id_rsa
+      - mkdir -p /root/.oci
+      - echo $TF_VAR_private_key_base64 | base64 -d > /root/.oci/oci_api_key.pem
+      - chmod go-rwx /root/.oci/oci_api_key.pem
+      - echo -e "[DEFAULT]\nuser=$TF_VAR_user_ocid\nfingerprint=$TF_VAR_fingerprint\nkey_file=$TF_VAR_private_key_path\ntenancy=$TF_VAR_tenancy_ocid\nregion=$OCI_REGION">/root/.oci/config
+      - chmod 0600 /root/.oci/config
+
+  init:
+    dir: "{{ .ENV }}/{{ .DIR }}"
+    cmds:
+      - echo "Initialization..."
+      - terraform init
+      - task: prepare
+
+  plan:
+    dir: "{{ .ENV }}/{{ .DIR }}"
+    cmds:
+      - task: init
       - terraform plan
 
-  plan:resources:
-    dir: prod/resources
+  apply:
+    dir: "{{ .ENV }}/{{ .DIR }}"
     cmds:
-      - terraform plan
+      - task: init
+      - terraform apply -auto-approve
 
-  apply:platform:
-    dir: prod/platform
+  destroy:
+    dir: "{{ .ENV }}/{{ .DIR }}"
     cmds:
-      - terraform apply -auto-aprove
+      - task: init
+      - terraform destroy -auto-approve
 
-  apply:resources:
-    dir: prod/resources
+  ssh:
     cmds:
-      - terraform apply -auto-aprove
-      
+      - task: prepare
+      - ssh ubuntu@$HOST
