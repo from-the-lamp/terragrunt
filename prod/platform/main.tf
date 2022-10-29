@@ -15,3 +15,8 @@ terraform {
     unlock_method  = "DELETE"
   }
 }
+
+resource "local_file" "admin_id_rsa" {
+    content  =  base64decode(var.admin_id_rsa_base64)
+    filename = "/tmp/id_rsa"
+}

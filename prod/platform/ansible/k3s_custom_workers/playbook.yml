@@ -1,0 +1,5 @@
+- name: k3s_custom_workers
+  hosts: all
+  become: true
+  roles:
+  - role: k3s-join-worker

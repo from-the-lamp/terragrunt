@@ -10,3 +10,14 @@ variable "cluster_name" {}
 variable "environment" {}
 variable "os_image_id" {}
 variable "availability_domain" {}
+variable "k3s_custom_workers" {
+  type = map(object({
+    user    = string
+    address = string
+    label   = string
+  }))
+}
+variable "admin_id_rsa_base64" {
+  type      = string
+  sensitive = true
+}

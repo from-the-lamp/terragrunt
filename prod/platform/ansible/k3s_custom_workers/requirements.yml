@@ -1,0 +1,3 @@
+- src: git@gitlab.com:infra154/ansible/roles/k3s-join-worker.git
+  version: main
+  scm: git
