@@ -10,6 +10,8 @@ variable "cluster_name" {}
 variable "environment" {}
 variable "os_image_id" {}
 variable "availability_domain" {}
+variable "vault_url" {}
+variable "vault_token" {}
 variable "k3s_custom_workers" {
   type = map(object({
     user    = string

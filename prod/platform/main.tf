@@ -4,6 +4,14 @@ terraform {
       source = "oracle/oci"
       version = "4.96.0"
     }
+    gitlab = {
+      source = "gitlabhq/gitlab"
+      version = "3.19.0"
+    }
+    vault = {
+      source = "hashicorp/vault"
+      version = "3.11.0"
+    }
   }
 
   backend "http" {

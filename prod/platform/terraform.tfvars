@@ -11,3 +11,4 @@ k3s_custom_workers = {
         label   = "node-group=eldorado"
     }
 }
+vault_url = "https://vault.djinn.cf"
