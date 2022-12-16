@@ -3,123 +3,35 @@ version: "3"
 dotenv: [".env"]
 vars:
   DOCKER_CI_CD_IMAGE: registry.gitlab.com/infra154/docker-images/cicd:latest
-  HOST: 1.2.3.4 # task docker:ssh
 env:
   OCI_REGION: eu-frankfurt-1
-  TF_VAR_private_key_path: /root/.oci/oci_api_key.pem
-  TF_VAR_ssh_public_key: /root/.ssh/id_rsa.pub
   ANSIBLE_HOST_KEY_CHECKING: False
+  TERRAGRUNT_AUTO_INIT: true
 
 silent: true
 tasks:
-  docker:plan:
-    dir: "{{ .ENV }}/{{ .DIR }}"
+  dir: prod
+  plan:all:
     cmds:
-      - task: oci
-        vars: {ACTION: plan}
+      - task: rm
+      - terragrunt run-all plan
 
-  docker:apply:
-    dir: "{{ .ENV }}/{{ .DIR }}"
+  apply:all:
     cmds:
-      - task: oci
-        vars: {ACTION: apply}
+      - task: rm
+      - terragrunt run-all apply -auto-approve
 
-  docker:apply:noplan:
-    dir: "{{ .ENV }}/{{ .DIR }}"
+  destroy:all:
     cmds:
-      - task: oci
-        vars: {ACTION: apply:noplan}
+      - task: rm
+      - terragrunt run-all destroy -auto-approve
 
-  docker:destroy:
-    dir: "{{ .ENV }}/{{ .DIR }}"
+  rm:
     cmds:
-      - task: oci
-        vars: {ACTION: destroy}
+      - find . -iname ".terraform.lock.hcl" -prune -exec rm -rf {} \;
+      - find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \;
+      - find . -iname ".terraform" -prune -exec rm -rf {} \;
 
-  docker:ssh:
+  availability:
     cmds:
-      - task: oci
-        vars: {ACTION: ssh}
-
-  docker:availability:
-    cmds:
-      - task: oci
-        vars: {ACTION: oci:availability:domain}
-
-  docker:images:
-    cmds:
-      - task: oci
-        vars: {ACTION: oci:images}
-
-  oci:
-    cmds:
-      - docker pull {{ .DOCKER_CI_CD_IMAGE }}
-      - >
-        docker run -it --rm  \
-                    -v $(pwd)/{{ .ENV }}:/workdir/{{ .ENV }} \
-                    -v $(pwd)/.env:/workdir/.env \
-                    -v $(pwd)/.terraform:$(pwd)/.terraform \
-                    -v $(pwd)/.terraform.lock.hcl:$(pwd)/.terraform.lock.hcl \
-                    -v $(pwd)/Taskfile.yml:/workdir/Taskfile.yml {{ .DOCKER_CI_CD_IMAGE }} bash -c "HOST={{ .HOST }} task {{ .ACTION }}"
-
-  oci:availability:domain:
-    dir: "{{ .ENV }}/{{ .DIR }}"
-    cmds:
-      - task: prepare
-      - oci iam availability-domain list --compartment-id $TF_VAR_compartment_ocid | jq '.data[].name' -r | head -n 1 
-
-  oci:images:
-    dir: "{{ .ENV }}/{{ .DIR }}"
-    cmds:
-      - task: prepare
-      - oci compute image list --compartment-id $TF_VAR_compartment_ocid --operating-system "Canonical Ubuntu" --shape "VM.Standard.A1.Flex" | jq '.data[].id' -r | head -1
-
-  prepare:
-    dir: "{{ .ENV }}/{{ .DIR }}"
-    cmds:
-      - mkdir -p /root/.ssh
-      - echo $TF_VAR_admin_id_rsa_base64 | base64 -d > /root/.ssh/id_rsa
-      - echo $TF_VAR_admin_id_rsa_pub_base64 | base64 -d > /root/.ssh/id_rsa.pub
-      - chmod 0700 /root/.ssh && chmod 0600 /root/.ssh/id_rsa
-      - mkdir -p /root/.oci
-      - echo $TF_VAR_private_key_base64 | base64 -d > /root/.oci/oci_api_key.pem
-      - chmod go-rwx /root/.oci/oci_api_key.pem
-      - echo -e "[DEFAULT]\nuser=$TF_VAR_user_ocid\nfingerprint=$TF_VAR_fingerprint\nkey_file=$TF_VAR_private_key_path\ntenancy=$TF_VAR_tenancy_ocid\nregion=$OCI_REGION">/root/.oci/config
-      - chmod 0600 /root/.oci/config
-      - ssh-keyscan -H gitlab.com >> ~/.ssh/known_hosts
-
-  init:
-    dir: "{{ .ENV }}/{{ .DIR }}"
-    cmds:
-      - echo "Initialization..."
-      - terraform init
-      - task: prepare
-
-  plan:
-    dir: "{{ .ENV }}/{{ .DIR }}"
-    cmds:
-      - task: init
-      - terraform plan -out=.terraform/plan.out
-
-  apply:
-    dir: "{{ .ENV }}/{{ .DIR }}"
-    cmds:
-      - task: init
-      - terraform apply -auto-approve .terraform/plan.out
-
-  apply:noplan:
-    dir: "{{ .ENV }}/{{ .DIR }}"
-    cmds:
-      - task: init
-      - terraform apply -auto-approve
-
-  destroy:
-    dir: "{{ .ENV }}/{{ .DIR }}"
-    cmds:
-      - task: init
-      - terraform destroy -auto-approve
-
-  ssh:
-    cmds:
-      - task: prepare
-      - ssh ubuntu@$HOST
+      - oci iam availability-domain list --compartment-id $TF_VAR_compartment_ocid  
