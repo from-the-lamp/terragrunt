@@ -22,7 +22,7 @@ inputs = merge(
     environment               = "prod"
     tenancy_ocid              = "${get_env("TF_VAR_tenancy_ocid")}"
     compartment_ocid          = "${get_env("TF_VAR_compartment_ocid")}"
-    availability_domain       = "Wxre:EU-FRANKFURT-1-AD-2"
+    availability_domain       = "Wxre:EU-FRANKFURT-1-AD-1"
     region                    = "eu-frankfurt-1"
     admin_ssh_pub             = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICLA+49/73HHo5vMFTeurz8JdDsWza4WvJtN+WnSWi5i \n ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILtNvLcjDTFxc/v03D93cyeEa77jxNC/u2DfqM9gn0k6"
   },
