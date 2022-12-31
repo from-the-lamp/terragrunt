@@ -10,18 +10,20 @@ env:
 
 silent: true
 tasks:
-  dir: prod
   plan:all:
+    dir: prod
     cmds:
       - task: rm
       - terragrunt run-all plan
 
   apply:all:
+    dir: prod
     cmds:
       - task: rm
       - terragrunt run-all apply -auto-approve
 
   destroy:all:
+    dir: prod
     cmds:
       - task: rm
       - terragrunt run-all destroy -auto-approve
