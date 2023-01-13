@@ -1,0 +1,7 @@
+# base64DockerConfigs: 
+#   gitlab: example
+
+# В примере: 
+# gitlab - итоговое название секрета в k8s
+# example - тут должен быть закодированный в base64 конфиг вроде этого {"auths": {"registry.gitlab.com": {"auth": "token"}}} 
+# Секретов может быть несколько

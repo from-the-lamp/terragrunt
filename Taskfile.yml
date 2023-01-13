@@ -1,39 +1,81 @@
 version: "3"
 
 dotenv: [".env"]
-vars:
-  DOCKER_CI_CD_IMAGE: registry.gitlab.com/infra154/docker-images/cicd:latest
 env:
   OCI_REGION: eu-frankfurt-1
-  ANSIBLE_HOST_KEY_CHECKING: False
   TERRAGRUNT_AUTO_INIT: true
 
 silent: true
 tasks:
-  plan:all:
-    dir: prod
-    cmds:
-      - task: rm
-      - terragrunt run-all plan
-
-  apply:all:
-    dir: prod
-    cmds:
-      - task: rm
-      - terragrunt run-all apply -auto-approve
-
-  destroy:all:
-    dir: prod
-    cmds:
-      - task: rm
-      - terragrunt run-all destroy -auto-approve
-
   rm:
     cmds:
-      - find . -iname ".terraform.lock.hcl" -prune -exec rm -rf {} \;
       - find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \;
-      - find . -iname ".terraform" -prune -exec rm -rf {} \;
+      - find . -type d -name ".terraform" -prune -exec rm -rf {} \;
+      - find . -iname "*generated*" -delete;
+      - find . -iname ".terraform.lock.hcl" -delete;
+      - find . -iname ".helmignore" -delete;
 
-  availability:
+  init:all:
+    dir: $DIR
     cmds:
-      - oci iam availability-domain list --compartment-id $TF_VAR_compartment_ocid  
+      - terragrunt run-all init
+
+  plan:all:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt run-all plan --terragrunt-non-interactive
+
+  apply:all:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt run-all apply --terragrunt-non-interactive
+
+  apply:all:force:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt run-all apply --terragrunt-non-interactive
+
+  destroy:all:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt run-all destroy
+
+  plan:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt plan
+
+  plan:force:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt plan --terragrunt-non-interactive
+
+  apply:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt apply
+
+  apply:force:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt apply  -auto-approve --terragrunt-non-interactive
+
+  destroy:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt destroy
+
+  destroy:force:
+    dir: $DIR
+    cmds:
+      - task: rm
+      - terragrunt destroy -auto-approve --terragrunt-non-interactive

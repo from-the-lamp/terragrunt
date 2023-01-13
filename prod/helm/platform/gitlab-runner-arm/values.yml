@@ -1,0 +1,23 @@
+gitlabUrl: https://gitlab.com
+concurrent: 20
+replicas: 1
+rbac:
+  create: true
+runners:
+  tags: "k8s-arm-default"
+  config: |
+    [[runners]]
+      name = "Kubernetes Gitlab Runner"
+      executor = "kubernetes"
+      [runners.kubernetes]
+        namespace = "{{.Release.Namespace}}"
+        image = "arm64v8/ubuntu:22.04"
+  helpers:
+    cpuLimit: 200m
+    memoryLimit: 256Mi
+    cpuRequests: 100m
+    memoryRequests: 128Mi
+    image: "gitlab/gitlab-runner-helper:arm64-latest"
+    
+# HELM_GITLAB_SECRET
+# runnerRegistrationToken: 123
