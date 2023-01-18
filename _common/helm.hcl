@@ -10,12 +10,16 @@ locals {
   common_settings          = read_terragrunt_config("${get_repo_root()}/_common/common_settings.hcl")
   gitlab_token             = "${local.common_settings.locals.gitlab_token}"
   private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
+  namespace_vars = read_terragrunt_config("../namespace.hcl")
+  namespace      = "${local.namespace_vars.locals.namespace}"
 }
 
 inputs = {
-  helm_release_name = "${basename(get_terragrunt_dir())}"
-  repository_username = "gitlab-ci-token"
-  repository_password = "${local.gitlab_token}"
+  helm_release_name       = "${basename(get_terragrunt_dir())}"
+  helm_internal_repo_url  = "https://gitlab.com/api/v4/projects/40582099/packages/helm/stable"
+  helm_internal_repo_user = "gitlab-ci-token"
+  helm_internal_repo_pass = get_env("TF_HTTP_PASSWORD")
+  k8s_namespace           = "${local.namespace}"
 }
 
 dependency "k3s" {

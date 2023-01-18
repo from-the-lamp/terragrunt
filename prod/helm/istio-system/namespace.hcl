@@ -1,0 +1,3 @@
+locals {
+    namespace = "istio-system"
+}
