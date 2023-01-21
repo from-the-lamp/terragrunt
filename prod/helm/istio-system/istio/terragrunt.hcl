@@ -6,11 +6,6 @@ include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
 }
 
-locals {
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env = local.environment_vars.locals.environment
-}
-
 inputs = {
   helm_external_repo    = true
   helm_values_file      = "values.yml"

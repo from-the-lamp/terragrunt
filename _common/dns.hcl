@@ -18,6 +18,12 @@ dependency "k3s" {
 inputs = {
     cloudflare_zone_name = "from-the-lamp.com"
     cloudflare_record = {
+        "." = {
+            address = "${dependency.k3s.outputs.public_lb_ip}"
+            type    = "A"
+            proxied = true
+            ttl     = "1"
+        }
         "*" = {
             address = "${dependency.k3s.outputs.public_lb_ip}"
             type    = "A"

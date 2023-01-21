@@ -6,16 +6,13 @@ include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
 }
 
-locals {
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env = local.environment_vars.locals.environment
-}
-
 dependency "ististio-ingressgateway" {
   config_path  = "../istio-ingressgateway"
   skip_outputs = true
 }
 
 inputs = {
-  helm_local_repo = true
+  helm_internal_repo = true
+  helm_chart_name    = "istio-gateway"
+  helm_chart_version = "0.0.2"
 }

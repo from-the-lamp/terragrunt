@@ -10,11 +10,13 @@ locals {
   common_settings          = read_terragrunt_config("${get_repo_root()}/_common/common_settings.hcl")
   gitlab_token             = "${local.common_settings.locals.gitlab_token}"
   private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
-  namespace_vars = read_terragrunt_config("../namespace.hcl")
-  namespace      = "${local.namespace_vars.locals.namespace}"
+  namespace_vars           = read_terragrunt_config("../namespace.hcl")
+  namespace                = "${local.namespace_vars.locals.namespace}"
 }
 
 inputs = {
+  force_update            = true
+  recreate_pods           = true
   helm_release_name       = "${basename(get_terragrunt_dir())}"
   helm_internal_repo_url  = "https://gitlab.com/api/v4/projects/40582099/packages/helm/stable"
   helm_internal_repo_user = "gitlab-ci-token"
@@ -38,9 +40,9 @@ generate "provider_helm" {
   if_exists = "overwrite"
   contents = <<EOF1
 provider "helm" {
-  // experiments {
-  //   manifest = true
-  // }
+  experiments {
+    manifest = true
+  }
   kubernetes {
     host = "${dependency.k3s.outputs.public_lb_ip}:6443"
     cluster_ca_certificate = <<-EOF2
