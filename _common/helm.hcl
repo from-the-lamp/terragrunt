@@ -40,9 +40,9 @@ generate "provider_helm" {
   if_exists = "overwrite"
   contents = <<EOF1
 provider "helm" {
-  experiments {
-    manifest = true
-  }
+  // experiments {
+  //   manifest = true
+  // }
   kubernetes {
     host = "${dependency.k3s.outputs.public_lb_ip}:6443"
     cluster_ca_certificate = <<-EOF2

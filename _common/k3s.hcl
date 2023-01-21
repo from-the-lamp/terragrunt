@@ -16,9 +16,6 @@ inputs = {
   my_public_ip_cidr         = "0.0.0.0/0"
   cluster_name              = "infra"
   os_image_id               = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaj6g2lci5ed7nfhk46olwkhmwkzrobyo3jntnhkk7fnm2vqflorna"
-  environment               = "prod"
-  tenancy_ocid              = "${get_env("TF_VAR_tenancy_ocid")}"
-  compartment_ocid          = "${get_env("TF_VAR_compartment_ocid")}"
   availability_domain       = "Wxre:EU-FRANKFURT-1-AD-1"
   region                    = "eu-frankfurt-1"
   admin_ssh_pub             = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICLA+49/73HHo5vMFTeurz8JdDsWza4WvJtN+WnSWi5i \n ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILtNvLcjDTFxc/v03D93cyeEa77jxNC/u2DfqM9gn0k6"
@@ -29,5 +26,5 @@ inputs = {
   expose_kubeapi            = true
   my_public_ip_cidr         = "0.0.0.0/0"
   cluster_name              = "infra"
-  os_image_id = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaj6g2lci5ed7nfhk46olwkhmwkzrobyo3jntnhkk7fnm2vqflorna"
+  environment               = "${local.env}"
 }

@@ -1,0 +1,47 @@
+grafana:
+  enabled: true
+  grafana.ini:
+    server:
+      root_url: https://grafana.from-the-lamp.com
+    users:
+      auto_assign_org_role: Editor
+gateway:
+  enabled: true
+  external: true
+  hosts:
+  - grafana.from-the-lamp.com
+destination:
+  name: kube-prometheus-stack-grafana
+  port: 80
+
+defaultRules:
+  create: true
+  rules:
+    alertmanager: false
+    etcd: false
+    configReloaders: true
+    general: true
+    k8s: true
+    kubeApiserverAvailability: true
+    kubeApiserverBurnrate: true
+    kubeApiserverHistogram: true
+    kubeApiserverSlos: true
+    kubelet: true
+    kubeProxy: false
+    kubePrometheusGeneral: true
+    kubePrometheusNodeRecording: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    kubeScheduler: true
+    kubeStateMetrics: true
+    network: true
+    node: true
+    nodeExporterAlerting: true
+    nodeExporterRecording: true
+    prometheus: true
+    prometheusOperator: true
+
+alertmanager:
+  enabled: false
