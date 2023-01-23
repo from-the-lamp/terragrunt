@@ -1,0 +1,32 @@
+gateway:
+  enabled: true
+  external: true
+  hosts:
+  - kiali.from-the-lamp.com
+
+destination:
+  name: kiali
+  port: 20001
+
+prometheus:  
+  url: "http://kube-prometheus-stack-prometheus.monitoring:9090"
+
+grafana:
+  in_cluster_url: "http://kube-prometheus-stack-grafana.monitoring:80"
+  url: "https://grafana.from-the-lamp.com"
+
+api:
+  namespaces:
+    exclude:
+    - "^istio-operator"
+    - "^kube-.*"
+    - "^openshift.*"
+    - "^ibm.*"
+    - "^kiali-operator"
+    - "monitoring"
+    - "infra"
+    - "longhorn-system"
+
+deployment:
+  accessible_namespaces:
+  - "**"
