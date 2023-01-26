@@ -6,6 +6,14 @@ include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
 }
 
+dependency "gitlab_vars" {
+  config_path = "../../../gitlab/variables"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "map_variables.grafana_admin_pass" = "fake-pass"
+  }
+}
+
 inputs = {
   helm_external_repo    = true
   helm_virtual_service  = true
@@ -19,6 +27,6 @@ inputs = {
   helm_addition_setting = {
     "destination.name"      = "kube-prometheus-stack-grafana"
     "destination.port"      = "80"
-    "grafana.adminPassword" = "${get_env("TF_VAR_grafana_admin_pass")}"
+    "grafana.adminPassword" = dependency.gitlab_vars.outputs.map_variables.grafana_admin_pass
   }
 }

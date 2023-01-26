@@ -11,9 +11,17 @@ dependency "origin-ca-issuer" {
   skip_outputs = true
 }
 
+dependency "gitlab_vars" {
+  config_path = "../../../gitlab/variables"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "map_variables.cloudflare_originCAissuerKey" = "fake-key"
+  }
+}
+
 inputs = {
   helm_local_repo       = true
   helm_addition_setting = {
-    originCAissuerKey   = "${get_env("TF_VAR_originCAissuerKey")}"
+    originCAissuerKey   =  dependency.gitlab_vars.outputs.map_variables.cloudflare_originCAissuerKey
   }
 }

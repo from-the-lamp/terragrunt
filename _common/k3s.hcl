@@ -8,6 +8,7 @@ locals {
 }
 
 inputs = {
+  compartment_ocid          = "${dependency.gitlab_vars.outputs.map_variables.compartment_ocid}"
   k3s_load_balancer_name    = "k3s-internal"
   public_load_balancer_name = "k3s-public"
   k3s_server_pool_size      = 2
@@ -27,4 +28,27 @@ inputs = {
   my_public_ip_cidr         = "0.0.0.0/0"
   cluster_name              = "infra"
   environment               = "${local.env}"
+}
+
+dependency "gitlab_vars" {
+  config_path = "../gitlab/variables"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "map_variables.tenancy_ocid"     = "fake-tenancy-ocid"
+    "map_variables.user_ocid"        = "fake-user-ocid"
+    "map_variables.compartment_ocid" = "fake-compartment-ocid"
+    "map_variables.fingerprint"      = "fake-fingerprint"
+  }
+}
+
+generate "oci_provider_cfg" {
+  path      = "oci_provider_cfg.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+    provider "oci" {
+      tenancy_ocid = "${dependency.gitlab_vars.outputs.map_variables.tenancy_ocid}"
+      user_ocid    = "${dependency.gitlab_vars.outputs.map_variables.user_ocid}"
+      fingerprint  = "${dependency.gitlab_vars.outputs.map_variables.fingerprint}"
+    }
+  EOF
 }

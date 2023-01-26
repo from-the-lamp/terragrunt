@@ -28,6 +28,15 @@ grafana:
         gnetId: 7639
         revision: 149
         datasource: Prometheus
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName:
+    accessModes:
+    - ReadWriteOnce
+    size: 2Gi
+    finalizers:
+    - kubernetes.io/pvc-protection
 
 gateway:
   enabled: true
@@ -69,6 +78,15 @@ defaultRules:
 
 alertmanager:
   enabled: false
+  alertmanagerSpec:
+      storage: 
+        volumeClaimTemplate:
+          spec:
+            storageClassName:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 2Gi
 
 prometheus:
   prometheusSpec:
@@ -91,3 +109,11 @@ prometheus:
       - source_labels: [__meta_kubernetes_pod_container_port_name]
         action: keep
         regex: '.*-envoy-prom'
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
