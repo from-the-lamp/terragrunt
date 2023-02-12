@@ -6,8 +6,8 @@ include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
 }
 
-dependency "gitlab_vars" {
-  config_path = "../../../gitlab/variables"
+dependency "get_infra_variables" {
+  config_path = "../../../gitlab/get_infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     "map_variables.runnerRegistrationToken" = "fake-token"
@@ -21,6 +21,6 @@ inputs = {
   helm_chart_name       = "gitlab-runner"
   helm_chart_version    = "0.47.1"
   helm_addition_setting = {
-    runnerRegistrationToken = dependency.gitlab_vars.outputs.map_variables.runnerRegistrationToken
+    runnerRegistrationToken = dependency.get_infra_variables.outputs.map_variables.runnerRegistrationToken
   }  
 }

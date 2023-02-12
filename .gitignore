@@ -4,3 +4,8 @@
 plan.out
 inventory
 .terragrunt-cache
+*generated*.tf
+.helmignore
+_modules
+.tmp
+terraform.tfstate

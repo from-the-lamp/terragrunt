@@ -1,26 +1,28 @@
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
+  region       = "eu-frankfurt-1"
+  s3_namespace = "frvqlxim3thv"
 }
 
 remote_state {
-  backend = "http"
-  config = {
-    address        = "https://gitlab.com/api/v4/projects/40541314/terraform/state/${local.env}-${basename(get_terragrunt_dir())}"
-    lock_address   = "https://gitlab.com/api/v4/projects/40541314/terraform/state/${local.env}-${basename(get_terragrunt_dir())}/lock"
-    unlock_address = "https://gitlab.com/api/v4/projects/40541314/terraform/state/${local.env}-${basename(get_terragrunt_dir())}/lock"
-    username       = "gitlab-ci-token"
-    lock_method    = "POST"
-    unlock_method  = "DELETE"
+  backend = "s3"
+  generate = {
+    path      = "backend.generated.tf"
+    if_exists = "overwrite"
   }
-}
-
-generate "terraform" {
-  path      = "terraform_http_backend.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-    terraform {
-      backend "http" {}
-    }
-  EOF
+  config = {
+    bucket   = "${local.env}-terrafrom-state"
+    key      = "${path_relative_to_include()}/terraform.tfstate"
+    region   = "${local.region}"
+    endpoint = "https://${local.s3_namespace}.compat.objectstorage.${local.region}.oraclecloud.com"
+    skip_region_validation      = true
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_bucket_root_access     = true
+    skip_bucket_enforced_tls    = true
+    skip_bucket_versioning      = true
+    force_path_style      = true
+    disable_bucket_update = true
+  }
 }

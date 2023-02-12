@@ -6,6 +6,14 @@ include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
 }
 
+dependency "get_infra_variables" {
+  config_path = "../../../gitlab/get_infra_variables"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "map_variables.runnerRegistrationToken" = "fake-token"
+  }
+}
+
 inputs = {
   helm_external_repo    = true
   helm_values_file      = "values.yml"
@@ -13,6 +21,6 @@ inputs = {
   helm_chart_name       = "gitlab-runner"
   helm_chart_version    = "0.47.1"
   helm_addition_setting = {
-    runnerRegistrationToken = "${get_env("TF_VAR_runnerRegistrationToken")}"
+    runnerRegistrationToken = dependency.get_infra_variables.outputs.map_variables.runnerRegistrationToken
   }
 }

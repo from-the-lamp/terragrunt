@@ -15,7 +15,16 @@ dependency "k3s" {
   }
 }
 
+dependency "get_infra_variables" {
+  config_path = "../gitlab/get_infra_variables"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "map_variables.cloudflare_api_token" = "fake-token"
+  }
+}
+
 inputs = {
+    cloudflare_api_token = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
     cloudflare_zone_name = "from-the-lamp.com"
     cloudflare_record = {
         "." = {

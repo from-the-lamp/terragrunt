@@ -2,7 +2,6 @@ version: "3"
 
 dotenv: [".env"]
 env:
-  OCI_REGION: eu-frankfurt-1
   TERRAGRUNT_AUTO_INIT: true
 
 silent: true
@@ -15,6 +14,7 @@ tasks:
       - find . -iname "*generated*" -delete;
       - find . -iname ".terraform.lock.hcl" -delete;
       - find . -iname ".helmignore" -delete;
+      - find . -iname "terraform.tfstate" -delete;
 
   rm:all:
     cmds:
@@ -22,12 +22,17 @@ tasks:
       - find . -type d -name ".terraform" -prune -exec rm -rf {} \;
       - find . -iname "*generated*" -delete;
       - find . -iname ".terraform.lock.hcl" -delete;
-      - find . -iname ".helmignore" -delete;
+      - find . -iname "terraform.tfstate" -delete;
 
   init:all:
     dir: $DIR
     cmds:
       - terragrunt run-all init
+
+  init:
+    dir: $DIR
+    cmds:
+      - terragrunt init
 
   plan:all:
     dir: $DIR
@@ -75,7 +80,7 @@ tasks:
     dir: $DIR
     cmds:
       - task: rm
-      - terragrunt apply  -auto-approve --terragrunt-non-interactive
+      - terragrunt apply -auto-approve --terragrunt-non-interactive
 
   destroy:
     dir: $DIR
