@@ -6,7 +6,6 @@ silent: true
 tasks:
   rm:all:
     cmds:
-      - echo $OCI_CONFIG_PATH
       - find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \;
       - find . -type d -name ".terraform" -prune -exec rm -rf {} \;
       - find . -iname "*generated*" -delete;

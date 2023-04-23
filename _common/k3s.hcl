@@ -1,8 +1,12 @@
 terraform {
-  source = "git@gitlab.com:infra154/terraform/modules/k3s-oci-cluster.git//.?ref=main"
+  source = "${local.private_modules_base_url}/${local.module_name}//?ref=${local.module_version}"
 }
 
 locals {
+  module_name = "k3s-oci-cluster"
+  module_version = "main"
+  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/common_settings.hcl")
+  private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
 }
