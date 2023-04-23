@@ -2,6 +2,9 @@ version: "3"
 
 dotenv: [".env"]
 
+env:
+  OCI_CONFIG_PATH: "$(echo $HOME)/.oci/config"
+
 silent: true
 tasks:
   rm:all:
@@ -16,7 +19,7 @@ tasks:
     cmds:
       - task: rm:all
       -
-        terragrunt {{ .ACTION }}
+        export OCI_CONFIG_PATH={{.OCI_CONFIG_PATH}} && terragrunt {{ .ACTION }}
         $(if [ "{{.AUTO_APPROVE}}" == "true" ]; then echo "-auto-approve"; fi)
         $(if [ "{{.NON_INTERACTIVE}}" == "true" ]; then echo "--terragrunt-non-interactive"; fi)
 
