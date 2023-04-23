@@ -46,9 +46,7 @@ generate "oci_provider_cfg" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
     provider "oci" {
-      tenancy_ocid = "${dependency.get_infra_variables.outputs.map_variables.tenancy_ocid}"
-      user_ocid    = "${dependency.get_infra_variables.outputs.map_variables.user_ocid}"
-      fingerprint  = "${dependency.get_infra_variables.outputs.map_variables.fingerprint}"
+      config_file_profile = "${get_env("AWS_PROFILE")}"
     }
   EOF
 }
