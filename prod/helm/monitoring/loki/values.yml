@@ -1,0 +1,47 @@
+grafana:
+  enabled: false
+prometheus:
+  enabled: false
+loki:
+  enabled: true
+  isDefault: false
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3100"
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 10m
+      memory: 20Mi
+  persistence:
+    enabled: true
+    size: 1Gi
+  config:
+    compactor:
+      retention_enabled: true
+    limits_config:
+      retention_period: 168h
+
+monitoring:
+  lokiCanary:
+    enabled: true
+
+write:
+  replicas: 1
+
+tableManager:
+  replicas: 1
+
+read:
+  replicas: 1
+
+backend:
+  replicas: 1
+
+singleBinary:
+  replicas: 1
+
+gateway:
+  replicas: 1
