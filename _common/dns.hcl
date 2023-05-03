@@ -3,7 +3,7 @@ terraform {
 }
 
 locals {
-  module_name = "cloudflare-dns-record"
+  module_name = "cloudflare/dns-record"
   module_version = "main"
   common_settings = read_terragrunt_config("${get_repo_root()}/_common/common_settings.hcl")
   private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"

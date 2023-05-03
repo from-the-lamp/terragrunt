@@ -3,7 +3,7 @@ terraform {
 }
 
 locals {
-  module_name              = "k8s-namespaces"
+  module_name              = "k8s/namespaces"
   module_version           = "main"
   environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                      = "${local.environment_vars.locals.environment}"

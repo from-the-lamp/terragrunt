@@ -16,9 +16,9 @@ dependency "get_infra_variables" {
 
 inputs = {
   helm_internal_repo    = true
-  helm_chart_name       = "image-pull-secrets"
+  helm_chart_name       = "image-pull-secret"
   helm_chart_version    = "0.0.1"
   helm_addition_setting = {
-    "base64DockerConfigs.gitlab-docker-registry" = dependency.get_infra_variables.outputs.map_variables.gitlab_docker_registry_secret
+    "token" = dependency.get_infra_variables.outputs.map_variables.gitlab_docker_registry_token
   }
 }

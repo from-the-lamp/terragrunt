@@ -3,7 +3,7 @@ terraform {
 }
 
 locals {
-  module_name              = "gitlab-variables"
+  module_name              = "gitlab/variables"
   module_version           = "main"
   environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                      = "${local.environment_vars.locals.environment}"
