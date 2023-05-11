@@ -1,10 +1,14 @@
 include "root" {
   path = find_in_parent_folders()
-  expose = true
 }
 
 include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
+}
+
+locals {
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  dns_zone_name = local.environment_vars.locals.dns_zone_name
 }
 
 dependency "kube-prometheus-stack" {
@@ -23,6 +27,11 @@ inputs = {
   helm_chart_name       = "kiali-cr"
   helm_chart_version    = "0.0.3"
   helm_addition_setting = {
-    "gateway.port" = "20001"
+    "destination.name" = "kiali"
+    "destination.port" = "20001"
+    "gateway.enabled"  = true
+    "gateway.external" = true
+    "gateway.hosts[0]" = "${basename(get_terragrunt_dir())}.${local.dns_zone_name}"
+    "grafana.url"      = "https://grafana.${local.dns_zone_name}"
   }
 }

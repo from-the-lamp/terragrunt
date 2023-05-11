@@ -8,7 +8,6 @@ include "common" {
 
 inputs = {
   helm_external_repo    = true
-  helm_values_file      = "values.yml"
   helm_chart_name       = "longhorn"
   helm_repo_url         = "https://charts.longhorn.io"
   helm_chart_version    = "1.4.0"

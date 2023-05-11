@@ -38,15 +38,6 @@ grafana:
     finalizers:
     - kubernetes.io/pvc-protection
 
-gateway:
-  enabled: true
-  external: true
-  hosts:
-  - grafana.from-the-lamp.com
-destination:
-  name: kube-prometheus-stack-grafana
-  port: 80
-
 defaultRules:
   create: true
   rules:

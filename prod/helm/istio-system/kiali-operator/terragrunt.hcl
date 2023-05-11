@@ -1,6 +1,5 @@
 include "root" {
   path = find_in_parent_folders()
-  expose = true
 }
 
 include "common" {
@@ -9,7 +8,6 @@ include "common" {
 
 inputs = {
   helm_external_repo    = true
-  helm_values_file      = "values.yml"
   helm_repo_url         = "https://kiali.org/helm-charts"
   helm_chart_name       = "kiali-operator"
   helm_chart_version    = "1.61.0"

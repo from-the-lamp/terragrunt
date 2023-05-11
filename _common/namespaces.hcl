@@ -23,6 +23,14 @@ dependency "k3s" {
   }
 }
 
+dependency "get_infra_variables" {
+  config_path =  "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "map_variables.gitlab_docker_registry_token" = "fake-secret"
+  }
+}
+
 generate "provider_kubernetes" {
   path      = "kubernetes.generated.tf"
   if_exists = "overwrite"
@@ -43,6 +51,7 @@ EOF1
 }
 
 inputs = {
+    helm_module_source = "${local.private_modules_base_url}/k8s/helm//?ref=main"
     namespaces = {
         "projects" = {
           labels = [
@@ -50,4 +59,19 @@ inputs = {
           ] 
         }
     }
+    charts = [
+      {
+        helm_internal_repo      = true
+        helm_chart_name         = "image-pull-secrets"
+        helm_chart_version      = "0.0.1"
+        force_update            = true
+        helm_release_name       = "image-pull-secrets"
+        helm_internal_repo_url  = "https://gitlab.com/api/v4/projects/40582099/packages/helm/stable"
+        helm_internal_repo_user = "gitlab-ci-token"
+        helm_internal_repo_pass = get_env("TF_HTTP_PASSWORD")
+        helm_addition_setting   = {
+          "base64DockerConfigs.gitlab-docker-registry" = dependency.get_infra_variables.outputs.map_variables.gitlab_docker_registry_token
+        }
+      }
+    ]
 }

@@ -3,12 +3,13 @@ terraform {
 }
 
 locals {
-  module_name = "cloudflare/dns-record"
-  module_version = "main"
-  common_settings = read_terragrunt_config("${get_repo_root()}/_common/common_settings.hcl")
+  module_name              = "cloudflare/dns-record"
+  module_version           = "main"
+  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/common_settings.hcl")
   private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env = local.environment_vars.locals.environment
+  environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env                      = local.environment_vars.locals.environment
+  dns_zone_name            = local.environment_vars.locals.dns_zone_name
 }
 
 dependency "k3s" {
@@ -29,7 +30,7 @@ dependency "get_infra_variables" {
 
 inputs = {
     cloudflare_api_token = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
-    cloudflare_zone_name = "from-the-lamp.com"
+    cloudflare_zone_name = local.dns_zone_name
     cloudflare_record = {
         "." = {
             address = "${dependency.k3s.outputs.public_lb_ip}"

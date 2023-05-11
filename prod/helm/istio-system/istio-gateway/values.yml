@@ -1,6 +1,3 @@
 name: https
-hosts:
-- "from-the-lamp.com"
-- "*.from-the-lamp.com"
 istioSelector: ingressgateway
 tls: true

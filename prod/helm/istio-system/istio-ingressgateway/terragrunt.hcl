@@ -18,7 +18,6 @@ dependency "istiod" {
 
 inputs = {
   helm_external_repo    = true
-  helm_values_file      = "values.yml"
   helm_chart_name       = "gateway"
   helm_repo_url         = "https://istio-release.storage.googleapis.com/charts"
   helm_chart_version    = "1.16.1"

@@ -13,7 +13,6 @@ dependency "origin-ca-issuer-crd" {
 
 inputs = {
   helm_external_repo    = true
-  helm_values_file      = "values.yml"
   helm_chart_name       = "origin-ca-issuer"
   helm_repo_url         = "https://cloudflare.github.io/origin-ca-issuer/charts"
   helm_chart_version    = "0.5.0"

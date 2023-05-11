@@ -6,6 +6,11 @@ include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
 }
 
+locals {
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  dns_zone_name = local.environment_vars.locals.dns_zone_name
+}
+
 dependency "get_infra_variables" {
   config_path = "../../../gitlab/get_infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
@@ -19,7 +24,6 @@ inputs = {
   helm_virtual_service  = true
   force_update          = false
   recreate_pods         = false
-  helm_values_file      = "values.yml"
   helm_chart_name       = "kube-prometheus-stack"
   helm_repo_url         = "https://prometheus-community.github.io/helm-charts"
   helm_chart_version    = "43.2.1"
@@ -28,5 +32,10 @@ inputs = {
     "destination.name"      = "kube-prometheus-stack-grafana"
     "destination.port"      = "80"
     "grafana.adminPassword" = dependency.get_infra_variables.outputs.map_variables.grafana_admin_pass
+    "gateway.enabled"       = true
+    "gateway.external"      = true
+    "destination.name"      = "kube-prometheus-stack-grafana"
+    "destination.port"      = "80"
+    "gateway.hosts[0]"      = "grafana.${local.dns_zone_name}"
   }
 }
