@@ -1,0 +1,15 @@
+gitlabUrl: https://gitlab.com
+concurrent: 20
+replicas: 1
+rbac:
+  create: true
+runners:
+  tags: "k8s-default"
+  helpers:
+    cpuLimit: 200m
+    memoryLimit: 256Mi
+    cpuRequests: 100m
+    memoryRequests: 128Mi
+    
+# HELM_GITLAB_SECRET
+# runnerRegistrationToken: 123

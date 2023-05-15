@@ -3,13 +3,14 @@ extraArgs:
 config:
   configFile: |-
     provider="gitlab"
-    provider_display_name="istio"
+    provider_display_name="GitLab"
     redirect_url="https://oauth2.from-the-lamp.com/oauth2/callback"
     login_url="https://oauth2.from-the-lamp.com/oauth/authorize"
     redeem_url="https://oauth2.from-the-lamp.com/oauth/token"
     oidc_jwks_url="https://oauth2.from-the-lamp.com/oauth/discovery/keys"
     validate_url="https://oauth2.from-the-lamp.com/api/v4/user"
-    email_domains=[ "*" ]
+    email_domains=[ "artyom.zverev@proton.me" ]
+    whitelist_domains=["book.from-the-lamp.com"]
     cookie_refresh=0
     cookie_secure=true
     oidc_issuer_url="https://gitlab.com"
@@ -17,17 +18,20 @@ config:
     pass_host_header=true
     pass_user_headers=true
     request_logging=true
+    set_authorization_header=true
+    pass_authorization_header=true 
+    pass_access_token=true
 sessionStorage:
-  type: redis
+  type: cookie
 redis:
-  enabled: true
-  image:
-    repository: arm64v8/redis
-    tag: 6.0.19
-  replica:
-    replicaCount: 0
-image:
-  tag: v7.4.0-arm64
+  enabled: false
+#   image:
+#     repository: arm64v8/redis
+#     tag: 6.0.19
+#   replica:
+#     replicaCount: 0
+# image:
+#   tag: v7.4.0-arm64
 
 livenessProbe:
   enabled: false
