@@ -3,7 +3,7 @@ include "root" {
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
+  path = "${dirname(find_in_parent_folders())}/_common/k8s/helm.hcl"
 }
 
 dependency "origin-ca-issuer" {

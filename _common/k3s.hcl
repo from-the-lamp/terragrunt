@@ -5,7 +5,7 @@ terraform {
 locals {
   module_name = "k3s-oci-cluster"
   module_version = "main"
-  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/common_settings.hcl")
+  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
   private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment

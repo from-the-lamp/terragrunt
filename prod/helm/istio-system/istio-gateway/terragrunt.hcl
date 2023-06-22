@@ -3,12 +3,12 @@ include "root" {
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
+  path = "${dirname(find_in_parent_folders())}/_common/k8s/helm.hcl"
 }
 
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  dns_zone_name    = local.environment_vars.locals.dns_zone_name
+  infra_zone    = local.environment_vars.locals.infra_zone
 }
 
 dependency "ististio-ingressgateway" {
@@ -21,7 +21,7 @@ inputs = {
   helm_chart_name    = "istio-gateway"
   helm_chart_version = "0.0.2"
   helm_addition_setting = {
-    "hosts[0]" = "${local.dns_zone_name}"
-    "hosts[1]" = "*.${local.dns_zone_name}"
+    "hosts[0]" = "${local.infra_zone}"
+    "hosts[1]" = "*.${local.infra_zone}"
   }
 }

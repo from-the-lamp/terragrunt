@@ -5,7 +5,3 @@ include "root" {
 include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/gitlab/get_infra_variables.hcl"
 }
-
-inputs = {
-  gitlab_project_variable = "TF_VAR_FILE_PROD"
-}

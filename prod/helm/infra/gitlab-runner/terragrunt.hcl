@@ -3,7 +3,7 @@ include "root" {
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
+  path = "${dirname(find_in_parent_folders())}/_common/k8s/helm.hcl"
 }
 
 locals {
@@ -23,7 +23,7 @@ inputs = {
   helm_external_repo    = true
   helm_repo_url         = "https://charts.gitlab.io"
   helm_chart_name       = "gitlab-runner"
-  helm_chart_version    = "0.47.1"
+  helm_chart_version    = "0.53.0"
   helm_addition_setting = {
     runnerRegistrationToken = dependency.get_infra_variables.outputs.map_variables.runnerRegistrationToken
   }  

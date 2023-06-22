@@ -3,12 +3,12 @@ include "root" {
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/helm.hcl"
+  path = "${dirname(find_in_parent_folders())}/_common/k8s/helm.hcl"
 }
 
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  dns_zone_name = local.environment_vars.locals.dns_zone_name
+  infra_zone = local.environment_vars.locals.infra_zone
 }
 
 dependency "kube-prometheus-stack" {
@@ -31,7 +31,7 @@ inputs = {
     "destination.port" = "20001"
     "gateway.enabled"  = true
     "gateway.external" = true
-    "gateway.hosts[0]" = "${basename(get_terragrunt_dir())}.${local.dns_zone_name}"
-    "grafana.url"      = "https://grafana.${local.dns_zone_name}"
+    "gateway.hosts[0]" = "${basename(get_terragrunt_dir())}.${local.infra_zone}"
+    "grafana.url"      = "https://grafana.${local.infra_zone}"
   }
 }

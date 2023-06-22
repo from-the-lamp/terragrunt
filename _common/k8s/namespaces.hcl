@@ -1,15 +1,16 @@
 terraform {
-  source = "${local.private_modules_base_url}/${local.module_name}//?ref=${local.module_version}"
+  source = "${local.private_modules_base_url}/${local.module_name}//${local.module_subdir}?ref=${local.module_version}"
 }
 
 locals {
-  module_name              = "k8s/namespaces"
+  module_name              = "k8s"
+  module_subdir            = "namespaces"
   module_version           = "main"
+  private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
   environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                      = "${local.environment_vars.locals.environment}"
-  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/common_settings.hcl")
+  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
   gitlab_token             = "${local.common_settings.locals.gitlab_token}"
-  private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
 }
 
 dependency "k3s" {
