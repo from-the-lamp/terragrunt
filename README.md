@@ -23,14 +23,17 @@ Get **S3** keys:
 
 Exapmle **~/.oci/config**:
 ```
-[prod]
+[lamp-prod]
 aws_access_key_id=
 aws_secret_access_key=
 user=
+compartment_ocid=
 fingerprint=
 tenancy=
-region=eu-frankfurt-1
-key_file=~/.oci/prod.pem
+region=
+availability_domain=
+key_file=
+s3_namespace=
 ```
 
 Create **.env** file for local usage:

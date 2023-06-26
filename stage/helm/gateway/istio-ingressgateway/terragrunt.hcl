@@ -7,12 +7,12 @@ include "common" {
 }
 
 dependency "istio" {
-  config_path  = "../istio"
+  config_path  = "../../istio-system/istio"
   skip_outputs = true
 }
 
 dependency "istiod" {
-  config_path  = "../istiod"
+  config_path  = "../../istio-system/istiod"
   skip_outputs = true
 }
 

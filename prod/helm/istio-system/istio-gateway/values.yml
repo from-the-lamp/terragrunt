@@ -1,3 +1,0 @@
-name: https
-istioSelector: ingressgateway
-tls: true

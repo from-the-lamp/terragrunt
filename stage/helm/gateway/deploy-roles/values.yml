@@ -1,0 +1,13 @@
+roles:
+  - name: deploy-certificates
+    namespace: gateway
+    rules:
+    - apiGroups: ["cert-manager.io"]
+      resources: ["certificates"]
+      verbs: ["get", "watch", "list", "patch", "create", "delete"]
+  - name: deploy-gateways
+    namespace: gateway
+    rules:
+    - apiGroups: ["networking.istio.io"]
+      resources: ["gateways"]
+      verbs: ["get", "watch", "list", "patch", "create", "delete"]

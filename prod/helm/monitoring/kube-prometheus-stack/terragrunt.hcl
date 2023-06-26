@@ -32,10 +32,12 @@ inputs = {
     "destination.name"      = "kube-prometheus-stack-grafana"
     "destination.port"      = "80"
     "grafana.adminPassword" = dependency.get_infra_variables.outputs.map_variables.grafana_admin_pass
-    "gateway.enabled"       = true
-    "gateway.external"      = true
-    "destination.name"      = "kube-prometheus-stack-grafana"
-    "destination.port"      = "80"
-    "gateway.hosts[0]"      = "grafana.${local.infra_zone}"
   }
+  helm_virtual_service          = true
+  helm_virtual_service_host     = "grafana.${local.infra_zone}"
+  helm_virtual_service_svc_host = "kube-prometheus-stack-grafana"
+  helm_virtual_service_svc_port = 80
+  helm_virtual_service_setting  = {
+    external = true
+  } 
 }
