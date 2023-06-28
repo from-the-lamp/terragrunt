@@ -96,6 +96,22 @@ tasks:
           AUTO_APPROVE: "true"
         }
 
+  graph:
+    cmds:
+      - task: terragrunt
+        vars: {
+          ACTION: "graph-dependencies",
+          NON_INTERACTIVE: "true",
+        }
+
+  graph:all:
+    cmds:
+      - task: terragrunt
+        vars: {
+          ACTION: "run-all graph-dependencies",
+          NON_INTERACTIVE: "true",
+        }
+
   unlock:
     dir: $DIR
     cmds:

@@ -27,11 +27,13 @@ inputs = {
   helm_chart_name       = "kiali-cr"
   helm_chart_version    = "0.0.3"
   helm_addition_setting = {
-    "destination.name" = "kiali"
-    "destination.port" = "20001"
-    "gateway.enabled"  = true
-    "gateway.external" = true
-    "gateway.hosts[0]" = "${basename(get_terragrunt_dir())}.${local.infra_zone}"
     "grafana.url"      = "https://grafana.${local.infra_zone}"
   }
+  helm_virtual_service          = true
+  helm_virtual_service_host     = "kiali.${local.infra_zone}"
+  helm_virtual_service_svc_host = "kiali"
+  helm_virtual_service_svc_port = 20001
+  helm_virtual_service_setting  = {
+    external = true
+  } 
 }

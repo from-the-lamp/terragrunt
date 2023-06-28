@@ -11,6 +11,12 @@ locals {
   env              = local.environment_vars.locals.environment
 }
 
+dependency "namespace" {
+  config_path = "../namespace"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
+  skip_outputs = true
+}
+
 dependency "gitlab_vars" {
   config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]

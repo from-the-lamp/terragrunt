@@ -13,37 +13,24 @@ locals {
   infra_zone               = local.environment_vars.locals.infra_zone
 }
 
-dependency "k3s" {
-  config_path = "../k3s"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
-  mock_outputs = {
-    public_lb_ip = "1.2.3.4"
-  }
-}
-
 dependency "get_infra_variables" {
-  config_path = "../gitlab/get_infra_variables"
+  config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     "map_variables.cloudflare_api_token" = "fake-token"
   }
 }
 
+dependency "k3s" {
+  config_path = "${get_repo_root()}/${local.env}/k3s"
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
+  mock_outputs = {
+    public_lb_ip = "1.2.3.4"
+  }
+}
+
 inputs = {
-    cloudflare_api_token = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
-    cloudflare_zone_name = local.infra_zone
-    cloudflare_record = {
-        "." = {
-            address = "${dependency.k3s.outputs.public_lb_ip}"
-            type    = "A"
-            proxied = true
-            ttl     = "1"
-        }
-        "*" = {
-            address = "${dependency.k3s.outputs.public_lb_ip}"
-            type    = "A"
-            proxied = true
-            ttl     = "1"
-        }
-    }
+  cloudflare_api_token = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
+  cloudflare_zone_name = local.infra_zone
+  global_address       = dependency.k3s.outputs.public_lb_ip
 }

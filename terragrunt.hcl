@@ -2,7 +2,7 @@ locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env              = local.environment_vars.locals.environment
   region           = get_env("DEFAULT_REGION")
-  s3_namespace     = run_cmd("--terragrunt-quiet", "${get_repo_root()}/.get_s3_namespace.sh", "${get_env("OCI_CONFIG_PATH")}", "${get_env("AWS_PROFILE")}")
+  s3_namespace     = run_cmd("--terragrunt-quiet", "${get_repo_root()}/.kek.sh", "s3_namespace", "${get_env("OCI_CONFIG_PATH")}", "${get_env("AWS_PROFILE")}")
 }
 
 remote_state {
