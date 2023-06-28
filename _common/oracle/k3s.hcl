@@ -13,6 +13,7 @@ locals {
   config_file_profile      = local.common_settings.locals.config_file_profile
   compartment_ocid         = local.common_settings.locals.compartment_ocid
   availability_domain      = local.common_settings.locals.availability_domain
+  k3s_os_image_id          = local.common_settings.locals.k3s_os_image_id
 }
 
 generate "oci_provider_cfg" {
@@ -38,4 +39,5 @@ inputs = {
   compartment_ocid    = local.compartment_ocid
   availability_domain = local.availability_domain
   primary_subnet_id   = dependency.vcn.outputs.vcn_id
+  k3s_os_image_id     = local.common_settings.locals.k3s_os_image_id
 }
