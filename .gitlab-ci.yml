@@ -36,6 +36,17 @@ include:
     DIR: stage/gitlab/groups/from-the-lamp/dns
     AWS_PROFILE: lamp-prod
 
+1:stage/gitlab/groups/from-the-lamp/dns/.terragrunt-cache/9stma6rXnQdwZ3U5IyS7kt_idFU/0g6uPzIsUnXfAX9si6Sy2vHrP8A/dns_record:
+  extends: .plan
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/dns/.terragrunt-cache/9stma6rXnQdwZ3U5IyS7kt_idFU/0g6uPzIsUnXfAX9si6Sy2vHrP8A/dns_record
+    AWS_PROFILE: fixme
+2:stage/gitlab/groups/from-the-lamp/dns/.terragrunt-cache/9stma6rXnQdwZ3U5IyS7kt_idFU/0g6uPzIsUnXfAX9si6Sy2vHrP8A/dns_record:
+  extends: .apply
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/dns/.terragrunt-cache/9stma6rXnQdwZ3U5IyS7kt_idFU/0g6uPzIsUnXfAX9si6Sy2vHrP8A/dns_record
+    AWS_PROFILE: lamp-prod
+
 1:stage/gitlab/groups/from-the-lamp/image-pull-secrets:
   extends: .plan
   variables:
@@ -45,6 +56,17 @@ include:
   extends: .apply
   variables:
     DIR: stage/gitlab/groups/from-the-lamp/image-pull-secrets
+    AWS_PROFILE: lamp-prod
+
+1:stage/gitlab/groups/from-the-lamp/image-pull-secrets/.terragrunt-cache/56FVENCWClZSt4rvdWvESxJNlK4/YZFYjuONKCXjst47FqEVR-XsMpc/helm:
+  extends: .plan
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/image-pull-secrets/.terragrunt-cache/56FVENCWClZSt4rvdWvESxJNlK4/YZFYjuONKCXjst47FqEVR-XsMpc/helm
+    AWS_PROFILE: fixme
+2:stage/gitlab/groups/from-the-lamp/image-pull-secrets/.terragrunt-cache/56FVENCWClZSt4rvdWvESxJNlK4/YZFYjuONKCXjst47FqEVR-XsMpc/helm:
+  extends: .apply
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/image-pull-secrets/.terragrunt-cache/56FVENCWClZSt4rvdWvESxJNlK4/YZFYjuONKCXjst47FqEVR-XsMpc/helm
     AWS_PROFILE: lamp-prod
 
 1:stage/gitlab/groups/from-the-lamp/namespace:
@@ -58,6 +80,17 @@ include:
     DIR: stage/gitlab/groups/from-the-lamp/namespace
     AWS_PROFILE: lamp-prod
 
+1:stage/gitlab/groups/from-the-lamp/namespace/.terragrunt-cache/2I6kVMgCoozThgFbqzuavTJ2Jt0/YZFYjuONKCXjst47FqEVR-XsMpc/namespaces:
+  extends: .plan
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/namespace/.terragrunt-cache/2I6kVMgCoozThgFbqzuavTJ2Jt0/YZFYjuONKCXjst47FqEVR-XsMpc/namespaces
+    AWS_PROFILE: fixme
+2:stage/gitlab/groups/from-the-lamp/namespace/.terragrunt-cache/2I6kVMgCoozThgFbqzuavTJ2Jt0/YZFYjuONKCXjst47FqEVR-XsMpc/namespaces:
+  extends: .apply
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/namespace/.terragrunt-cache/2I6kVMgCoozThgFbqzuavTJ2Jt0/YZFYjuONKCXjst47FqEVR-XsMpc/namespaces
+    AWS_PROFILE: lamp-prod
+
 1:stage/gitlab/groups/from-the-lamp/vars:
   extends: .plan
   variables:
@@ -67,6 +100,39 @@ include:
   extends: .apply
   variables:
     DIR: stage/gitlab/groups/from-the-lamp/vars
+    AWS_PROFILE: lamp-prod
+
+1:stage/gitlab/groups/from-the-lamp/vars/.terragrunt-cache/8whD6KxHlOjBtAo1MJJ1eWv0Mxo/DiHTX2ek3xRsMne_-YeIB8QmmtU/add_variables:
+  extends: .plan
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/vars/.terragrunt-cache/8whD6KxHlOjBtAo1MJJ1eWv0Mxo/DiHTX2ek3xRsMne_-YeIB8QmmtU/add_variables
+    AWS_PROFILE: fixme
+2:stage/gitlab/groups/from-the-lamp/vars/.terragrunt-cache/8whD6KxHlOjBtAo1MJJ1eWv0Mxo/DiHTX2ek3xRsMne_-YeIB8QmmtU/add_variables:
+  extends: .apply
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/vars/.terragrunt-cache/8whD6KxHlOjBtAo1MJJ1eWv0Mxo/DiHTX2ek3xRsMne_-YeIB8QmmtU/add_variables
+    AWS_PROFILE: lamp-prod
+
+1:stage/gitlab/groups/from-the-lamp/cloudflare_api_token:
+  extends: .plan
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/cloudflare_api_token
+    AWS_PROFILE: fixme
+2:stage/gitlab/groups/from-the-lamp/cloudflare_api_token:
+  extends: .apply
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/cloudflare_api_token
+    AWS_PROFILE: lamp-prod
+
+1:stage/gitlab/groups/from-the-lamp/cloudflare_api_token/.terragrunt-cache/hb6aI4NgRzQR_lXs_SvCC5te9M0/0g6uPzIsUnXfAX9si6Sy2vHrP8A/api_token:
+  extends: .plan
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/cloudflare_api_token/.terragrunt-cache/hb6aI4NgRzQR_lXs_SvCC5te9M0/0g6uPzIsUnXfAX9si6Sy2vHrP8A/api_token
+    AWS_PROFILE: fixme
+2:stage/gitlab/groups/from-the-lamp/cloudflare_api_token/.terragrunt-cache/hb6aI4NgRzQR_lXs_SvCC5te9M0/0g6uPzIsUnXfAX9si6Sy2vHrP8A/api_token:
+  extends: .apply
+  variables:
+    DIR: stage/gitlab/groups/from-the-lamp/cloudflare_api_token/.terragrunt-cache/hb6aI4NgRzQR_lXs_SvCC5te9M0/0g6uPzIsUnXfAX9si6Sy2vHrP8A/api_token
     AWS_PROFILE: lamp-prod
 
 1:stage/helm/istio-system/istio:
@@ -377,6 +443,17 @@ include:
     DIR: prod/gitlab/groups/from-the-lamp/vars
     AWS_PROFILE: lamp-prod
 
+1:prod/gitlab/groups/from-the-lamp/cloudflare_api_token:
+  extends: .plan
+  variables:
+    DIR: prod/gitlab/groups/from-the-lamp/cloudflare_api_token
+    AWS_PROFILE: lamp-prod
+2:prod/gitlab/groups/from-the-lamp/cloudflare_api_token:
+  extends: .apply
+  variables:
+    DIR: prod/gitlab/groups/from-the-lamp/cloudflare_api_token
+    AWS_PROFILE: lamp-prod
+
 1:prod/helm/gateway/cert-manager:
   extends: .plan
   variables:
@@ -562,17 +639,6 @@ include:
   extends: .apply
   variables:
     DIR: prod/oracle/k3s/workers/instance_pool
-    AWS_PROFILE: lamp-prod
-
-1:prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/B9-wKY3LZEEwbI-Il0kTTagUh3w/instance_pool:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/B9-wKY3LZEEwbI-Il0kTTagUh3w/instance_pool
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/B9-wKY3LZEEwbI-Il0kTTagUh3w/instance_pool:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/B9-wKY3LZEEwbI-Il0kTTagUh3w/instance_pool
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/k3s/workers/nlb_backend_https:

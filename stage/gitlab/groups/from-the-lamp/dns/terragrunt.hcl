@@ -3,7 +3,7 @@ include "root" {
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/dns.hcl"
+  path = "${dirname(find_in_parent_folders())}/_common/cloudflare/record.hcl"
 }
 
 locals {

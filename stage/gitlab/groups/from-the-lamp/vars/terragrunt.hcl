@@ -19,17 +19,43 @@ dependency "ssh_read_file_content" {
   }
 }
 
+dependency "cloudflare_api_token" {
+  config_path = "../cloudflare_api_token"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "cloudflare_api_token" = "fake-token"
+  }
+}
+
+dependency "dns" {
+  config_path = "../dns"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "cloudflare_zone_id" = "fake-id"
+  }
+}
+
 inputs = {
   vars = {
-    "K8S_NAMESPACE" = {
-      value     = "${basename(dirname(get_terragrunt_dir()))}"
-      protected = false
-      masked    = false
-    },
     "${local.env}_KUBECONFIG_BASE64" = {
       value     = "${base64encode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/k3s.yaml"))}"
       protected = false
       masked    = true
+    },
+    "${local.env}_CLOUDFLARE_ZONE_ID" = {
+      value     = "${dependency.dns.outputs.cloudflare_zone_id}"
+      protected = false
+      masked    = false
+    },
+    "${local.env}_CLOUDFLARE_API_TOKEN" = {
+      value     = "${dependency.cloudflare_api_token.outputs.cloudflare_api_token}"
+      protected = false
+      masked    = true
+    },
+    "K8S_NAMESPACE" = {
+      value     = "${basename(dirname(get_terragrunt_dir()))}"
+      protected = false
+      masked    = false
     },
   }
 }
