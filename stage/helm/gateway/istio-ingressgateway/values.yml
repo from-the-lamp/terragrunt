@@ -6,6 +6,6 @@ affinity:
       nodeSelectorTerms:
         - matchExpressions:
             - key: node-role.kubernetes.io/master
-              operator: In
+              operator: NotIn
               values:
                 - "true"

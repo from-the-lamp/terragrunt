@@ -1,7 +1,0 @@
-
-service:
-  type: None
-
-global:
-  proxy:
-    autoInject: disabled

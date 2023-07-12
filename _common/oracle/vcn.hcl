@@ -31,4 +31,11 @@ inputs = {
   vcn_internet_gateway_enabled = true
   vcn_internet_gateway_name    = "default"
   oci_core_vcn_cidr            = "10.0.0.0/16"
+  vcn_subnets = {
+        k3s = {
+            cidr_block      = "10.0.1.0/24"
+            display_name    = "k3s"
+            dns_label       = "k3s"
+        }
+    }
 }

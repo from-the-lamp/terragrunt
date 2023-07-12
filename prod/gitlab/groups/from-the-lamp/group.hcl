@@ -3,13 +3,16 @@ locals {
     gitlab_group_name = "from-the-lamp"
     cloudflare_record = {
         "." = {
-
             type    = "A",
             proxied = true,
             ttl     = "1"
         },
-        "*" = {
-            address = "${dependency.k3s.outputs.public_lb_ip}",
+        "book" = {
+            type    = "A",
+            proxied = true,
+            ttl     = "1"
+        },
+        "grafana" = {
             type    = "A",
             proxied = true,
             ttl     = "1"

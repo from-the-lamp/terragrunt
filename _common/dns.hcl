@@ -6,7 +6,7 @@ locals {
   module_name              = "cloudflare"
   module_subdir            = "dns_record"
   module_version           = "main"
-  private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
+  private_modules_base_url = local.common_settings.locals.private_modules_base_url
   common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
   environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                      = local.environment_vars.locals.environment
@@ -21,16 +21,16 @@ dependency "get_infra_variables" {
   }
 }
 
-dependency "k3s" {
-  config_path = "${get_repo_root()}/${local.env}/k3s"
+dependency "nlb" {
+  config_path = "${get_repo_root()}/${local.env}/oracle/nlb"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
   mock_outputs = {
-    public_lb_ip = "1.2.3.4"
+    ip = "1.2.3.4"
   }
 }
 
 inputs = {
   cloudflare_api_token = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
   cloudflare_zone_name = local.infra_zone
-  global_address       = dependency.k3s.outputs.public_lb_ip
+  global_address       = dependency.nlb.outputs.ip
 }

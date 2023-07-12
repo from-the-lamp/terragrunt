@@ -6,7 +6,7 @@ locals {
   module_name              = "gitlab"
   module_subdir            = "add_variables"
   module_version           = "main"
-  private_modules_base_url = "${local.common_settings.locals.private_modules_base_url}"
+  private_modules_base_url = local.common_settings.locals.private_modules_base_url
   environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                      = local.environment_vars.locals.environment
   common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")

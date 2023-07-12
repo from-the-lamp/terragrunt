@@ -117,3 +117,15 @@ tasks:
     cmds:
       - task: rm
       - terragrunt force-unlock $ID
+
+  get:
+    cmds:
+      - |
+        if [ -f "{{ .OCI_CONFIG_PATH }}" ]; then
+          awk -F= -v section="[{{ .AWS_PROFILE }}]" -v key="{{ .VAR }}" '
+            $1 == section { in_section = 1; next }
+            $1 == "[" section "]" { in_section = 0 }
+            in_section && $1 == key { print $2; exit }' "{{ .OCI_CONFIG_PATH }}"
+        else
+          echo "File {{ .OCI_CONFIG_PATH }} does not exist."
+        fi
