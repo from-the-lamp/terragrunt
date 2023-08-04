@@ -39,4 +39,3 @@ s3_namespace=
 Create **.env** file for local usage:
 
 - Just look at **.env.example**
-  

@@ -6,14 +6,21 @@ include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/k8s/helm.hcl"
 }
 
-dependency "origin-ca-issuer-crd" {
-  config_path  = "../origin-ca-issuer-crd"
-  skip_outputs = true
+dependency "get_infra_variables" {
+  config_path = "../../../gitlab/get_infra_variables"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    map_variables = {
+      cloudflare_originCAissuerKey = "fake-key"
+    }
+  }
 }
 
 inputs = {
-  helm_external_repo    = true
+  helm_internal_repo    = true
   helm_chart_name       = "origin-ca-issuer"
-  helm_repo_url         = "https://cloudflare.github.io/origin-ca-issuer/charts"
-  helm_chart_version    = "0.5.0"
+  helm_chart_version    = "0.0.1"
+  helm_addition_setting = {
+    originCAissuerKey = dependency.get_infra_variables.outputs.map_variables.cloudflare_originCAissuerKey
+  }
 }

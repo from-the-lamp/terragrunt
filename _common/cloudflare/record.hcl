@@ -17,20 +17,57 @@ dependency "get_infra_variables" {
   config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    "map_variables.cloudflare_api_token" = "fake-token"
+    map_variables = {
+      cloudflare_api_token = "fake-token"
+    }
   }
 }
 
-dependency "nlb" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/nlb"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
+dependency "ssh_read_file_content" {
+  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    ip = "1.2.3.4"
+    file_contents = {
+      "/etc/rancher/k3s/server" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/certificate-authority-data" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/client-certificate-data" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/client-key-data" = "ZmFrZS1kYXRhCg==",
+    }
   }
+}
+
+dependency "lb" {
+  config_path = "${get_repo_root()}/${local.env}/helm/gateway/istio-ingressgateway"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    skip_outputs = true
+  }
+}
+
+generate "provider_kubernetes" {
+  path      = "kubernetes.generated.tf"
+  if_exists = "overwrite"
+  contents = <<EOF1
+provider "kubernetes" {
+    host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server")}:6443"
+    cluster_ca_certificate = <<-EOF2
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/certificate-authority-data"))}
+    EOF2
+    client_certificate = <<-EOF2
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
+    EOF2
+    client_key= <<-EOF2
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
+    EOF2
+}
+EOF1
 }
 
 inputs = {
-  cloudflare_api_token = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
-  cloudflare_zone_name = local.infra_zone
-  global_address       = dependency.nlb.outputs.ip
+  cloudflare_api_token      = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
+  cloudflare_zone_name      = local.infra_zone
+  external_load_balancer    = true
+  external_lb_svc_name      = "istio-ingressgateway"
+  external_lb_svc_namespace = "gateway"
+  internal_load_balancer    = false
 }

@@ -15,7 +15,7 @@ dependency "ssh_read_file_content" {
   config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
   mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    file_contents = {}
+    file_contents = {"/etc/rancher/k3s/k3s.yaml" = "fake-data"}
   }
 }
 

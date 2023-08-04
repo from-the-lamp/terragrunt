@@ -13,41 +13,17 @@ locals {
 
 dependency "vcn" {
   config_path = "${get_repo_root()}/${local.env}/oracle/vcn"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    subnets_ids = "fake-ids"
+    subnets_ids = {"k3s" = "fake-data"}
   }
 }
 
 dependency "cloudinit_config" {
   config_path = "../cloudinit_config"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    config = "fake-config"
-  }
-}
-
-dependency "allow_ssh_from_all" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/nsg/allow_ssh_from_all"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
-  mock_outputs = {
-    id = "fake-id"
-  }
-}
-
-dependency "allow_icmp_between_instances" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/nsg/allow_icmp_between_instances"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
-  mock_outputs = {
-    id = "fake-id"
-  }
-}
-
-dependency "allow_https_from_all" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/nsg/allow_https_from_all"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
-  mock_outputs = {
-    id = "fake-id"
+    config = {"rendered"="fake-data"}
   }
 }
 
@@ -56,7 +32,5 @@ inputs = {
   assign_public_ip = true
   subnet_id        = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
   user_data        = dependency.cloudinit_config.outputs.config.rendered
-  nsg_ids          = [dependency.allow_ssh_from_all.outputs.id,
-                      dependency.allow_icmp_between_instances.outputs.id,
-                      dependency.allow_https_from_all.outputs.id]
+  nsg_ids          = []
 }

@@ -1,0 +1,33 @@
+kind: DaemonSet
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/master
+              operator: NotIn
+              values:
+                - "true"
+
+service:
+  externalTrafficPolicy: Local
+  annotations:
+    oci.oraclecloud.com/load-balancer-type: "lb"
+    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: 10Mbps
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: 10Mbps
+    oci.oraclecloud.com/node-label-selector: node-role.kubernetes.io/master!=true
+    service.beta.kubernetes.io/oci-load-balancer-security-list-management-mode: "All"
+  ports:
+  - name: status-port
+    port: 15021
+    protocol: TCP
+    targetPort: 15021
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+
+labels:
+  app: istio-ingressgateway-internal
+  istio: internal

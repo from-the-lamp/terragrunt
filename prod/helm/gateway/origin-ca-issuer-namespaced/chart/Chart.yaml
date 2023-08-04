@@ -1,5 +1,0 @@
-apiVersion: v1
-name: origin-ca-issue-namespaced
-description: namespaced
-appVersion: 0.0.1
-version: 0.0.1

@@ -13,7 +13,7 @@ locals {
 
 dependency "vcn" {
   config_path = "${get_repo_root()}/${local.env}/oracle/vcn"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     vcn_id = "fake-id"
   }
@@ -28,7 +28,6 @@ inputs = {
         max = "443"
         min = "443"
       }
-    } 
+    }
   }
 }
-

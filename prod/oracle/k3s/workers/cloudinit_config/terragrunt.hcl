@@ -23,11 +23,11 @@ dependency "token" {
   }
 }
 
-dependency "get_infra_variables" {
-  config_path =  "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
-  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+dependency "ssh_read_file_content" {
+  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    "map_variables.k3s_master_host" = "fake-host"
+    file_contents = {"/etc/rancher/k3s/server" = "fake-data"}
   }
 }
 
@@ -37,7 +37,7 @@ inputs = {
     compartment_ocid    = local.compartment_ocid
     availability_domain = local.availability_domain
     k3s_version         = local.k3s_version
-    k3s_master_host     = dependency.get_infra_variables.outputs.map_variables.k3s_master_host
+    k3s_master_host     = lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server")
     k3s_token           = dependency.token.outputs.password
   }
 }

@@ -16,9 +16,5 @@ inputs = {
   vars    = {
     compartment_ocid    = local.compartment_ocid
     availability_domain = local.availability_domain
-    k3s_url             = "123"
-    k3s_token           = "1234"
-    k3s_version         = "latest"
-    is_k3s_master       = "true"
   }
 }

@@ -1,5 +1,0 @@
-apiVersion: v1
-name: origin-ca-issuer-crd
-description: Extra
-version: 0.0.1
-appVersion: 0.0.1

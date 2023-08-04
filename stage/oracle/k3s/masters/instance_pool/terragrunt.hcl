@@ -13,7 +13,7 @@ locals {
 
 dependency "instance_config" {
   config_path = "../instance_config"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     id = "fake-id"
   }
@@ -21,9 +21,9 @@ dependency "instance_config" {
 
 dependency "vcn" {
   config_path = "${get_repo_root()}/${local.env}/oracle/vcn"
-  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init"]
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    subnets_ids = "fake-ids"
+    subnets_ids = {"k3s" = "fake-data"}
   }
 }
 
