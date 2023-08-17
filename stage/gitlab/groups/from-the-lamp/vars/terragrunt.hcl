@@ -37,11 +37,6 @@ dependency "dns" {
 
 inputs = {
   vars = {
-    "${local.env}_KUBECONFIG_BASE64" = {
-      value     = "${base64encode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/k3s.yaml"))}"
-      protected = false
-      masked    = true
-    },
     "${local.env}_CLOUDFLARE_ZONE_ID" = {
       value     = "${dependency.dns.outputs.cloudflare_zone_id}"
       protected = false
@@ -51,11 +46,6 @@ inputs = {
       value     = "${dependency.cloudflare_api_token.outputs.cloudflare_api_token}"
       protected = false
       masked    = true
-    },
-    "K8S_NAMESPACE" = {
-      value     = "${basename(dirname(get_terragrunt_dir()))}"
-      protected = false
-      masked    = false
     },
   }
 }

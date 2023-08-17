@@ -27,7 +27,7 @@ dependency "ssh_read_file_content" {
   config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
   mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    file_contents = {"/etc/rancher/k3s/server" = "fake-data"}
+    file_contents = {"/etc/rancher/k3s/server-ip" = "fake-data"}
   }
 }
 
@@ -37,7 +37,7 @@ inputs = {
     compartment_ocid    = local.compartment_ocid
     availability_domain = local.availability_domain
     k3s_version         = local.k3s_version
-    k3s_master_host     = lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server")
+    k3s_master_host     = lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")
     k3s_token           = dependency.token.outputs.password
   }
 }

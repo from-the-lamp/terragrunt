@@ -1,0 +1,3 @@
+image:
+  name: ghcr.io/oracle/cloud-provider-oci
+  tag: v1.25.0

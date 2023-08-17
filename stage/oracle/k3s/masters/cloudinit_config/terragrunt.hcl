@@ -12,7 +12,8 @@ locals {
   common_settings     = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
   compartment_ocid    = local.common_settings.locals.compartment_ocid
   availability_domain = local.common_settings.locals.availability_domain
-  k3s_version         = local.common_settings.locals.k3s_version
+  versions            = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
+  k3s_cluster         = local.versions.locals.k3s_cluster
 }
 
 dependency "token" {
@@ -28,8 +29,9 @@ inputs = {
   vars    = {
     compartment_ocid    = local.compartment_ocid
     availability_domain = local.availability_domain
-    k3s_version         = local.k3s_version
+    k3s_version         = local.k3s_cluster
     k3s_master_host     = "localhost"
     k3s_token           = dependency.token.outputs.password
+    k3s_node_label      = "node-role=control-plane"
   }
 }

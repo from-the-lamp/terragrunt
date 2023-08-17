@@ -1,0 +1,92 @@
+projects:
+- namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  sourceRepos:
+  - '*'
+  destinations:
+  - name: "in-cluster"
+  - name: "in-cluster" 
+    namespace: gateway
+  clusterResourceWhitelist:
+    - group: ''
+      kind: 'Namespace'
+
+applications:
+- name: image-pull-secret
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  destination:
+    name: in-cluster 
+  source:
+    chart: image-pull-secret
+    helm:
+      releaseName: image-pull-secret
+      parameters:
+      - name: token
+  syncPolicy:
+    automated: 
+      prune: true 
+      selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        istio-injection: enabled
+    syncOptions:
+    - CreateNamespace=true
+- name: gitlab-runner
+  dependsOn:
+  - name: image-pull-secrets
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  destination:
+    name: in-cluster 
+  source:
+    repoURL: https://charts.gitlab.io
+    chart: gitlab-runner
+    helm:
+      releaseName: gitlab-runner
+      parameters:
+      - name: runnerRegistrationToken
+      values: |
+        gitlabUrl: https://gitlab.com
+        concurrent: 5
+        replicas: 1
+        rbac:
+          create: true
+          rules:
+          - apiGroups: [""]
+            resources: ["pods"]
+            verbs: ["list", "get", "watch", "create", "delete"]
+          - apiGroups: [""]
+            resources: ["pods/exec"]
+            verbs: ["create"]
+          - apiGroups: [""]
+            resources: ["pods/log"]
+            verbs: ["get"]
+          - apiGroups: [""]
+            resources: ["pods/attach"]
+            verbs: ["list", "get", "create", "delete", "update"]
+          - apiGroups: [""]
+            resources: ["secrets"]
+            verbs: ["list", "get", "create", "delete", "update"]      
+          - apiGroups: [""]
+            resources: ["configmaps"]
+            verbs: ["list", "get", "create", "delete", "update"]  
+        runners:
+          config: |
+            [[runners]]
+              name = "Kubernetes Gitlab Runner"
+              executor = "kubernetes"
+              [runners.kubernetes]
+                namespace = "{{.Release.Namespace}}"
+                image = "ubuntu:22.04"
+                helper_image = "gitlab/gitlab-runner-helper:arm64-latest"
+          helpers:
+            cpuLimit: 1
+            memoryLimit: 5Gi
+            cpuRequests: 200m
+            memoryRequests: 256Mi
+  syncPolicy:
+    automated: 
+      prune: true 
+      selfHeal: true

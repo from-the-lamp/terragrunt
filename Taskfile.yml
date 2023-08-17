@@ -129,3 +129,13 @@ tasks:
         else
           echo "File {{ .OCI_CONFIG_PATH }} does not exist."
         fi
+
+  kubeconfig:
+    cmds:
+      - |
+        oci os object get --profile lamp-stage \
+                          --bucket-name stage-terraform-state \
+                          --name stage/oracle/k3s/masters/ssh_read_file_content/terraform.tfstate \
+                          --file /tmp/stage-kubeconfig 
+      - cat /tmp/stage-kubeconfig | jq '.outputs.file_contents.value."/etc/rancher/k3s/k3s.yaml"' -r > ~/.config/kubeconfigs/RAW-lamp-stage
+      - chmod 0600 ~/.config/kubeconfigs/RAW-lamp-stage

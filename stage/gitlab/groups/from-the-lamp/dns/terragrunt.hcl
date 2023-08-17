@@ -7,12 +7,12 @@ include "common" {
 }
 
 locals {
-  environment_vars  = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env               = local.environment_vars.locals.environment
-  group_vars        = read_terragrunt_config(find_in_parent_folders("group.hcl"))
-  cloudflare_record = local.group_vars.locals.cloudflare_record
+  environment_vars   = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env                = local.environment_vars.locals.environment
+  group_vars         = read_terragrunt_config(find_in_parent_folders("group.hcl"))
+  cloudflare_records = local.group_vars.locals.cloudflare_records
 }
 
 inputs = {
-  cloudflare_record = local.cloudflare_record
+  cloudflare_records = local.cloudflare_records
 }

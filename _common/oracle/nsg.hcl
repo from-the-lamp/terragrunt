@@ -14,16 +14,7 @@ locals {
   compartment_ocid         = local.common_settings.locals.compartment_ocid
 }
 
-generate "oci_provider_cfg" {
-  path      = "oci.generated.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-    provider "oci" {
-      config_file_profile = "${local.config_file_profile}"
-    }
-  EOF
-}
-
 inputs = {
-  compartment_ocid = local.compartment_ocid
+  config_file_profile = local.config_file_profile
+  compartment_ocid    = local.compartment_ocid
 }

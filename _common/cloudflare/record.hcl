@@ -23,47 +23,36 @@ dependency "get_infra_variables" {
   }
 }
 
+dependency "load_balancer" {
+  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/workers/argocd/argocd-apps"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  skip_outputs = true
+}
+
 dependency "ssh_read_file_content" {
   config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
   mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     file_contents = {
-      "/etc/rancher/k3s/server" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/certificate-authority-data" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/server-ip" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/server-certificate-authority-data" = "ZmFrZS1kYXRhCg==",
       "/etc/rancher/k3s/client-certificate-data" = "ZmFrZS1kYXRhCg==",
       "/etc/rancher/k3s/client-key-data" = "ZmFrZS1kYXRhCg==",
     }
   }
 }
 
-dependency "lb" {
-  config_path = "${get_repo_root()}/${local.env}/helm/gateway/istio-ingressgateway"
-  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
-  mock_outputs = {
-    skip_outputs = true
-  }
-}
-
-generate "provider_kubernetes" {
-  path      = "kubernetes.generated.tf"
-  if_exists = "overwrite"
-  contents = <<EOF1
-provider "kubernetes" {
-    host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server")}:6443"
-    cluster_ca_certificate = <<-EOF2
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/certificate-authority-data"))}
-    EOF2
-    client_certificate = <<-EOF2
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
-    EOF2
-    client_key= <<-EOF2
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
-    EOF2
-}
-EOF1
-}
-
 inputs = {
+  host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
+  cluster_ca_certificate = <<-EOF
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data"))}
+  EOF
+  client_certificate = <<-EOF
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
+  EOF
+  client_key = <<-EOF
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
+  EOF
   cloudflare_api_token      = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
   cloudflare_zone_name      = local.infra_zone
   external_load_balancer    = true

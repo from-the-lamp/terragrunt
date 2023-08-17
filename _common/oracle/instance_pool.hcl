@@ -16,17 +16,8 @@ locals {
   admin_ssh_pub            = local.common_settings.locals.admin_ssh_pub
 }
 
-generate "oci_provider_cfg" {
-  path      = "oci.generated.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-    provider "oci" {
-      config_file_profile = "${local.config_file_profile}"
-    }
-  EOF
-}
-
 inputs = {
+  config_file_profile = local.config_file_profile
   compartment_ocid    = local.compartment_ocid
   availability_domain = local.availability_domain
 }

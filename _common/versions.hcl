@@ -1,0 +1,17 @@
+locals {
+    k3s_cluster                  = "v1.25.11+k3s1"
+    oci_cloud_controller_manager = "0.0.1"
+    base_helm_chart              = "0.1.5"
+    virtual_service              = "0.0.2"
+    istio_system                 = "1.18.2"
+    istio_gateway                = "0.0.3"
+    argo_cd                      = "5.41.2"
+    argocd_apps                  = "1.4.1"
+    cert_manager                 = "1.9.1"
+    origin_ca_issuer_controller  = "0.5.1"
+    origin_ca_issuer             = "0.0.1"
+    role_with_rolebinding        = "0.0.1"
+    gitlab_runner                = "0.54.0"
+    image_pull_secret            = "0.0.1"
+    namespace                    = "0.0.1"
+}

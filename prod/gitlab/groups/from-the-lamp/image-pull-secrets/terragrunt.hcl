@@ -7,8 +7,10 @@ include "common" {
 }
 
 locals {
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env              = local.environment_vars.locals.environment
+  environment_vars  = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env               = local.environment_vars.locals.environment
+  versions          = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
+  image_pull_secret = local.versions.locals.image_pull_secret
 }
 
 dependency "namespace" {
@@ -30,7 +32,7 @@ dependency "gitlab_vars" {
 inputs = {
   helm_internal_repo    = true
   helm_chart_name       = "image-pull-secret"
-  helm_chart_version    = "0.0.1"
+  helm_chart_version    = local.image_pull_secret
   helm_addition_setting = {
     token = dependency.gitlab_vars.outputs.map_variables.gitlab_docker_registry_token
   }

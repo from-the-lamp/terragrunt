@@ -3,14 +3,21 @@ terraform {
 }
 
 locals {
-  module_name              = "k8s"
-  module_subdir            = "namespaces"
+  module_name              = "argocd"
+  module_subdir            = "get_pass"
   module_version           = "main"
   private_modules_base_url = local.common_settings.locals.private_modules_base_url
+  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
   environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                      = local.environment_vars.locals.environment
-  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
-  gitlab_token             = local.common_settings.locals.gitlab_token
+  infra_zone               = local.environment_vars.locals.infra_zone
+  infra_helm_repo_url      = local.common_settings.locals.infra_helm_repo_url
+}
+
+dependency "argo_cd" {
+  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/workers/argocd/argo-cd"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
+  skip_outputs = true
 }
 
 dependency "ssh_read_file_content" {
@@ -27,22 +34,14 @@ dependency "ssh_read_file_content" {
 }
 
 inputs = {
-  host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
-  cluster_ca_certificate = <<-EOF
+    host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
+    cluster_ca_certificate = <<-EOF2
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data"))}
-  EOF
-  client_certificate = <<-EOF
+    EOF2
+    client_certificate = <<-EOF2
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
-  EOF
-  client_key = <<-EOF
+    EOF2
+    client_key = <<-EOF2
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
-  EOF
-  helm_module_source = "${local.private_modules_base_url}/k8s/helm//?ref=main"
-  namespaces = {
-    "projects" = {
-      labels = [
-        {label="istio-injection", value="enabled"},
-      ] 
-    }
-  }
+    EOF2
 }

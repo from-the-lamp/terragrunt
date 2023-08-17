@@ -9,6 +9,8 @@ include "common" {
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env              = local.environment_vars.locals.environment
+  versions         = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
+  gitlab_runner    = local.versions.locals.gitlab_runner
 }
 
 dependency "namespace" {
@@ -30,7 +32,7 @@ inputs = {
   helm_values_file      = "values.yml"
   helm_chart_name       = "gitlab-runner"
   helm_repo_url         = "https://charts.gitlab.io"
-  helm_chart_version    = "0.54.0"
+  helm_chart_version    = local.gitlab_runner
   helm_addition_setting = {
     runnerRegistrationToken = dependency.gitlab_runner_token.outputs.runners_token
   }

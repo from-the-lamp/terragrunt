@@ -11,17 +11,9 @@ locals {
   env                      = local.environment_vars.locals.environment
   common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
   gitlab_token             = local.common_settings.locals.gitlab_token
-}
-
-inputs = {
-  force_update            = true
-  recreate_pods           = true
-  helm_release_name       = basename(get_terragrunt_dir())
-  helm_internal_repo_url  = "https://gitlab.com/api/v4/projects/40582099/packages/helm/stable"
-  helm_internal_repo_user = "gitlab-ci-token"
-  helm_internal_repo_pass = get_env("TF_HTTP_PASSWORD")
-  helm_values_file_path   = "values.yml"
-  k8s_namespace           = basename(dirname(get_terragrunt_dir()))
+  versions                 = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
+  virtual_service          = local.versions.locals.virtual_service
+  infra_helm_repo_url      = local.common_settings.locals.infra_helm_repo_url
 }
 
 dependency "ssh_read_file_content" {
@@ -29,34 +21,32 @@ dependency "ssh_read_file_content" {
   mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     file_contents = {
-      "/etc/rancher/k3s/server" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/certificate-authority-data" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/server-ip" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/server-certificate-authority-data" = "ZmFrZS1kYXRhCg==",
       "/etc/rancher/k3s/client-certificate-data" = "ZmFrZS1kYXRhCg==",
       "/etc/rancher/k3s/client-key-data" = "ZmFrZS1kYXRhCg==",
     }
   }
 }
 
-generate "provider_helm" {
-  path      = "helm.generated.tf"
-  if_exists = "overwrite"
-  contents = <<EOF1
-provider "helm" {
-  // experiments {
-  //   manifest = true
-  // }
-  kubernetes {
-    host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server")}:6443"
-    cluster_ca_certificate = <<-EOF2
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/certificate-authority-data"))}
-    EOF2
-    client_certificate = <<-EOF2
+inputs = {
+  host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
+  cluster_ca_certificate = <<-EOF
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data"))}
+    EOF
+  client_certificate = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
-    EOF2
-    client_key= <<-EOF2
+    EOF
+  client_key = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
-    EOF2
-  }
+    EOF
+  force_update                  = true
+  recreate_pods                 = true
+  helm_release_name             = basename(get_terragrunt_dir())
+  helm_internal_repo_url        = local.infra_helm_repo_url
+  helm_internal_repo_user       = "gitlab-ci-token"
+  helm_internal_repo_pass       = get_env("TF_HTTP_PASSWORD")
+  helm_values_file_path         = "values.yml"
+  k8s_namespace                 = basename(dirname(get_terragrunt_dir()))
+  virtual_service_chart_version = local.virtual_service
 }
-EOF1
-}       
