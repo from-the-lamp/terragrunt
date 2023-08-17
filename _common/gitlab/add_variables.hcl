@@ -17,6 +17,7 @@ locals {
 }
 
 inputs = {
-  gitlab_token    = local.gitlab_token
-  gitlab_group_id = local.gitlab_group_id
+  gitlab_token      = local.gitlab_token
+  gitlab_group_id   = local.gitlab_group_id
+  environment_scope = local.env
 }

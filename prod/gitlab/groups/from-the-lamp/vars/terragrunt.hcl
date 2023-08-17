@@ -35,20 +35,28 @@ dependency "dns" {
   }
 }
 
+dependency "argocd_pass" {
+  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/workers/argocd/argocd_pass"
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    "password" = "fake-pass"
+  }
+}
+
 inputs = {
   vars = {
-    "${local.env}_KUBECONFIG_BASE64" = {
-      value     = "${base64encode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/k3s.yaml"))}"
+    "CLOUDFLARE_ZONE_ID" = {
+      value     = "${dependency.dns.outputs.cloudflare_zone_id}"
       protected = false
       masked    = true
     },
-    "${local.env}_CLOUDFLARE_ZONE_ID" = {
-      value     = "${dependency.dns.outputs.cloudflare_zone_id}"
-      protected = false
-      masked    = false
-    },
-    "${local.env}_CLOUDFLARE_API_TOKEN" = {
+    "CLOUDFLARE_API_TOKEN" = {
       value     = "${dependency.cloudflare_api_token.outputs.cloudflare_api_token}"
+      protected = false
+      masked    = true
+    },
+    "ARGOCD_PASSWORD" = {
+      value     = "${dependency.argocd_pass.outputs.password}"
       protected = false
       masked    = true
     },

@@ -133,9 +133,23 @@ tasks:
   kubeconfig:
     cmds:
       - |
-        oci os object get --profile lamp-stage \
-                          --bucket-name stage-terraform-state \
-                          --name stage/oracle/k3s/masters/ssh_read_file_content/terraform.tfstate \
-                          --file /tmp/stage-kubeconfig 
-      - cat /tmp/stage-kubeconfig | jq '.outputs.file_contents.value."/etc/rancher/k3s/k3s.yaml"' -r > ~/.config/kubeconfigs/RAW-lamp-stage
-      - chmod 0600 ~/.config/kubeconfigs/RAW-lamp-stage
+        oci os object get --profile lamp-{{ .ENV }} \
+                          --bucket-name {{ .ENV }}-terraform-state \
+                          --name {{ .ENV }}/oracle/k3s/masters/ssh_read_file_content/terraform.tfstate \
+                          --file /tmp/{{ .ENV }}-kubeconfig 
+      - cat /tmp/{{ .ENV }}-kubeconfig | jq '.outputs.file_contents.value."/etc/rancher/k3s/k3s.yaml"' -r > ~/.config/kubeconfigs/RAW-lamp-{{ .ENV }}
+      - chmod 0600 ~/.config/kubeconfigs/RAW-lamp-{{ .ENV }}
+
+  kubeconfig:stage:
+    cmds:
+      - task: kubeconfig
+        vars: {
+          ENV: "stage"
+        }
+
+  kubeconfig:prod:
+    cmds:
+      - task: kubeconfig
+        vars: {
+          ENV: "prod"
+        }

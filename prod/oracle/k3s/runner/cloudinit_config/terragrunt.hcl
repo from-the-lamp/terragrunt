@@ -40,6 +40,6 @@ inputs = {
     k3s_version         = local.k3s_cluster
     k3s_master_host     = lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")
     k3s_token           = dependency.token.outputs.password
-    k3s_node_label      = "node-role=worker"
+    k3s_node_label      = "node-role=runner"
   }
 }
