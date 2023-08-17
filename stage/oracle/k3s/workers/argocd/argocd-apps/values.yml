@@ -189,9 +189,9 @@ applications:
     chart: istio-gateway
     helm:
       releaseName: argocd-istio-gateway
+      parameters:
+      - name: "hosts[0]"
       values: |
-        hosts:
-        - "argocd.from-the-lamp.work"
         external: true
         virtualService:
           destination:

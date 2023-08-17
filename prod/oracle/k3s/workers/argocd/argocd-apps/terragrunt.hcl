@@ -9,6 +9,7 @@ include "common" {
 locals {
   environment_vars                    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                                 = local.environment_vars.locals.environment
+  infra_zone                          = local.environment_vars.locals.infra_zone
   common_settings                     = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
   infra_helm_repo_url                 = local.common_settings.locals.infra_helm_repo_url
   versions                            = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
@@ -81,7 +82,8 @@ inputs = {
     "applications[5].source.repoURL"        = local.infra_helm_repo_url
     "applications[5].source.targetRevision" = local.role_with_rolebinding_version
     # argocd-istio-gateway
-    "applications[6].source.repoURL"        = local.infra_helm_repo_url
-    "applications[6].source.targetRevision" = local.istio_gateway_version
+    "applications[6].source.repoURL"                  = local.infra_helm_repo_url
+    "applications[6].source.targetRevision"           = local.istio_gateway_version
+    "applications[6].source.helm.parameters[0].value" = "argocd.${local.infra_zone}"
   }
 }
