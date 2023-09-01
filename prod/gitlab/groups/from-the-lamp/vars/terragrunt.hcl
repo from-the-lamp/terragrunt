@@ -9,6 +9,7 @@ include "common" {
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env              = local.environment_vars.locals.environment
+  infra_zone       = local.environment_vars.locals.infra_zone
 }
 
 dependency "ssh_read_file_content" {
@@ -52,6 +53,11 @@ inputs = {
     },
     "CLOUDFLARE_API_TOKEN" = {
       value     = "${dependency.cloudflare_api_token.outputs.cloudflare_api_token}"
+      protected = false
+      masked    = true
+    },
+    "ARGOCD_HOST" = {
+      value     = "argocd.${local.infra_zone}"
       protected = false
       masked    = true
     },

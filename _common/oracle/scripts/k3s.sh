@@ -17,7 +17,6 @@ systemctl restart systemd-journald
 
 INSTANCE_PUBLIC_IP=$(curl https://ifconfig.me)
 INSTANCE_PRIVATE_IP=$(hostname -I | awk '{print $1}')
-NODE_LABEL=
 if [[ "${k3s_master_host}" == "localhost" ]]; then
   echo "Cluster init"
   k3s_install_params=()

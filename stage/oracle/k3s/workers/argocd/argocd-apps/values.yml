@@ -209,4 +209,26 @@ applications:
     jsonPointers:
     - /spec/duration
     - /spec/renewBefore
-    
+- name: crossplane 
+  namespace: argocd
+  project: default
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  destination:
+    namespace: crossplane
+    name: in-cluster 
+  source:
+    repoURL: https://charts.crossplane.io/master/
+    chart: crossplane
+    helm:
+      releaseName: crossplane
+      values: |
+        provider:
+          packages:
+          - xpkg.upbound.io/upbound/provider-terraform:v0.10.0
+  syncPolicy:
+    automated: 
+      prune: true 
+      selfHeal: true 
+    syncOptions:
+    - CreateNamespace=true

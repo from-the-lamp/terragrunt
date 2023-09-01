@@ -85,5 +85,7 @@ inputs = {
     "applications[6].source.repoURL"                  = local.infra_helm_repo_url
     "applications[6].source.targetRevision"           = local.istio_gateway_version
     "applications[6].source.helm.parameters[0].value" = "argocd.${local.infra_zone}"
+    # crossplane
+    "applications[7].source.targetRevision"           = "1.2.1"
   }
 }
