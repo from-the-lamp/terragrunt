@@ -58,6 +58,16 @@ inputs = {
     requests:
       memory: 128Mi
       cpu: 100m
+  runners:
+    tags: "k8s-arm-default"
+    config: |
+      [[runners]]
+        name = "Kubernetes Gitlab Runner"
+        executor = "kubernetes"
+        [runners.kubernetes]
+          namespace = "{{.Release.Namespace}}"
+          image = "arm64v8/ubuntu:22.04"
+          helper_image = "gitlab/gitlab-runner-helper:arm-latest"
   rbac:
     create: true
     rules:
