@@ -7,8 +7,8 @@ include "common" {
 }
 
 locals {
-  environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env                      = local.environment_vars.locals.environment
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env = local.environment_vars.locals.environment
 }
 
 dependency "vcn" {
@@ -28,9 +28,9 @@ dependency "cloudinit_config" {
 }
 
 inputs = {
-  display_name     = "k3s-worker"
+  display_name = "k3s-worker"
   assign_public_ip = true
-  subnet_id        = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
-  user_data        = dependency.cloudinit_config.outputs.config.rendered
-  nsg_ids          = []
+  subnet_id = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
+  user_data = dependency.cloudinit_config.outputs.config.rendered
+  nsg_ids = []
 }

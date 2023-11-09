@@ -11,7 +11,7 @@ locals {
   origin_ca_issuer_controller = "0.5.1"
   origin_ca_issuer = "0.0.1"
   role_with_rolebinding = "0.0.1"
-  gitlab_runner = "0.54.0"
+  gitlab_runner = "0.58.2"
   image_pull_secret = "0.0.1"
   namespace = "0.0.1"
   vault = "0.26.1"

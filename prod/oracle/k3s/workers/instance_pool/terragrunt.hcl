@@ -8,7 +8,7 @@ include "common" {
 
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env              = local.environment_vars.locals.environment
+  env = local.environment_vars.locals.environment
 }
 
 dependency "instance_config" {
@@ -34,8 +34,8 @@ dependency "oci-cloud-controller-manager" {
 }
 
 inputs = {
-  primary_subnet_id         = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
+  primary_subnet_id = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
   instance_configuration_id = dependency.instance_config.outputs.id
-  display_name              = "k3s-worker"
-  size                      = 2
+  display_name = "k3s-worker"
+  size = 2
 }

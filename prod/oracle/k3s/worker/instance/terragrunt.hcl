@@ -34,7 +34,7 @@ dependency "oci-cloud-controller-manager" {
 }
 
 inputs = {
-  display_name = "k3s-runner"
-  subnet_id    = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
-  user_data    = dependency.cloudinit_config.outputs.config.rendered
+  display_name = "k3s-worker"
+  subnet_id = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
+  user_data = dependency.cloudinit_config.outputs.config.rendered
 }
