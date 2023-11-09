@@ -1,19 +1,19 @@
 terraform {
-  source = "${local.private_modules_base_url}/${local.module_name}//${local.module_subdir}?ref=${local.module_version}"
+  source = "${local.modules_url}/${local.module_name}//${local.module_dir}?ref=${local.module_version}"
 }
 
 locals {
-  module_name              = "argocd"
-  module_subdir            = "application"
-  module_version           = "main"
-  private_modules_base_url = local.common_settings.locals.private_modules_base_url
-  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
-  environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env                      = local.environment_vars.locals.environment
-  infra_zone               = local.environment_vars.locals.infra_zone
-  infra_helm_repo_url      = local.common_settings.locals.infra_helm_repo_url
-  versions                 = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
-  base_helm_chart          = local.versions.locals.base_helm_chart
+  common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  modules_url = local.common_settings.locals.private_modules_base_url
+  module_name = "argocd"
+  module_dir = "application"
+  module_version = "main"
+  infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env = local.environment_vars.locals.environment
+  infra_zone = local.environment_vars.locals.infra_zone
+  versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
+  base_helm_chart = local.versions.locals.base_helm_chart
 }
 
 dependency "argocd_pass" {

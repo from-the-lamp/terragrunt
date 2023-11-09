@@ -3,356 +3,411 @@ include:
   - project: from-the-lamp/infra/ci-cd-includes
     file: tf_oracle.yml
 
-1:stage/gitlab/get_infra_variables:
+1:infra/vault/oidc:
   extends: .plan
   variables:
-    DIR: stage/gitlab/get_infra_variables
+    DIR: infra/vault/oidc
     AWS_PROFILE: fixme
-2:stage/gitlab/get_infra_variables:
+2:infra/vault/oidc:
   extends: .apply
   variables:
-    DIR: stage/gitlab/get_infra_variables
+    DIR: infra/vault/oidc
     AWS_PROFILE: lamp-prod
 
-1:stage/gitlab/groups/from-the-lamp/cloudflare_api_token:
+1:infra/vault/policies/admin:
   extends: .plan
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/cloudflare_api_token
+    DIR: infra/vault/policies/admin
     AWS_PROFILE: fixme
-2:stage/gitlab/groups/from-the-lamp/cloudflare_api_token:
+2:infra/vault/policies/admin:
   extends: .apply
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/cloudflare_api_token
+    DIR: infra/vault/policies/admin
     AWS_PROFILE: lamp-prod
 
-1:stage/gitlab/groups/from-the-lamp/dns:
+1:infra/gitlab/get_infra_variables:
   extends: .plan
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/dns
+    DIR: infra/gitlab/get_infra_variables
     AWS_PROFILE: fixme
-2:stage/gitlab/groups/from-the-lamp/dns:
+2:infra/gitlab/get_infra_variables:
   extends: .apply
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/dns
+    DIR: infra/gitlab/get_infra_variables
     AWS_PROFILE: lamp-prod
 
-1:stage/gitlab/groups/from-the-lamp/image-pull-secrets:
+1:infra/gitlab/groups/from-the-lamp/apps:
   extends: .plan
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/image-pull-secrets
+    DIR: infra/gitlab/groups/from-the-lamp/apps
     AWS_PROFILE: fixme
-2:stage/gitlab/groups/from-the-lamp/image-pull-secrets:
+2:infra/gitlab/groups/from-the-lamp/apps:
   extends: .apply
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/image-pull-secrets
+    DIR: infra/gitlab/groups/from-the-lamp/apps
     AWS_PROFILE: lamp-prod
 
-1:stage/gitlab/groups/from-the-lamp/namespace:
+1:infra/gitlab/groups/from-the-lamp/gitlab_runner_token:
   extends: .plan
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/namespace
+    DIR: infra/gitlab/groups/from-the-lamp/gitlab_runner_token
     AWS_PROFILE: fixme
-2:stage/gitlab/groups/from-the-lamp/namespace:
+2:infra/gitlab/groups/from-the-lamp/gitlab_runner_token:
   extends: .apply
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/namespace
+    DIR: infra/gitlab/groups/from-the-lamp/gitlab_runner_token
     AWS_PROFILE: lamp-prod
 
-1:stage/gitlab/groups/from-the-lamp/vars:
+1:infra/gitlab/groups/from-the-lamp/cloudflare_api_token:
   extends: .plan
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/vars
+    DIR: infra/gitlab/groups/from-the-lamp/cloudflare_api_token
     AWS_PROFILE: fixme
-2:stage/gitlab/groups/from-the-lamp/vars:
+2:infra/gitlab/groups/from-the-lamp/cloudflare_api_token:
   extends: .apply
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/vars
+    DIR: infra/gitlab/groups/from-the-lamp/cloudflare_api_token
     AWS_PROFILE: lamp-prod
 
-1:stage/gitlab/groups/from-the-lamp/gitlab_runner_token:
+1:infra/helm/infra/argo-cd-gateway:
   extends: .plan
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/gitlab_runner_token
+    DIR: infra/helm/infra/argo-cd-gateway
     AWS_PROFILE: fixme
-2:stage/gitlab/groups/from-the-lamp/gitlab_runner_token:
+2:infra/helm/infra/argo-cd-gateway:
   extends: .apply
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/gitlab_runner_token
+    DIR: infra/helm/infra/argo-cd-gateway
     AWS_PROFILE: lamp-prod
 
-1:stage/gitlab/groups/from-the-lamp/gitlab-runner:
+1:infra/helm/infra/argo-cd:
   extends: .plan
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/gitlab-runner
+    DIR: infra/helm/infra/argo-cd
     AWS_PROFILE: fixme
-2:stage/gitlab/groups/from-the-lamp/gitlab-runner:
+2:infra/helm/infra/argo-cd:
   extends: .apply
   variables:
-    DIR: stage/gitlab/groups/from-the-lamp/gitlab-runner
+    DIR: infra/helm/infra/argo-cd
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/masters/cloudinit_config:
+1:infra/helm/infra/vault-gateway:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/masters/cloudinit_config
+    DIR: infra/helm/infra/vault-gateway
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/masters/cloudinit_config:
+2:infra/helm/infra/vault-gateway:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/masters/cloudinit_config
+    DIR: infra/helm/infra/vault-gateway
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/masters/instance_config:
+1:infra/helm/infra/vault:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/masters/instance_config
+    DIR: infra/helm/infra/vault
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/masters/instance_config:
+2:infra/helm/infra/vault:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/masters/instance_config
+    DIR: infra/helm/infra/vault
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/masters/instance_pool:
+1:infra/helm/istio-system/cert-manager:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/masters/instance_pool
+    DIR: infra/helm/istio-system/cert-manager
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/masters/instance_pool:
+2:infra/helm/istio-system/cert-manager:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/masters/instance_pool
+    DIR: infra/helm/istio-system/cert-manager
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/masters/ssh_read_file_content:
+1:infra/helm/istio-system/ingressgateway:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/masters/ssh_read_file_content
+    DIR: infra/helm/istio-system/ingressgateway
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/masters/ssh_read_file_content:
+2:infra/helm/istio-system/ingressgateway:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/masters/ssh_read_file_content
+    DIR: infra/helm/istio-system/ingressgateway
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/masters/identity_dynamic_group:
+1:infra/helm/istio-system/istio:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/masters/identity_dynamic_group
+    DIR: infra/helm/istio-system/istio
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/masters/identity_dynamic_group:
+2:infra/helm/istio-system/istio:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/masters/identity_dynamic_group
+    DIR: infra/helm/istio-system/istio
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/token:
+1:infra/helm/istio-system/istiod:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/token
+    DIR: infra/helm/istio-system/istiod
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/token:
+2:infra/helm/istio-system/istiod:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/token
+    DIR: infra/helm/istio-system/istiod
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/workers/cloudinit_config:
+1:infra/helm/istio-system/origin-ca-issuer-controller:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/workers/cloudinit_config
+    DIR: infra/helm/istio-system/origin-ca-issuer-controller
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/workers/cloudinit_config:
+2:infra/helm/istio-system/origin-ca-issuer-controller:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/workers/cloudinit_config
+    DIR: infra/helm/istio-system/origin-ca-issuer-controller
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/workers/instance_config:
+1:infra/helm/istio-system/origin-ca-issuer:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/workers/instance_config
+    DIR: infra/helm/istio-system/origin-ca-issuer
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/workers/instance_config:
+2:infra/helm/istio-system/origin-ca-issuer:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/workers/instance_config
+    DIR: infra/helm/istio-system/origin-ca-issuer
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/workers/instance_pool:
+1:infra/helm/kube-system/oci-cloud-controller-manager:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/workers/instance_pool
+    DIR: infra/helm/kube-system/oci-cloud-controller-manager
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/workers/instance_pool:
+2:infra/helm/kube-system/oci-cloud-controller-manager:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/workers/instance_pool
+    DIR: infra/helm/kube-system/oci-cloud-controller-manager
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/k3s/workers/identity_dynamic_group:
+1:infra/namespaces:
   extends: .plan
   variables:
-    DIR: stage/oracle/k3s/workers/identity_dynamic_group
+    DIR: infra/namespaces
     AWS_PROFILE: fixme
-2:stage/oracle/k3s/workers/identity_dynamic_group:
+2:infra/namespaces:
   extends: .apply
   variables:
-    DIR: stage/oracle/k3s/workers/identity_dynamic_group
+    DIR: infra/namespaces
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/nsg/allow_https_from_all:
+1:infra/oracle/k3s/masters/cloudinit_config:
   extends: .plan
   variables:
-    DIR: stage/oracle/nsg/allow_https_from_all
+    DIR: infra/oracle/k3s/masters/cloudinit_config
     AWS_PROFILE: fixme
-2:stage/oracle/nsg/allow_https_from_all:
+2:infra/oracle/k3s/masters/cloudinit_config:
   extends: .apply
   variables:
-    DIR: stage/oracle/nsg/allow_https_from_all
+    DIR: infra/oracle/k3s/masters/cloudinit_config
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/nsg/allow_icmp_between_instances:
+1:infra/oracle/k3s/masters/identity_dynamic_group:
   extends: .plan
   variables:
-    DIR: stage/oracle/nsg/allow_icmp_between_instances
+    DIR: infra/oracle/k3s/masters/identity_dynamic_group
     AWS_PROFILE: fixme
-2:stage/oracle/nsg/allow_icmp_between_instances:
+2:infra/oracle/k3s/masters/identity_dynamic_group:
   extends: .apply
   variables:
-    DIR: stage/oracle/nsg/allow_icmp_between_instances
+    DIR: infra/oracle/k3s/masters/identity_dynamic_group
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/nsg/allow_ssh_from_all:
+1:infra/oracle/k3s/masters/instance_config:
   extends: .plan
   variables:
-    DIR: stage/oracle/nsg/allow_ssh_from_all
+    DIR: infra/oracle/k3s/masters/instance_config
     AWS_PROFILE: fixme
-2:stage/oracle/nsg/allow_ssh_from_all:
+2:infra/oracle/k3s/masters/instance_config:
   extends: .apply
   variables:
-    DIR: stage/oracle/nsg/allow_ssh_from_all
+    DIR: infra/oracle/k3s/masters/instance_config
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/nsg/allow_kube_api_from_all:
+1:infra/oracle/k3s/masters/instance_pool:
   extends: .plan
   variables:
-    DIR: stage/oracle/nsg/allow_kube_api_from_all
+    DIR: infra/oracle/k3s/masters/instance_pool
     AWS_PROFILE: fixme
-2:stage/oracle/nsg/allow_kube_api_from_all:
+2:infra/oracle/k3s/masters/instance_pool:
   extends: .apply
   variables:
-    DIR: stage/oracle/nsg/allow_kube_api_from_all
+    DIR: infra/oracle/k3s/masters/instance_pool
     AWS_PROFILE: lamp-prod
 
-1:stage/oracle/vcn:
+1:infra/oracle/k3s/masters/ssh_read_file_content:
   extends: .plan
   variables:
-    DIR: stage/oracle/vcn
+    DIR: infra/oracle/k3s/masters/ssh_read_file_content
     AWS_PROFILE: fixme
-2:stage/oracle/vcn:
+2:infra/oracle/k3s/masters/ssh_read_file_content:
   extends: .apply
   variables:
-    DIR: stage/oracle/vcn
+    DIR: infra/oracle/k3s/masters/ssh_read_file_content
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/gateway/cert-manager:
+1:infra/oracle/k3s/runner/cloudinit_config:
   extends: .plan
   variables:
-    DIR: stage/helm/gateway/cert-manager
+    DIR: infra/oracle/k3s/runner/cloudinit_config
     AWS_PROFILE: fixme
-2:stage/helm/gateway/cert-manager:
+2:infra/oracle/k3s/runner/cloudinit_config:
   extends: .apply
   variables:
-    DIR: stage/helm/gateway/cert-manager
+    DIR: infra/oracle/k3s/runner/cloudinit_config
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/gateway/deploy-roles:
+1:infra/oracle/k3s/runner/identity_dynamic_group:
   extends: .plan
   variables:
-    DIR: stage/helm/gateway/deploy-roles
+    DIR: infra/oracle/k3s/runner/identity_dynamic_group
     AWS_PROFILE: fixme
-2:stage/helm/gateway/deploy-roles:
+2:infra/oracle/k3s/runner/identity_dynamic_group:
   extends: .apply
   variables:
-    DIR: stage/helm/gateway/deploy-roles
+    DIR: infra/oracle/k3s/runner/identity_dynamic_group
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/gateway/origin-ca-issuer-controller:
+1:infra/oracle/k3s/runner/instance:
   extends: .plan
   variables:
-    DIR: stage/helm/gateway/origin-ca-issuer-controller
+    DIR: infra/oracle/k3s/runner/instance
     AWS_PROFILE: fixme
-2:stage/helm/gateway/origin-ca-issuer-controller:
+2:infra/oracle/k3s/runner/instance:
   extends: .apply
   variables:
-    DIR: stage/helm/gateway/origin-ca-issuer-controller
+    DIR: infra/oracle/k3s/runner/instance
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/gateway/origin-ca-issuer:
+1:infra/oracle/k3s/token:
   extends: .plan
   variables:
-    DIR: stage/helm/gateway/origin-ca-issuer
+    DIR: infra/oracle/k3s/token
     AWS_PROFILE: fixme
-2:stage/helm/gateway/origin-ca-issuer:
+2:infra/oracle/k3s/token:
   extends: .apply
   variables:
-    DIR: stage/helm/gateway/origin-ca-issuer
+    DIR: infra/oracle/k3s/token
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/gateway/istio-ingressgateway:
+1:infra/oracle/k3s/workers/cloudinit_config:
   extends: .plan
   variables:
-    DIR: stage/helm/gateway/istio-ingressgateway
+    DIR: infra/oracle/k3s/workers/cloudinit_config
     AWS_PROFILE: fixme
-2:stage/helm/gateway/istio-ingressgateway:
+2:infra/oracle/k3s/workers/cloudinit_config:
   extends: .apply
   variables:
-    DIR: stage/helm/gateway/istio-ingressgateway
+    DIR: infra/oracle/k3s/workers/cloudinit_config
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/gateway/istio-ingressgateway-internal:
+1:infra/oracle/k3s/workers/identity_dynamic_group:
   extends: .plan
   variables:
-    DIR: stage/helm/gateway/istio-ingressgateway-internal
+    DIR: infra/oracle/k3s/workers/identity_dynamic_group
     AWS_PROFILE: fixme
-2:stage/helm/gateway/istio-ingressgateway-internal:
+2:infra/oracle/k3s/workers/identity_dynamic_group:
   extends: .apply
   variables:
-    DIR: stage/helm/gateway/istio-ingressgateway-internal
+    DIR: infra/oracle/k3s/workers/identity_dynamic_group
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/istio-system/istio:
+1:infra/oracle/k3s/workers/instance_config:
   extends: .plan
   variables:
-    DIR: stage/helm/istio-system/istio
+    DIR: infra/oracle/k3s/workers/instance_config
     AWS_PROFILE: fixme
-2:stage/helm/istio-system/istio:
+2:infra/oracle/k3s/workers/instance_config:
   extends: .apply
   variables:
-    DIR: stage/helm/istio-system/istio
+    DIR: infra/oracle/k3s/workers/instance_config
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/istio-system/istiod:
+1:infra/oracle/k3s/workers/instance_pool:
   extends: .plan
   variables:
-    DIR: stage/helm/istio-system/istiod
+    DIR: infra/oracle/k3s/workers/instance_pool
     AWS_PROFILE: fixme
-2:stage/helm/istio-system/istiod:
+2:infra/oracle/k3s/workers/instance_pool:
   extends: .apply
   variables:
-    DIR: stage/helm/istio-system/istiod
+    DIR: infra/oracle/k3s/workers/instance_pool
     AWS_PROFILE: lamp-prod
 
-1:stage/helm/kube-system/oci-cloud-controller-manager:
+1:infra/oracle/nsg/allow_https_from_all:
   extends: .plan
   variables:
-    DIR: stage/helm/kube-system/oci-cloud-controller-manager
+    DIR: infra/oracle/nsg/allow_https_from_all
     AWS_PROFILE: fixme
-2:stage/helm/kube-system/oci-cloud-controller-manager:
+2:infra/oracle/nsg/allow_https_from_all:
   extends: .apply
   variables:
-    DIR: stage/helm/kube-system/oci-cloud-controller-manager
+    DIR: infra/oracle/nsg/allow_https_from_all
+    AWS_PROFILE: lamp-prod
+
+1:infra/oracle/nsg/allow_icmp_between_instances:
+  extends: .plan
+  variables:
+    DIR: infra/oracle/nsg/allow_icmp_between_instances
+    AWS_PROFILE: fixme
+2:infra/oracle/nsg/allow_icmp_between_instances:
+  extends: .apply
+  variables:
+    DIR: infra/oracle/nsg/allow_icmp_between_instances
+    AWS_PROFILE: lamp-prod
+
+1:infra/oracle/nsg/allow_kube_api_from_all:
+  extends: .plan
+  variables:
+    DIR: infra/oracle/nsg/allow_kube_api_from_all
+    AWS_PROFILE: fixme
+2:infra/oracle/nsg/allow_kube_api_from_all:
+  extends: .apply
+  variables:
+    DIR: infra/oracle/nsg/allow_kube_api_from_all
+    AWS_PROFILE: lamp-prod
+
+1:infra/oracle/nsg/allow_ssh_from_all:
+  extends: .plan
+  variables:
+    DIR: infra/oracle/nsg/allow_ssh_from_all
+    AWS_PROFILE: fixme
+2:infra/oracle/nsg/allow_ssh_from_all:
+  extends: .apply
+  variables:
+    DIR: infra/oracle/nsg/allow_ssh_from_all
+    AWS_PROFILE: lamp-prod
+
+1:infra/oracle/vcn:
+  extends: .plan
+  variables:
+    DIR: infra/oracle/vcn
+    AWS_PROFILE: fixme
+2:infra/oracle/vcn:
+  extends: .apply
+  variables:
+    DIR: infra/oracle/vcn
+    AWS_PROFILE: lamp-prod
+
+1:infra/dns:
+  extends: .plan
+  variables:
+    DIR: infra/dns
+    AWS_PROFILE: fixme
+2:infra/dns:
+  extends: .apply
+  variables:
+    DIR: infra/dns
     AWS_PROFILE: lamp-prod
 
 1:terragrunt.hcl:
@@ -377,301 +432,103 @@ include:
     DIR: prod/gitlab/get_infra_variables
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/get_infra_variables/.terragrunt-cache/cFymgAfiq5GfjPse1UNMG1k_c4s/eTdRvcKE3sjUAMAUHSOXMee-nj4/get_variables:
+1:prod/gitlab/get_infra_variables/.terragrunt-cache/cFymgAfiq5GfjPse1UNMG1k_c4s/jmcOrW_wgKnbvr9qk7tU73iTUUY/get_file_variables:
   extends: .plan
   variables:
-    DIR: prod/gitlab/get_infra_variables/.terragrunt-cache/cFymgAfiq5GfjPse1UNMG1k_c4s/eTdRvcKE3sjUAMAUHSOXMee-nj4/get_variables
+    DIR: prod/gitlab/get_infra_variables/.terragrunt-cache/cFymgAfiq5GfjPse1UNMG1k_c4s/jmcOrW_wgKnbvr9qk7tU73iTUUY/get_file_variables
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/get_infra_variables/.terragrunt-cache/cFymgAfiq5GfjPse1UNMG1k_c4s/eTdRvcKE3sjUAMAUHSOXMee-nj4/get_variables:
+2:prod/gitlab/get_infra_variables/.terragrunt-cache/cFymgAfiq5GfjPse1UNMG1k_c4s/jmcOrW_wgKnbvr9qk7tU73iTUUY/get_file_variables:
   extends: .apply
   variables:
-    DIR: prod/gitlab/get_infra_variables/.terragrunt-cache/cFymgAfiq5GfjPse1UNMG1k_c4s/eTdRvcKE3sjUAMAUHSOXMee-nj4/get_variables
+    DIR: prod/gitlab/get_infra_variables/.terragrunt-cache/cFymgAfiq5GfjPse1UNMG1k_c4s/jmcOrW_wgKnbvr9qk7tU73iTUUY/get_file_variables
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/groups/from-the-lamp/cloudflare_api_token:
+1:prod/helm/infra/vault:
   extends: .plan
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/cloudflare_api_token
+    DIR: prod/helm/infra/vault
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/cloudflare_api_token:
+2:prod/helm/infra/vault:
   extends: .apply
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/cloudflare_api_token
+    DIR: prod/helm/infra/vault
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/groups/from-the-lamp/cloudflare_api_token/.terragrunt-cache/YUyJSp0wa_AIBxAPUBq0mrFpOwo/J4PvAKH_LIaZjaA_pZdwriMj1_A/api_token:
+1:prod/helm/infra/vault/.terragrunt-cache/VhqV1dRYg-TTDJm51emiQgC52Eg/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .plan
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/cloudflare_api_token/.terragrunt-cache/YUyJSp0wa_AIBxAPUBq0mrFpOwo/J4PvAKH_LIaZjaA_pZdwriMj1_A/api_token
+    DIR: prod/helm/infra/vault/.terragrunt-cache/VhqV1dRYg-TTDJm51emiQgC52Eg/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/cloudflare_api_token/.terragrunt-cache/YUyJSp0wa_AIBxAPUBq0mrFpOwo/J4PvAKH_LIaZjaA_pZdwriMj1_A/api_token:
+2:prod/helm/infra/vault/.terragrunt-cache/VhqV1dRYg-TTDJm51emiQgC52Eg/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .apply
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/cloudflare_api_token/.terragrunt-cache/YUyJSp0wa_AIBxAPUBq0mrFpOwo/J4PvAKH_LIaZjaA_pZdwriMj1_A/api_token
+    DIR: prod/helm/infra/vault/.terragrunt-cache/VhqV1dRYg-TTDJm51emiQgC52Eg/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/groups/from-the-lamp/dns:
+1:prod/helm/infra/vault-gateway:
   extends: .plan
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/dns
+    DIR: prod/helm/infra/vault-gateway
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/dns:
+2:prod/helm/infra/vault-gateway:
   extends: .apply
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/dns
+    DIR: prod/helm/infra/vault-gateway
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/groups/from-the-lamp/dns/.terragrunt-cache/1951qDLoX6Z3ffKgcaaEzC6P9EQ/J4PvAKH_LIaZjaA_pZdwriMj1_A/dns_record:
+1:prod/helm/infra/vault-gateway/.terragrunt-cache/sHcLga4vEdGZn3tyJNQUNqnEomg/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .plan
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/dns/.terragrunt-cache/1951qDLoX6Z3ffKgcaaEzC6P9EQ/J4PvAKH_LIaZjaA_pZdwriMj1_A/dns_record
+    DIR: prod/helm/infra/vault-gateway/.terragrunt-cache/sHcLga4vEdGZn3tyJNQUNqnEomg/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/dns/.terragrunt-cache/1951qDLoX6Z3ffKgcaaEzC6P9EQ/J4PvAKH_LIaZjaA_pZdwriMj1_A/dns_record:
+2:prod/helm/infra/vault-gateway/.terragrunt-cache/sHcLga4vEdGZn3tyJNQUNqnEomg/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .apply
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/dns/.terragrunt-cache/1951qDLoX6Z3ffKgcaaEzC6P9EQ/J4PvAKH_LIaZjaA_pZdwriMj1_A/dns_record
+    DIR: prod/helm/infra/vault-gateway/.terragrunt-cache/sHcLga4vEdGZn3tyJNQUNqnEomg/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/groups/from-the-lamp/gitlab-runner:
+1:prod/helm/istio-system/cert-manager:
   extends: .plan
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/gitlab-runner
+    DIR: prod/helm/istio-system/cert-manager
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/gitlab-runner:
+2:prod/helm/istio-system/cert-manager:
   extends: .apply
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/gitlab-runner
+    DIR: prod/helm/istio-system/cert-manager
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/groups/from-the-lamp/gitlab-runner/.terragrunt-cache/Me9ISXqkiRbYJj6WqdEYg_NYxm4/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
+1:prod/helm/istio-system/cert-manager/.terragrunt-cache/3LVAT1JbziI1RTL4B2xum2Trq0w/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .plan
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/gitlab-runner/.terragrunt-cache/Me9ISXqkiRbYJj6WqdEYg_NYxm4/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/istio-system/cert-manager/.terragrunt-cache/3LVAT1JbziI1RTL4B2xum2Trq0w/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/gitlab-runner/.terragrunt-cache/Me9ISXqkiRbYJj6WqdEYg_NYxm4/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
+2:prod/helm/istio-system/cert-manager/.terragrunt-cache/3LVAT1JbziI1RTL4B2xum2Trq0w/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .apply
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/gitlab-runner/.terragrunt-cache/Me9ISXqkiRbYJj6WqdEYg_NYxm4/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/istio-system/cert-manager/.terragrunt-cache/3LVAT1JbziI1RTL4B2xum2Trq0w/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/groups/from-the-lamp/gitlab_runner_token:
+1:prod/helm/istio-system/ingressgateway:
   extends: .plan
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/gitlab_runner_token
+    DIR: prod/helm/istio-system/ingressgateway
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/gitlab_runner_token:
+2:prod/helm/istio-system/ingressgateway:
   extends: .apply
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/gitlab_runner_token
+    DIR: prod/helm/istio-system/ingressgateway
     AWS_PROFILE: lamp-prod
 
-1:prod/gitlab/groups/from-the-lamp/gitlab_runner_token/.terragrunt-cache/wHBGQKVeDD3ATXr6BD4jaRXnJao/eTdRvcKE3sjUAMAUHSOXMee-nj4/get_runner_token:
+1:prod/helm/istio-system/ingressgateway/.terragrunt-cache/ToZFn0PfiRcxt4wgg5QfO_r1Jv8/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .plan
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/gitlab_runner_token/.terragrunt-cache/wHBGQKVeDD3ATXr6BD4jaRXnJao/eTdRvcKE3sjUAMAUHSOXMee-nj4/get_runner_token
+    DIR: prod/helm/istio-system/ingressgateway/.terragrunt-cache/ToZFn0PfiRcxt4wgg5QfO_r1Jv8/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/gitlab_runner_token/.terragrunt-cache/wHBGQKVeDD3ATXr6BD4jaRXnJao/eTdRvcKE3sjUAMAUHSOXMee-nj4/get_runner_token:
+2:prod/helm/istio-system/ingressgateway/.terragrunt-cache/ToZFn0PfiRcxt4wgg5QfO_r1Jv8/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .apply
   variables:
-    DIR: prod/gitlab/groups/from-the-lamp/gitlab_runner_token/.terragrunt-cache/wHBGQKVeDD3ATXr6BD4jaRXnJao/eTdRvcKE3sjUAMAUHSOXMee-nj4/get_runner_token
-    AWS_PROFILE: lamp-prod
-
-1:prod/gitlab/groups/from-the-lamp/image-pull-secrets:
-  extends: .plan
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/image-pull-secrets
-    AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/image-pull-secrets:
-  extends: .apply
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/image-pull-secrets
-    AWS_PROFILE: lamp-prod
-
-1:prod/gitlab/groups/from-the-lamp/image-pull-secrets/.terragrunt-cache/n1OVNet1t_GfTP2iUzdAnCDaaSI/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .plan
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/image-pull-secrets/.terragrunt-cache/n1OVNet1t_GfTP2iUzdAnCDaaSI/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/image-pull-secrets/.terragrunt-cache/n1OVNet1t_GfTP2iUzdAnCDaaSI/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .apply
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/image-pull-secrets/.terragrunt-cache/n1OVNet1t_GfTP2iUzdAnCDaaSI/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-
-1:prod/gitlab/groups/from-the-lamp/namespace:
-  extends: .plan
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/namespace
-    AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/namespace:
-  extends: .apply
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/namespace
-    AWS_PROFILE: lamp-prod
-
-1:prod/gitlab/groups/from-the-lamp/namespace/.terragrunt-cache/QJ0CcyN_jC5dUypJ2MzWo3l5_x8/NUTsEwNegoDnp2-Eh4jlwjowuE0/namespaces:
-  extends: .plan
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/namespace/.terragrunt-cache/QJ0CcyN_jC5dUypJ2MzWo3l5_x8/NUTsEwNegoDnp2-Eh4jlwjowuE0/namespaces
-    AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/namespace/.terragrunt-cache/QJ0CcyN_jC5dUypJ2MzWo3l5_x8/NUTsEwNegoDnp2-Eh4jlwjowuE0/namespaces:
-  extends: .apply
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/namespace/.terragrunt-cache/QJ0CcyN_jC5dUypJ2MzWo3l5_x8/NUTsEwNegoDnp2-Eh4jlwjowuE0/namespaces
-    AWS_PROFILE: lamp-prod
-
-1:prod/gitlab/groups/from-the-lamp/vars:
-  extends: .plan
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/vars
-    AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/vars:
-  extends: .apply
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/vars
-    AWS_PROFILE: lamp-prod
-
-1:prod/gitlab/groups/from-the-lamp/vars/.terragrunt-cache/mXi3VBKDG-qLvuK4q_wuhp7cIoA/eTdRvcKE3sjUAMAUHSOXMee-nj4/add_variables:
-  extends: .plan
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/vars/.terragrunt-cache/mXi3VBKDG-qLvuK4q_wuhp7cIoA/eTdRvcKE3sjUAMAUHSOXMee-nj4/add_variables
-    AWS_PROFILE: lamp-prod
-2:prod/gitlab/groups/from-the-lamp/vars/.terragrunt-cache/mXi3VBKDG-qLvuK4q_wuhp7cIoA/eTdRvcKE3sjUAMAUHSOXMee-nj4/add_variables:
-  extends: .apply
-  variables:
-    DIR: prod/gitlab/groups/from-the-lamp/vars/.terragrunt-cache/mXi3VBKDG-qLvuK4q_wuhp7cIoA/eTdRvcKE3sjUAMAUHSOXMee-nj4/add_variables
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/cert-manager:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/cert-manager
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/cert-manager:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/cert-manager
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/cert-manager/.terragrunt-cache/Qzknb9M2qmAbZdczGhfyJZXV5vw/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/cert-manager/.terragrunt-cache/Qzknb9M2qmAbZdczGhfyJZXV5vw/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/cert-manager/.terragrunt-cache/Qzknb9M2qmAbZdczGhfyJZXV5vw/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/cert-manager/.terragrunt-cache/Qzknb9M2qmAbZdczGhfyJZXV5vw/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/deploy-roles:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/deploy-roles
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/deploy-roles:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/deploy-roles
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/deploy-roles/.terragrunt-cache/NyLOR5-1448tNk3KvEuYE1XuSNI/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/deploy-roles/.terragrunt-cache/NyLOR5-1448tNk3KvEuYE1XuSNI/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/deploy-roles/.terragrunt-cache/NyLOR5-1448tNk3KvEuYE1XuSNI/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/deploy-roles/.terragrunt-cache/NyLOR5-1448tNk3KvEuYE1XuSNI/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/istio-ingressgateway:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/istio-ingressgateway
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/istio-ingressgateway:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/istio-ingressgateway
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/istio-ingressgateway/.terragrunt-cache/XOkAj-M8xhpm9C-QV5keU97lHhk/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/istio-ingressgateway/.terragrunt-cache/XOkAj-M8xhpm9C-QV5keU97lHhk/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/istio-ingressgateway/.terragrunt-cache/XOkAj-M8xhpm9C-QV5keU97lHhk/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/istio-ingressgateway/.terragrunt-cache/XOkAj-M8xhpm9C-QV5keU97lHhk/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/istio-ingressgateway-internal:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/istio-ingressgateway-internal
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/istio-ingressgateway-internal:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/istio-ingressgateway-internal
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/istio-ingressgateway-internal/.terragrunt-cache/U1qXH8x2ZgUPuoJ6sCY2Td6DCFo/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/istio-ingressgateway-internal/.terragrunt-cache/U1qXH8x2ZgUPuoJ6sCY2Td6DCFo/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/istio-ingressgateway-internal/.terragrunt-cache/U1qXH8x2ZgUPuoJ6sCY2Td6DCFo/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/istio-ingressgateway-internal/.terragrunt-cache/U1qXH8x2ZgUPuoJ6sCY2Td6DCFo/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/origin-ca-issuer:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/origin-ca-issuer
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/origin-ca-issuer:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/origin-ca-issuer
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/origin-ca-issuer/.terragrunt-cache/AVhhk4rje5700h43CSycV6mH4_s/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/origin-ca-issuer/.terragrunt-cache/AVhhk4rje5700h43CSycV6mH4_s/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/origin-ca-issuer/.terragrunt-cache/AVhhk4rje5700h43CSycV6mH4_s/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/origin-ca-issuer/.terragrunt-cache/AVhhk4rje5700h43CSycV6mH4_s/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/origin-ca-issuer-controller:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/origin-ca-issuer-controller
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/origin-ca-issuer-controller:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/origin-ca-issuer-controller
-    AWS_PROFILE: lamp-prod
-
-1:prod/helm/gateway/origin-ca-issuer-controller/.terragrunt-cache/zrUv3y3d2NFCjgXEAzVq9aEUgE0/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .plan
-  variables:
-    DIR: prod/helm/gateway/origin-ca-issuer-controller/.terragrunt-cache/zrUv3y3d2NFCjgXEAzVq9aEUgE0/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
-    AWS_PROFILE: lamp-prod
-2:prod/helm/gateway/origin-ca-issuer-controller/.terragrunt-cache/zrUv3y3d2NFCjgXEAzVq9aEUgE0/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
-  extends: .apply
-  variables:
-    DIR: prod/helm/gateway/origin-ca-issuer-controller/.terragrunt-cache/zrUv3y3d2NFCjgXEAzVq9aEUgE0/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/istio-system/ingressgateway/.terragrunt-cache/ToZFn0PfiRcxt4wgg5QfO_r1Jv8/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
 
 1:prod/helm/istio-system/istio:
@@ -685,15 +542,15 @@ include:
     DIR: prod/helm/istio-system/istio
     AWS_PROFILE: lamp-prod
 
-1:prod/helm/istio-system/istio/.terragrunt-cache/t2mfV0FgNe86XnwKQwND2_dM0SE/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
+1:prod/helm/istio-system/istio/.terragrunt-cache/t2mfV0FgNe86XnwKQwND2_dM0SE/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .plan
   variables:
-    DIR: prod/helm/istio-system/istio/.terragrunt-cache/t2mfV0FgNe86XnwKQwND2_dM0SE/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/istio-system/istio/.terragrunt-cache/t2mfV0FgNe86XnwKQwND2_dM0SE/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
-2:prod/helm/istio-system/istio/.terragrunt-cache/t2mfV0FgNe86XnwKQwND2_dM0SE/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
+2:prod/helm/istio-system/istio/.terragrunt-cache/t2mfV0FgNe86XnwKQwND2_dM0SE/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .apply
   variables:
-    DIR: prod/helm/istio-system/istio/.terragrunt-cache/t2mfV0FgNe86XnwKQwND2_dM0SE/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/istio-system/istio/.terragrunt-cache/t2mfV0FgNe86XnwKQwND2_dM0SE/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
 
 1:prod/helm/istio-system/istiod:
@@ -707,15 +564,59 @@ include:
     DIR: prod/helm/istio-system/istiod
     AWS_PROFILE: lamp-prod
 
-1:prod/helm/istio-system/istiod/.terragrunt-cache/-Q2s9nu4jqeqQEpNSuhtwi9vWbs/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
+1:prod/helm/istio-system/istiod/.terragrunt-cache/-Q2s9nu4jqeqQEpNSuhtwi9vWbs/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .plan
   variables:
-    DIR: prod/helm/istio-system/istiod/.terragrunt-cache/-Q2s9nu4jqeqQEpNSuhtwi9vWbs/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/istio-system/istiod/.terragrunt-cache/-Q2s9nu4jqeqQEpNSuhtwi9vWbs/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
-2:prod/helm/istio-system/istiod/.terragrunt-cache/-Q2s9nu4jqeqQEpNSuhtwi9vWbs/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
+2:prod/helm/istio-system/istiod/.terragrunt-cache/-Q2s9nu4jqeqQEpNSuhtwi9vWbs/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .apply
   variables:
-    DIR: prod/helm/istio-system/istiod/.terragrunt-cache/-Q2s9nu4jqeqQEpNSuhtwi9vWbs/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/istio-system/istiod/.terragrunt-cache/-Q2s9nu4jqeqQEpNSuhtwi9vWbs/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
+    AWS_PROFILE: lamp-prod
+
+1:prod/helm/istio-system/origin-ca-issuer:
+  extends: .plan
+  variables:
+    DIR: prod/helm/istio-system/origin-ca-issuer
+    AWS_PROFILE: lamp-prod
+2:prod/helm/istio-system/origin-ca-issuer:
+  extends: .apply
+  variables:
+    DIR: prod/helm/istio-system/origin-ca-issuer
+    AWS_PROFILE: lamp-prod
+
+1:prod/helm/istio-system/origin-ca-issuer/.terragrunt-cache/PUic7sg9SdbTIAU7iKrok4vjJGA/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
+  extends: .plan
+  variables:
+    DIR: prod/helm/istio-system/origin-ca-issuer/.terragrunt-cache/PUic7sg9SdbTIAU7iKrok4vjJGA/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
+    AWS_PROFILE: lamp-prod
+2:prod/helm/istio-system/origin-ca-issuer/.terragrunt-cache/PUic7sg9SdbTIAU7iKrok4vjJGA/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
+  extends: .apply
+  variables:
+    DIR: prod/helm/istio-system/origin-ca-issuer/.terragrunt-cache/PUic7sg9SdbTIAU7iKrok4vjJGA/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
+    AWS_PROFILE: lamp-prod
+
+1:prod/helm/istio-system/origin-ca-issuer-controller:
+  extends: .plan
+  variables:
+    DIR: prod/helm/istio-system/origin-ca-issuer-controller
+    AWS_PROFILE: lamp-prod
+2:prod/helm/istio-system/origin-ca-issuer-controller:
+  extends: .apply
+  variables:
+    DIR: prod/helm/istio-system/origin-ca-issuer-controller
+    AWS_PROFILE: lamp-prod
+
+1:prod/helm/istio-system/origin-ca-issuer-controller/.terragrunt-cache/t7qy5wov5Nxi768B9sF7ztejAkY/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
+  extends: .plan
+  variables:
+    DIR: prod/helm/istio-system/origin-ca-issuer-controller/.terragrunt-cache/t7qy5wov5Nxi768B9sF7ztejAkY/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
+    AWS_PROFILE: lamp-prod
+2:prod/helm/istio-system/origin-ca-issuer-controller/.terragrunt-cache/t7qy5wov5Nxi768B9sF7ztejAkY/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
+  extends: .apply
+  variables:
+    DIR: prod/helm/istio-system/origin-ca-issuer-controller/.terragrunt-cache/t7qy5wov5Nxi768B9sF7ztejAkY/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
 
 1:prod/helm/kube-system/oci-cloud-controller-manager:
@@ -729,15 +630,26 @@ include:
     DIR: prod/helm/kube-system/oci-cloud-controller-manager
     AWS_PROFILE: lamp-prod
 
-1:prod/helm/kube-system/oci-cloud-controller-manager/.terragrunt-cache/Qg8wFSF1UlHv0W-CPgnU2wWYzuo/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
+1:prod/helm/kube-system/oci-cloud-controller-manager/.terragrunt-cache/Qg8wFSF1UlHv0W-CPgnU2wWYzuo/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .plan
   variables:
-    DIR: prod/helm/kube-system/oci-cloud-controller-manager/.terragrunt-cache/Qg8wFSF1UlHv0W-CPgnU2wWYzuo/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/kube-system/oci-cloud-controller-manager/.terragrunt-cache/Qg8wFSF1UlHv0W-CPgnU2wWYzuo/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
     AWS_PROFILE: lamp-prod
-2:prod/helm/kube-system/oci-cloud-controller-manager/.terragrunt-cache/Qg8wFSF1UlHv0W-CPgnU2wWYzuo/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm:
+2:prod/helm/kube-system/oci-cloud-controller-manager/.terragrunt-cache/Qg8wFSF1UlHv0W-CPgnU2wWYzuo/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm:
   extends: .apply
   variables:
-    DIR: prod/helm/kube-system/oci-cloud-controller-manager/.terragrunt-cache/Qg8wFSF1UlHv0W-CPgnU2wWYzuo/NUTsEwNegoDnp2-Eh4jlwjowuE0/helm
+    DIR: prod/helm/kube-system/oci-cloud-controller-manager/.terragrunt-cache/Qg8wFSF1UlHv0W-CPgnU2wWYzuo/cs5lJoMjhDoYiCYA91u1q6a2zGo/helm
+    AWS_PROFILE: lamp-prod
+
+1:prod/namespaces:
+  extends: .plan
+  variables:
+    DIR: prod/namespaces
+    AWS_PROFILE: lamp-prod
+2:prod/namespaces:
+  extends: .apply
+  variables:
+    DIR: prod/namespaces
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/k3s/masters/cloudinit_config:
@@ -751,17 +663,6 @@ include:
     DIR: prod/oracle/k3s/masters/cloudinit_config
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/k3s/masters/cloudinit_config/.terragrunt-cache/QVPKYdLQeg29eRtnEP95RyoQ1FE/nAwNjdJiAJhpX_cWsi7Z_TKQkyU:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/k3s/masters/cloudinit_config/.terragrunt-cache/QVPKYdLQeg29eRtnEP95RyoQ1FE/nAwNjdJiAJhpX_cWsi7Z_TKQkyU
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/masters/cloudinit_config/.terragrunt-cache/QVPKYdLQeg29eRtnEP95RyoQ1FE/nAwNjdJiAJhpX_cWsi7Z_TKQkyU:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/k3s/masters/cloudinit_config/.terragrunt-cache/QVPKYdLQeg29eRtnEP95RyoQ1FE/nAwNjdJiAJhpX_cWsi7Z_TKQkyU
-    AWS_PROFILE: lamp-prod
-
 1:prod/oracle/k3s/masters/identity_dynamic_group:
   extends: .plan
   variables:
@@ -773,15 +674,15 @@ include:
     DIR: prod/oracle/k3s/masters/identity_dynamic_group
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/k3s/masters/identity_dynamic_group/.terragrunt-cache/GsOwoEgMrmM2Hce1d3OOWvrArWU/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/identity_dynamic_group:
+1:prod/oracle/k3s/masters/identity_dynamic_group/.terragrunt-cache/GsOwoEgMrmM2Hce1d3OOWvrArWU/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group:
   extends: .plan
   variables:
-    DIR: prod/oracle/k3s/masters/identity_dynamic_group/.terragrunt-cache/GsOwoEgMrmM2Hce1d3OOWvrArWU/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/identity_dynamic_group
+    DIR: prod/oracle/k3s/masters/identity_dynamic_group/.terragrunt-cache/GsOwoEgMrmM2Hce1d3OOWvrArWU/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group
     AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/masters/identity_dynamic_group/.terragrunt-cache/GsOwoEgMrmM2Hce1d3OOWvrArWU/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/identity_dynamic_group:
+2:prod/oracle/k3s/masters/identity_dynamic_group/.terragrunt-cache/GsOwoEgMrmM2Hce1d3OOWvrArWU/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group:
   extends: .apply
   variables:
-    DIR: prod/oracle/k3s/masters/identity_dynamic_group/.terragrunt-cache/GsOwoEgMrmM2Hce1d3OOWvrArWU/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/identity_dynamic_group
+    DIR: prod/oracle/k3s/masters/identity_dynamic_group/.terragrunt-cache/GsOwoEgMrmM2Hce1d3OOWvrArWU/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/k3s/masters/instance_config:
@@ -795,17 +696,6 @@ include:
     DIR: prod/oracle/k3s/masters/instance_config
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/k3s/masters/instance_config/.terragrunt-cache/AJs6T955bSmNkNm42-cSTdQoXnI/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_config:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/k3s/masters/instance_config/.terragrunt-cache/AJs6T955bSmNkNm42-cSTdQoXnI/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_config
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/masters/instance_config/.terragrunt-cache/AJs6T955bSmNkNm42-cSTdQoXnI/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_config:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/k3s/masters/instance_config/.terragrunt-cache/AJs6T955bSmNkNm42-cSTdQoXnI/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_config
-    AWS_PROFILE: lamp-prod
-
 1:prod/oracle/k3s/masters/instance_pool:
   extends: .plan
   variables:
@@ -815,17 +705,6 @@ include:
   extends: .apply
   variables:
     DIR: prod/oracle/k3s/masters/instance_pool
-    AWS_PROFILE: lamp-prod
-
-1:prod/oracle/k3s/masters/instance_pool/.terragrunt-cache/69brwx1nh36GBQ3gCSS6VE2R5rc/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_pool:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/k3s/masters/instance_pool/.terragrunt-cache/69brwx1nh36GBQ3gCSS6VE2R5rc/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_pool
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/masters/instance_pool/.terragrunt-cache/69brwx1nh36GBQ3gCSS6VE2R5rc/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_pool:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/k3s/masters/instance_pool/.terragrunt-cache/69brwx1nh36GBQ3gCSS6VE2R5rc/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_pool
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/k3s/masters/ssh_read_file_content:
@@ -839,15 +718,70 @@ include:
     DIR: prod/oracle/k3s/masters/ssh_read_file_content
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/k3s/masters/ssh_read_file_content/.terragrunt-cache/tPfHrF3k4vTh5fvaoso2XA3Uhr0/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/ssh_read_file_content:
+1:prod/oracle/k3s/runner/cloudinit_config:
   extends: .plan
   variables:
-    DIR: prod/oracle/k3s/masters/ssh_read_file_content/.terragrunt-cache/tPfHrF3k4vTh5fvaoso2XA3Uhr0/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/ssh_read_file_content
+    DIR: prod/oracle/k3s/runner/cloudinit_config
     AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/masters/ssh_read_file_content/.terragrunt-cache/tPfHrF3k4vTh5fvaoso2XA3Uhr0/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/ssh_read_file_content:
+2:prod/oracle/k3s/runner/cloudinit_config:
   extends: .apply
   variables:
-    DIR: prod/oracle/k3s/masters/ssh_read_file_content/.terragrunt-cache/tPfHrF3k4vTh5fvaoso2XA3Uhr0/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/ssh_read_file_content
+    DIR: prod/oracle/k3s/runner/cloudinit_config
+    AWS_PROFILE: lamp-prod
+
+1:prod/oracle/k3s/runner/cloudinit_config/.terragrunt-cache/hc-EJb8AVlKQhnfuXvKzk1L_irE/4rhodTKZMFcHbs8Tna-r4Df8ZdQ/cloudinit_config:
+  extends: .plan
+  variables:
+    DIR: prod/oracle/k3s/runner/cloudinit_config/.terragrunt-cache/hc-EJb8AVlKQhnfuXvKzk1L_irE/4rhodTKZMFcHbs8Tna-r4Df8ZdQ/cloudinit_config
+    AWS_PROFILE: lamp-prod
+2:prod/oracle/k3s/runner/cloudinit_config/.terragrunt-cache/hc-EJb8AVlKQhnfuXvKzk1L_irE/4rhodTKZMFcHbs8Tna-r4Df8ZdQ/cloudinit_config:
+  extends: .apply
+  variables:
+    DIR: prod/oracle/k3s/runner/cloudinit_config/.terragrunt-cache/hc-EJb8AVlKQhnfuXvKzk1L_irE/4rhodTKZMFcHbs8Tna-r4Df8ZdQ/cloudinit_config
+    AWS_PROFILE: lamp-prod
+
+1:prod/oracle/k3s/runner/identity_dynamic_group:
+  extends: .plan
+  variables:
+    DIR: prod/oracle/k3s/runner/identity_dynamic_group
+    AWS_PROFILE: lamp-prod
+2:prod/oracle/k3s/runner/identity_dynamic_group:
+  extends: .apply
+  variables:
+    DIR: prod/oracle/k3s/runner/identity_dynamic_group
+    AWS_PROFILE: lamp-prod
+
+1:prod/oracle/k3s/runner/identity_dynamic_group/.terragrunt-cache/mUa4Pj8i0uHdg9xhNn6Ak-Oq8mE/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group:
+  extends: .plan
+  variables:
+    DIR: prod/oracle/k3s/runner/identity_dynamic_group/.terragrunt-cache/mUa4Pj8i0uHdg9xhNn6Ak-Oq8mE/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group
+    AWS_PROFILE: lamp-prod
+2:prod/oracle/k3s/runner/identity_dynamic_group/.terragrunt-cache/mUa4Pj8i0uHdg9xhNn6Ak-Oq8mE/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group:
+  extends: .apply
+  variables:
+    DIR: prod/oracle/k3s/runner/identity_dynamic_group/.terragrunt-cache/mUa4Pj8i0uHdg9xhNn6Ak-Oq8mE/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group
+    AWS_PROFILE: lamp-prod
+
+1:prod/oracle/k3s/runner/instance:
+  extends: .plan
+  variables:
+    DIR: prod/oracle/k3s/runner/instance
+    AWS_PROFILE: lamp-prod
+2:prod/oracle/k3s/runner/instance:
+  extends: .apply
+  variables:
+    DIR: prod/oracle/k3s/runner/instance
+    AWS_PROFILE: lamp-prod
+
+1:prod/oracle/k3s/runner/instance/.terragrunt-cache/UtZc95ZNfqv0R73G_rmnrNBPKPM/a9ek4muCXaHhcEK3WBOTwWY0vJc/instance:
+  extends: .plan
+  variables:
+    DIR: prod/oracle/k3s/runner/instance/.terragrunt-cache/UtZc95ZNfqv0R73G_rmnrNBPKPM/a9ek4muCXaHhcEK3WBOTwWY0vJc/instance
+    AWS_PROFILE: lamp-prod
+2:prod/oracle/k3s/runner/instance/.terragrunt-cache/UtZc95ZNfqv0R73G_rmnrNBPKPM/a9ek4muCXaHhcEK3WBOTwWY0vJc/instance:
+  extends: .apply
+  variables:
+    DIR: prod/oracle/k3s/runner/instance/.terragrunt-cache/UtZc95ZNfqv0R73G_rmnrNBPKPM/a9ek4muCXaHhcEK3WBOTwWY0vJc/instance
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/k3s/token:
@@ -861,17 +795,6 @@ include:
     DIR: prod/oracle/k3s/token
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/k3s/token/.terragrunt-cache/wHb4n7ytW7yvkNRDr6XxGUfyOG4/qbFAMR1A1oSBFeA84ZiOz-5Zq-s:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/k3s/token/.terragrunt-cache/wHb4n7ytW7yvkNRDr6XxGUfyOG4/qbFAMR1A1oSBFeA84ZiOz-5Zq-s
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/token/.terragrunt-cache/wHb4n7ytW7yvkNRDr6XxGUfyOG4/qbFAMR1A1oSBFeA84ZiOz-5Zq-s:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/k3s/token/.terragrunt-cache/wHb4n7ytW7yvkNRDr6XxGUfyOG4/qbFAMR1A1oSBFeA84ZiOz-5Zq-s
-    AWS_PROFILE: lamp-prod
-
 1:prod/oracle/k3s/workers/cloudinit_config:
   extends: .plan
   variables:
@@ -881,17 +804,6 @@ include:
   extends: .apply
   variables:
     DIR: prod/oracle/k3s/workers/cloudinit_config
-    AWS_PROFILE: lamp-prod
-
-1:prod/oracle/k3s/workers/cloudinit_config/.terragrunt-cache/C275nefdMXg9Gm-f1-WrbnhbYvo/nAwNjdJiAJhpX_cWsi7Z_TKQkyU:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/k3s/workers/cloudinit_config/.terragrunt-cache/C275nefdMXg9Gm-f1-WrbnhbYvo/nAwNjdJiAJhpX_cWsi7Z_TKQkyU
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/workers/cloudinit_config/.terragrunt-cache/C275nefdMXg9Gm-f1-WrbnhbYvo/nAwNjdJiAJhpX_cWsi7Z_TKQkyU:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/k3s/workers/cloudinit_config/.terragrunt-cache/C275nefdMXg9Gm-f1-WrbnhbYvo/nAwNjdJiAJhpX_cWsi7Z_TKQkyU
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/k3s/workers/identity_dynamic_group:
@@ -905,15 +817,15 @@ include:
     DIR: prod/oracle/k3s/workers/identity_dynamic_group
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/k3s/workers/identity_dynamic_group/.terragrunt-cache/xl2SDn8kn-vI2ZobCaq841WQ-Ao/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/identity_dynamic_group:
+1:prod/oracle/k3s/workers/identity_dynamic_group/.terragrunt-cache/xl2SDn8kn-vI2ZobCaq841WQ-Ao/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group:
   extends: .plan
   variables:
-    DIR: prod/oracle/k3s/workers/identity_dynamic_group/.terragrunt-cache/xl2SDn8kn-vI2ZobCaq841WQ-Ao/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/identity_dynamic_group
+    DIR: prod/oracle/k3s/workers/identity_dynamic_group/.terragrunt-cache/xl2SDn8kn-vI2ZobCaq841WQ-Ao/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group
     AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/workers/identity_dynamic_group/.terragrunt-cache/xl2SDn8kn-vI2ZobCaq841WQ-Ao/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/identity_dynamic_group:
+2:prod/oracle/k3s/workers/identity_dynamic_group/.terragrunt-cache/xl2SDn8kn-vI2ZobCaq841WQ-Ao/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group:
   extends: .apply
   variables:
-    DIR: prod/oracle/k3s/workers/identity_dynamic_group/.terragrunt-cache/xl2SDn8kn-vI2ZobCaq841WQ-Ao/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/identity_dynamic_group
+    DIR: prod/oracle/k3s/workers/identity_dynamic_group/.terragrunt-cache/xl2SDn8kn-vI2ZobCaq841WQ-Ao/a9ek4muCXaHhcEK3WBOTwWY0vJc/identity_dynamic_group
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/k3s/workers/instance_config:
@@ -927,17 +839,6 @@ include:
     DIR: prod/oracle/k3s/workers/instance_config
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/k3s/workers/instance_config/.terragrunt-cache/_eUvQJdwYoZHdkMOTDWZ0zuGFQc/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_config:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/k3s/workers/instance_config/.terragrunt-cache/_eUvQJdwYoZHdkMOTDWZ0zuGFQc/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_config
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/workers/instance_config/.terragrunt-cache/_eUvQJdwYoZHdkMOTDWZ0zuGFQc/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_config:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/k3s/workers/instance_config/.terragrunt-cache/_eUvQJdwYoZHdkMOTDWZ0zuGFQc/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_config
-    AWS_PROFILE: lamp-prod
-
 1:prod/oracle/k3s/workers/instance_pool:
   extends: .plan
   variables:
@@ -949,15 +850,15 @@ include:
     DIR: prod/oracle/k3s/workers/instance_pool
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_pool:
+1:prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/a9ek4muCXaHhcEK3WBOTwWY0vJc/instance_pool:
   extends: .plan
   variables:
-    DIR: prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_pool
+    DIR: prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/a9ek4muCXaHhcEK3WBOTwWY0vJc/instance_pool
     AWS_PROFILE: lamp-prod
-2:prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_pool:
+2:prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/a9ek4muCXaHhcEK3WBOTwWY0vJc/instance_pool:
   extends: .apply
   variables:
-    DIR: prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/instance_pool
+    DIR: prod/oracle/k3s/workers/instance_pool/.terragrunt-cache/wp-V89K2trQrM3Z0KrBaMQJVUEw/a9ek4muCXaHhcEK3WBOTwWY0vJc/instance_pool
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/nsg/allow_https_from_all:
@@ -971,15 +872,15 @@ include:
     DIR: prod/oracle/nsg/allow_https_from_all
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/nsg/allow_https_from_all/.terragrunt-cache/qCI3oXXEwC-XF0vc5UJ6XdrHNCE/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg:
+1:prod/oracle/nsg/allow_https_from_all/.terragrunt-cache/qCI3oXXEwC-XF0vc5UJ6XdrHNCE/a9ek4muCXaHhcEK3WBOTwWY0vJc/nsg:
   extends: .plan
   variables:
-    DIR: prod/oracle/nsg/allow_https_from_all/.terragrunt-cache/qCI3oXXEwC-XF0vc5UJ6XdrHNCE/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg
+    DIR: prod/oracle/nsg/allow_https_from_all/.terragrunt-cache/qCI3oXXEwC-XF0vc5UJ6XdrHNCE/a9ek4muCXaHhcEK3WBOTwWY0vJc/nsg
     AWS_PROFILE: lamp-prod
-2:prod/oracle/nsg/allow_https_from_all/.terragrunt-cache/qCI3oXXEwC-XF0vc5UJ6XdrHNCE/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg:
+2:prod/oracle/nsg/allow_https_from_all/.terragrunt-cache/qCI3oXXEwC-XF0vc5UJ6XdrHNCE/a9ek4muCXaHhcEK3WBOTwWY0vJc/nsg:
   extends: .apply
   variables:
-    DIR: prod/oracle/nsg/allow_https_from_all/.terragrunt-cache/qCI3oXXEwC-XF0vc5UJ6XdrHNCE/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg
+    DIR: prod/oracle/nsg/allow_https_from_all/.terragrunt-cache/qCI3oXXEwC-XF0vc5UJ6XdrHNCE/a9ek4muCXaHhcEK3WBOTwWY0vJc/nsg
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/nsg/allow_icmp_between_instances:
@@ -993,15 +894,15 @@ include:
     DIR: prod/oracle/nsg/allow_icmp_between_instances
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/nsg/allow_icmp_between_instances/.terragrunt-cache/sNprrujR5Bsf2Ed5dwfpOSfQzkA/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg:
+1:prod/oracle/nsg/allow_icmp_between_instances/.terragrunt-cache/sNprrujR5Bsf2Ed5dwfpOSfQzkA/a9ek4muCXaHhcEK3WBOTwWY0vJc/nsg:
   extends: .plan
   variables:
-    DIR: prod/oracle/nsg/allow_icmp_between_instances/.terragrunt-cache/sNprrujR5Bsf2Ed5dwfpOSfQzkA/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg
+    DIR: prod/oracle/nsg/allow_icmp_between_instances/.terragrunt-cache/sNprrujR5Bsf2Ed5dwfpOSfQzkA/a9ek4muCXaHhcEK3WBOTwWY0vJc/nsg
     AWS_PROFILE: lamp-prod
-2:prod/oracle/nsg/allow_icmp_between_instances/.terragrunt-cache/sNprrujR5Bsf2Ed5dwfpOSfQzkA/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg:
+2:prod/oracle/nsg/allow_icmp_between_instances/.terragrunt-cache/sNprrujR5Bsf2Ed5dwfpOSfQzkA/a9ek4muCXaHhcEK3WBOTwWY0vJc/nsg:
   extends: .apply
   variables:
-    DIR: prod/oracle/nsg/allow_icmp_between_instances/.terragrunt-cache/sNprrujR5Bsf2Ed5dwfpOSfQzkA/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg
+    DIR: prod/oracle/nsg/allow_icmp_between_instances/.terragrunt-cache/sNprrujR5Bsf2Ed5dwfpOSfQzkA/a9ek4muCXaHhcEK3WBOTwWY0vJc/nsg
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/nsg/allow_kube_api_from_all:
@@ -1015,17 +916,6 @@ include:
     DIR: prod/oracle/nsg/allow_kube_api_from_all
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/nsg/allow_kube_api_from_all/.terragrunt-cache/aL-Vo9DKu5LAAdVs8lBxJHw5G30/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/nsg/allow_kube_api_from_all/.terragrunt-cache/aL-Vo9DKu5LAAdVs8lBxJHw5G30/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/nsg/allow_kube_api_from_all/.terragrunt-cache/aL-Vo9DKu5LAAdVs8lBxJHw5G30/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/nsg/allow_kube_api_from_all/.terragrunt-cache/aL-Vo9DKu5LAAdVs8lBxJHw5G30/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg
-    AWS_PROFILE: lamp-prod
-
 1:prod/oracle/nsg/allow_ssh_from_all:
   extends: .plan
   variables:
@@ -1035,17 +925,6 @@ include:
   extends: .apply
   variables:
     DIR: prod/oracle/nsg/allow_ssh_from_all
-    AWS_PROFILE: lamp-prod
-
-1:prod/oracle/nsg/allow_ssh_from_all/.terragrunt-cache/r8bjZLvgVMlcq9YxHLrZ7aStTkY/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg:
-  extends: .plan
-  variables:
-    DIR: prod/oracle/nsg/allow_ssh_from_all/.terragrunt-cache/r8bjZLvgVMlcq9YxHLrZ7aStTkY/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg
-    AWS_PROFILE: lamp-prod
-2:prod/oracle/nsg/allow_ssh_from_all/.terragrunt-cache/r8bjZLvgVMlcq9YxHLrZ7aStTkY/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg:
-  extends: .apply
-  variables:
-    DIR: prod/oracle/nsg/allow_ssh_from_all/.terragrunt-cache/r8bjZLvgVMlcq9YxHLrZ7aStTkY/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/nsg
     AWS_PROFILE: lamp-prod
 
 1:prod/oracle/vcn:
@@ -1059,14 +938,25 @@ include:
     DIR: prod/oracle/vcn
     AWS_PROFILE: lamp-prod
 
-1:prod/oracle/vcn/.terragrunt-cache/Uxn-yfldT51NaVsBGcew5ghex58/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/vcn:
+1:prod/dns:
   extends: .plan
   variables:
-    DIR: prod/oracle/vcn/.terragrunt-cache/Uxn-yfldT51NaVsBGcew5ghex58/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/vcn
+    DIR: prod/dns
     AWS_PROFILE: lamp-prod
-2:prod/oracle/vcn/.terragrunt-cache/Uxn-yfldT51NaVsBGcew5ghex58/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/vcn:
+2:prod/dns:
   extends: .apply
   variables:
-    DIR: prod/oracle/vcn/.terragrunt-cache/Uxn-yfldT51NaVsBGcew5ghex58/Z-91G2pZ1uU0Bg1JvilyHy-5Zn8/vcn
+    DIR: prod/dns
+    AWS_PROFILE: lamp-prod
+
+1:prod/dns/.terragrunt-cache/YCMBnxDPtJ5c_9vYfpqOXC4WOuM/wugkdUjD8kjCKyC2IOfdpRGqR1E/dns_record:
+  extends: .plan
+  variables:
+    DIR: prod/dns/.terragrunt-cache/YCMBnxDPtJ5c_9vYfpqOXC4WOuM/wugkdUjD8kjCKyC2IOfdpRGqR1E/dns_record
+    AWS_PROFILE: lamp-prod
+2:prod/dns/.terragrunt-cache/YCMBnxDPtJ5c_9vYfpqOXC4WOuM/wugkdUjD8kjCKyC2IOfdpRGqR1E/dns_record:
+  extends: .apply
+  variables:
+    DIR: prod/dns/.terragrunt-cache/YCMBnxDPtJ5c_9vYfpqOXC4WOuM/wugkdUjD8kjCKyC2IOfdpRGqR1E/dns_record
     AWS_PROFILE: lamp-prod
 

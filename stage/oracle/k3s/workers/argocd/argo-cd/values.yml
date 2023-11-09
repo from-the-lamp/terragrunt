@@ -1,9 +1,0 @@
-configs:
-  repositories:
-    from-the-lamp-helm-repo:
-      name: from-the-lamp
-      type: helm
-  params:
-    server.insecure: true
-    application.namespaces: "*"
-    createClusterRoles: true
