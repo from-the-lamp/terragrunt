@@ -1,155 +1,38 @@
 version: "3"
 
 dotenv: [".env"]
-
-env:
-  DEFAULT_REGION: eu-frankfurt-1
   
 silent: true
 tasks:
   rm:all:
     cmds:
-      - find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \;
-      - find . -type d -name ".terraform" -prune -exec rm -rf {} \;
-      - find . -iname "*generated*" -delete;
-      - find . -iname ".terraform.lock.hcl" -delete;
-      - find . -iname ".helmignore" -delete;
+    - find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \;
+    - find . -type d -name ".terraform" -prune -exec rm -rf {} \;
+    - find . -iname "*generated*" -delete;
+    - find . -iname ".terraform.lock.hcl" -delete;
+    - find . -iname ".helmignore" -delete;
+
   terragrunt:
     dir: $DIR
     cmds:
-      - task: rm:all
-      -
-        terragrunt {{ .ACTION }}
-        $(if [ "{{.AUTO_APPROVE}}" == "true" ]; then echo "-auto-approve"; fi)
-        $(if [ "{{.NON_INTERACTIVE}}" == "true" ]; then echo "--terragrunt-non-interactive"; fi)
+    - task: rm:all
+    - terragrunt run-all {{ .ACTION }} --terragrunt-non-interactive
 
   plan:
     cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "plan",
-          NON_INTERACTIVE: "true",
-        }
-  plan:all:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "run-all plan",
-          NON_INTERACTIVE: "true",
-        }
-
+    - task: terragrunt
+      vars: {
+        ACTION: "plan",
+      }
   apply:
     cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "apply",
-        }
-  apply:force:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "apply",
-          NON_INTERACTIVE: "true",
-          AUTO_APPROVE: "true"
-        }
-  apply:all:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "run-all apply",
-        }
-  apply:all:force:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "run-all apply",
-          NON_INTERACTIVE: "true",
-          AUTO_APPROVE: "true"
-        }
-
+    - task: terragrunt
+      vars: {
+        ACTION: "apply",
+      }
   destroy:
     cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "destroy",
-        }
-  destroy:force:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "destroy",
-          NON_INTERACTIVE: "true",
-          AUTO_APPROVE: "true"
-        }
-  destroy:all:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "run-all destroy",
-        }
-  destroy:all:force:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "run-all destroy",
-          NON_INTERACTIVE: "true",
-          AUTO_APPROVE: "true"
-        }
-
-  graph:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "graph-dependencies",
-          NON_INTERACTIVE: "true",
-        }
-
-  graph:all:
-    cmds:
-      - task: terragrunt
-        vars: {
-          ACTION: "run-all graph-dependencies",
-          NON_INTERACTIVE: "true",
-        }
-
-  unlock:
-    dir: $DIR
-    cmds:
-      - task: rm
-      - terragrunt force-unlock $ID
-
-  get:
-    cmds:
-      - |
-        if [ -f "{{ .OCI_CONFIG_PATH }}" ]; then
-          awk -F= -v section="[{{ .AWS_PROFILE }}]" -v key="{{ .VAR }}" '
-            $1 == section { in_section = 1; next }
-            $1 == "[" section "]" { in_section = 0 }
-            in_section && $1 == key { print $2; exit }' "{{ .OCI_CONFIG_PATH }}"
-        else
-          echo "File {{ .OCI_CONFIG_PATH }} does not exist."
-        fi
-
-  kubeconfig:
-    cmds:
-      - |
-        oci os object get --profile lamp-{{ .ENV }} \
-                          --bucket-name {{ .ENV }}-terraform-state \
-                          --name {{ .ENV }}/oracle/k3s/masters/ssh_read_file_content/terraform.tfstate \
-                          --file /tmp/{{ .ENV }}-kubeconfig 
-      - cat /tmp/{{ .ENV }}-kubeconfig | jq '.outputs.file_contents.value."/etc/rancher/k3s/k3s.yaml"' -r > ~/.config/kubeconfigs/RAW-lamp-{{ .ENV }}
-      - chmod 0600 ~/.config/kubeconfigs/RAW-lamp-{{ .ENV }}
-
-  kubeconfig:stage:
-    cmds:
-      - task: kubeconfig
-        vars: {
-          ENV: "stage"
-        }
-
-  kubeconfig:prod:
-    cmds:
-      - task: kubeconfig
-        vars: {
-          ENV: "prod"
-        }
+    - task: terragrunt
+      vars: {
+        ACTION: "destroy",
+      }

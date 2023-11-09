@@ -1,30 +1,30 @@
 terraform {
-  source = "${local.private_modules_base_url}/${local.module_name}//${local.module_subdir}?ref=${local.module_version}"
+  source = "${local.modules_url}/${local.module_name}//${local.module_dir}?ref=${local.module_version}"
 }
 
 locals {
-  module_name              = "cloudflare"
-  module_subdir            = "dns_record"
-  module_version           = "main"
-  private_modules_base_url = local.common_settings.locals.private_modules_base_url
-  common_settings          = read_terragrunt_config("${get_repo_root()}/_common/settings.hcl")
-  environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env                      = local.environment_vars.locals.environment
-  infra_zone               = local.environment_vars.locals.infra_zone
+  common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  modules_url = local.common_settings.locals.private_modules_base_url
+  module_name = "cloudflare"
+  module_dir = "dns_record"
+  module_version = "main"
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env = local.environment_vars.locals.environment
+  infra_zone = local.environment_vars.locals.infra_zone
 }
 
 dependency "get_infra_variables" {
   config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    map_variables = {
+    variables = {
       cloudflare_api_token = "fake-token"
     }
   }
 }
 
-dependency "load_balancer" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/workers/argocd/argocd-apps"
+dependency "ingressgateway" {
+  config_path = "${get_repo_root()}/${local.env}/helm/istio-system/ingressgateway"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   skip_outputs = true
 }
@@ -53,10 +53,10 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
   client_key = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
   EOF
-  cloudflare_api_token      = dependency.get_infra_variables.outputs.map_variables.cloudflare_api_token
-  cloudflare_zone_name      = local.infra_zone
-  external_load_balancer    = true
-  external_lb_svc_name      = "istio-ingressgateway"
-  external_lb_svc_namespace = "gateway"
-  internal_load_balancer    = false
+  cloudflare_api_token = dependency.get_infra_variables.outputs.variables.cloudflare_api_token
+  cloudflare_zone_name = local.infra_zone
+  external_load_balancer = true
+  external_lb_svc_name = "ingressgateway"
+  external_lb_svc_namespace = "istio-system"
+  internal_load_balancer = false
 }
