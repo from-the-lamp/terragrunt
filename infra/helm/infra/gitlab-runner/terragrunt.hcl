@@ -59,7 +59,6 @@ inputs = {
       memory: 128Mi
       cpu: 100m
   runners:
-    tags: "k8s-arm-default"
     config: |
       [[runners]]
         name = "Kubernetes Gitlab Runner"
