@@ -34,8 +34,10 @@ locals {
   helm_repo_pass = get_env("TF_HTTP_PASSWORD")
   infra_helm_repo_id = "40582099"
   infra_helm_repo_url = "https://${local.gitlab_base_url}/api/v4/projects/${local.infra_helm_repo_id}/packages/helm/stable"
-  oidc_client_id = "6c818bd896fabe3395fc48379925a2e1fa0432b821312228585886fb9e244f64"
-  vault_base_url = "vault.from-the-lamp.work"
+  vault_openid_client_id = "6c818bd896fabe3395fc48379925a2e1fa0432b821312228585886fb9e244f64"
+  vault_base_url = "vault.from-the-lamp.com"
+  grafana_openid_client_id = "913608a80a8f71ed9a73d9baa2662033cc570a0f473b29e10c7dd34ace8a0524"
+  argocd_openid_client_id = "2fd7eebea2c98fcc945b386fef203dfdc21b066f53cd23307baa9844264ff32e"
 }
 
 inputs = {

@@ -26,4 +26,5 @@ dependency "get_infra_variables" {
 inputs = {
   host = "https://${local.vault_base_url}"
   token = dependency.get_infra_variables.outputs.variables.vault_token
+  policy_name = basename(get_terragrunt_dir())
 }

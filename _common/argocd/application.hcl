@@ -13,47 +13,23 @@ locals {
   env = local.environment_vars.locals.environment
   infra_zone = local.environment_vars.locals.infra_zone
   versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
-  base_helm_chart = local.versions.locals.base_helm_chart
-}
-
-dependency "argocd_pass" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/workers/argocd_pass"
-  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
-  mock_outputs = {
-    password = "fake-pass"
-  }
-}
-
-dependency "ssh_read_file_content" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
-  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
-  mock_outputs = {
-    file_contents = {
-      "/etc/rancher/k3s/server-ip" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/server-certificate-authority-data" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/client-certificate-data" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/client-key-data" = "ZmFrZS1kYXRhCg==",
-    }
-  }
+  base_helm_chart_version = local.versions.locals.base_helm_chart
 }
 
 inputs = {
-  host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
-  cluster_ca_certificate = <<-EOF
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data"))}
-    EOF
-  client_certificate = <<-EOF
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
-    EOF
-  client_key = <<-EOF
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
-    EOF
-  password                  = dependency.argocd_pass.outputs.password
-  release_name              = basename(get_terragrunt_dir())
-  k8s_namespace             = basename(dirname(get_terragrunt_dir()))
-  helm_repo_url             = local.infra_helm_repo_url
-  helm_chart_version        = local.base_helm_chart
-  values_file_external_repo = false
-  values_file_repo_url      = "https://"
-  values_file_path          = "values.yml"
+  server_addr = "argocd.from-the-lamp.work:443"
+  auth_token = get_env("argo_auth_token")
+  app_name = "${basename(dirname(get_terragrunt_dir()))}-${basename(get_terragrunt_dir())}"
+  release_name = basename(get_terragrunt_dir())
+  app_namespace = "infra"
+  dest_cluster_name = "prod"
+  dest_namespace = basename(dirname(get_terragrunt_dir()))
+  helm_repo_url = local.infra_helm_repo_url
+  helm_chart_name = basename(get_terragrunt_dir())
+  helm_chart_version = local.base_helm_chart_version
+  project = basename(dirname(get_terragrunt_dir()))
+  sync_options = ["CreateNamespace=true"]
+  namespace_labels = {
+    "istio-injection" = "enabled"
+  }
 }

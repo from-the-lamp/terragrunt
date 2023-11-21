@@ -23,12 +23,6 @@ dependency "get_infra_variables" {
   }
 }
 
-dependency "ingressgateway" {
-  config_path = "${get_repo_root()}/${local.env}/helm/istio-system/ingressgateway"
-  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
-  skip_outputs = true
-}
-
 dependency "ssh_read_file_content" {
   config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
   mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]

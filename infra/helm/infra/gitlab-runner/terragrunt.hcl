@@ -7,17 +7,18 @@ include "common" {
 }
 
 locals {
-  versions         = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
-  gateway          = local.versions.locals.gateway
-  gitlab_runner    = local.versions.locals.gitlab_runner
-  common_settings  = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
-  helm_repo_url    = local.common_settings.locals.infra_helm_repo_url
-  helm_repo_user   = local.common_settings.locals.helm_repo_user
-  helm_repo_pass   = local.common_settings.locals.helm_repo_pass
+  versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
+  gateway = local.versions.locals.gateway
+  gitlab_runner_version = local.versions.locals.gitlab_runner
+  common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  helm_repo_url = local.common_settings.locals.infra_helm_repo_url
+  helm_repo_user = local.common_settings.locals.helm_repo_user
+  helm_repo_pass = local.common_settings.locals.helm_repo_pass
+  infra_zone = local.environment_vars.locals.infra_zone
+  gitlab_base_url = local.common_settings.locals.gitlab_base_url
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env              = local.environment_vars.locals.environment
-  infra_zone       = local.environment_vars.locals.infra_zone
-  gitlab_base_url  = local.common_settings.locals.gitlab_base_url
+  env = local.environment_vars.locals.environment
+
 }
 
 dependency "cert-manager" {
@@ -42,7 +43,7 @@ dependency "runner_token" {
 
 inputs = {
   helm_repo_url = "https://charts.gitlab.io"
-  helm_chart_version = local.gitlab_runner
+  helm_chart_version = local.gitlab_runner_version
   helm_set_sensitive = {
     "runnerRegistrationToken" = dependency.runner_token.outputs.token
   }
@@ -54,19 +55,18 @@ inputs = {
   resources:
     limits:
       memory: 4000Mi
-      cpu: 2000m
+      cpu: 1
     requests:
       memory: 128Mi
       cpu: 100m
   runners:
     config: |
       [[runners]]
-        name = "Kubernetes Gitlab Runner"
-        executor = "kubernetes"
         [runners.kubernetes]
           namespace = "{{.Release.Namespace}}"
-          image = "arm64v8/ubuntu:22.04"
+          image = "arm64v8/ubuntu:23.04"
           helper_image = "gitlab/gitlab-runner-helper:arm-latest"
+          node_selector_overwrite_allowed = ".*"
   rbac:
     create: true
     rules:

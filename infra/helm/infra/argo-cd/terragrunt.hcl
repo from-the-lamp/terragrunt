@@ -11,9 +11,10 @@ locals {
   env = local.environment_vars.locals.environment
   infra_zone = local.environment_vars.locals.infra_zone
   versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
-  argo_cd = local.versions.locals.argo_cd
+  argo_cd_version = local.versions.locals.argo_cd
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
+  argocd_openid_client_id = local.common_settings.locals.argocd_openid_client_id
 }
 
 dependency "get_infra_variables" {
@@ -42,9 +43,9 @@ dependency "k8s_data_prod" {
 
 inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
-  helm_chart_version = local.argo_cd
+  helm_chart_version = local.argo_cd_version
   helm_set_sensitive = {
-    "configs.secret.gitlabSecret" = dependency.get_infra_variables.outputs.variables.gitlab_openid_secret
+    "configs.secret.gitlabSecret" = dependency.get_infra_variables.outputs.variables.argocd_openid_client_secret
     "configs.clusterCredentials[0].config.tlsClientConfig.caData" = lookup(dependency.k8s_data_prod.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data")
     "configs.clusterCredentials[0].config.tlsClientConfig.certData" = lookup(dependency.k8s_data_prod.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data")
     "configs.clusterCredentials[0].config.tlsClientConfig.keyData" = lookup(dependency.k8s_data_prod.outputs.file_contents, "/etc/rancher/k3s/client-key-data")
@@ -57,6 +58,8 @@ inputs = {
       admin.enabled: "false"
       exec.enabled: true
       accounts.gitlab-ci-user: apiKey
+      accounts.iac: apiKey
+      application.resourceTrackingMethod: annotation
       dex.config: |
         connectors:
         - type: gitlab
@@ -66,7 +69,7 @@ inputs = {
           config:
             baseURL: https://gitlab.com
             redirectURI: https://argocd.${local.infra_zone}/api/dex/callback
-            clientID: 2fd7eebea2c98fcc945b386fef203dfdc21b066f53cd23307baa9844264ff32e
+            clientID: ${local.argocd_openid_client_id}
             clientSecret: $webhook.gitlab.secret
             useLoginAsID: false
     params:
@@ -91,7 +94,7 @@ inputs = {
         p, role:release-admin, repositories, update, *, allow
         p, role:release-admin, repositories, delete, *, allow
         g, from-the-lamp, role:admin
-        g, infra, role:admin
+        g, iac, role:admin
         g, gitlab-ci-user, role:release-admin
         g, frontend, role:release-admin
         g, backend, role:release-admin
