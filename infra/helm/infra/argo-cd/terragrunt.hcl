@@ -28,28 +28,11 @@ dependency "get_infra_variables" {
   }
 }
 
-dependency "k8s_data_prod" {
-  config_path = "${get_repo_root()}/prod/oracle/k3s/masters/ssh_read_file_content"
-  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
-  mock_outputs = {
-    file_contents = {
-      "/etc/rancher/k3s/server-ip" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/server-certificate-authority-data" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/client-certificate-data" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/client-key-data" = "ZmFrZS1kYXRhCg==",
-    }
-  }
-}
-
 inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
   helm_chart_version = local.argo_cd_version
   helm_set_sensitive = {
     "configs.secret.gitlabSecret" = dependency.get_infra_variables.outputs.variables.argocd_openid_client_secret
-    "configs.clusterCredentials[0].config.tlsClientConfig.caData" = lookup(dependency.k8s_data_prod.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data")
-    "configs.clusterCredentials[0].config.tlsClientConfig.certData" = lookup(dependency.k8s_data_prod.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data")
-    "configs.clusterCredentials[0].config.tlsClientConfig.keyData" = lookup(dependency.k8s_data_prod.outputs.file_contents, "/etc/rancher/k3s/client-key-data")
-    "configs.repositories.devops.url" = local.infra_helm_repo_url
   }
   helm_values_file = <<-EOF
   configs:
@@ -76,14 +59,6 @@ inputs = {
       server.insecure: true
       application.namespaces: "*"
       createClusterRoles: true
-    clusterCredentials:
-      - name: prod
-        server: https://${lookup(dependency.k8s_data_prod.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443
-        labels: {}
-        annotations: {}
-        config:
-          tlsClientConfig:
-            insecure: false
     rbac:
       policy.default: role:readonly
       policy.csv: |
@@ -98,9 +73,5 @@ inputs = {
         g, gitlab-ci-user, role:release-admin
         g, frontend, role:release-admin
         g, backend, role:release-admin
-    repositories:
-      devops:
-        name: infra
-        type: helm
   EOF
 }
