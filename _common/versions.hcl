@@ -2,7 +2,7 @@ locals {
   k3s_cluster = "v1.25.11+k3s1"
   oci_cloud_controller_manager = "0.0.1"
   base_helm_chart = "0.1.17"
-  config = "0.0.1"
+  config = "0.0.5"
   gateway = "0.0.3"
   istio_system = "1.19.3"
   istio_gateway = "0.0.3"
@@ -24,5 +24,5 @@ locals {
   vault_secrets_operator = "0.3.4"
   crossplane = "1.14.1"
   crossplane_providers = "0.0.2"
-  crossplane_workspaces = "0.0.6"
+  crossplane_workspaces = "0.0.18"
 }

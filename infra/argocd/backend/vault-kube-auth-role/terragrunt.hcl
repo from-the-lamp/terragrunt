@@ -8,6 +8,7 @@ include "common" {
 
 locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  vault_base_url = local.common_settings.locals.vault_base_url
   versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
   crossplane_workspaces_version = local.versions.locals.crossplane_workspaces
   helm_repo_url = local.common_settings.locals.infra_helm_repo_url
@@ -17,12 +18,12 @@ locals {
   env = local.environment_vars.locals.environment
 }
 
-dependency "gitlab_vars" {
+dependency "get_infra_variables" {
   config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
-  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
+  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {
-      cloudflare_api_token = "fake-token"
+      vault_token = "fake-token"
     }
   }
 }
@@ -34,34 +35,21 @@ inputs = {
       helm_chart_version = local.crossplane_workspaces_version
       values = <<EOT
       workspaces:
-        cloudflare:
+        vault:
           enabled: true
-          url: https://gitlab.com/from-the-lamp/infra/terraform/modules/cloudflare
-          dir: dns_record
-          branch: main
+          dir: kubernetes_auth_role
           varmap:
-            cloudflare-records:
-            - name: "."
-              type: A
-              proxied: true
-            - name: "*"
-              type: A
-              proxied: true
+            service_account_names:
+            - frontend-app
+            service_account_namespaces:
+            - frontend-app
+            token_policies:
+            - frontend-read
           vars:
-          - key: external_load_balancer
-            value: "true"
-          - key: internal_load_balancer
-            value: "false"
-          - key: external_lb_svc_namespace
-            value: "istio-system"
-          - key: external_lb_svc_name
-            value: "ingressgateway"
-          - key: cloudflare_api_token
-            value: ${dependency.gitlab_vars.outputs.variables.cloudflare_api_token}
-          - key: cloudflare_zone_name
-            value: "from-the-lamp.com"
+          - key: role_name
+            value: "frontend-app"
       providers:
-        cloudflare:
+        vault:
           enabled: true
       EOT
     }

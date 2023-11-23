@@ -3,7 +3,7 @@ include "root" {
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/argocd/application.hcl"
+  path = "${dirname(find_in_parent_folders())}/_common/argocd/application_set.hcl"
 }
 
 locals {
@@ -19,7 +19,7 @@ inputs = {
       values = <<EOT
       defaultVaultConnection:
         enabled: true
-        address: "http://infra-vault.infra.svc.cluster.local:8200"
+        address: "http://vault.infra.svc.cluster.local:8200"
       EOT
     }
   ]

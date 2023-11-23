@@ -27,3 +27,12 @@ inputs = {
   host = "https://${local.vault_base_url}"
   token = dependency.get_infra_variables.outputs.variables.vault_token
 }
+
+inputs = {
+  db_name = "postgres"
+  role_name = "readonly"
+  creation_statements = [
+    "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';",
+    "GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" 
+  ]
+}
