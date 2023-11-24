@@ -40,14 +40,14 @@ inputs = {
           dir: kubernetes_auth_role
           varmap:
             service_account_names:
-            - frontend-app
+            - "*"
             service_account_namespaces:
-            - frontend-app
+            - "*"
             token_policies:
-            - frontend-read
+            - "admin"
           vars:
           - key: role_name
-            value: "frontend-app"
+            value: "app"
       providers:
         vault:
           enabled: true

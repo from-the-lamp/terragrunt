@@ -17,12 +17,6 @@ locals {
   env = local.environment_vars.locals.environment
 }
 
-dependency "namespaces" {
-  config_path = "${get_repo_root()}/${local.env}/namespaces"
-  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
-  skip_outputs = true
-}
-
 dependency "ssh_read_file_content" {
   config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
   mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]

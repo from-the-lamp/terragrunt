@@ -34,7 +34,12 @@ inputs = {
   }
   dest_cluster_list = [
     {
+      cluster = "in-cluster"
+      domen = "from-the-lamp.work"
+    },
+    {
       cluster = "prod"
+      domen = "from-the-lamp.com"
     }
   ]
 }

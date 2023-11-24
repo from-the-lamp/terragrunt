@@ -51,9 +51,9 @@ inputs = {
         annotations:
           oci.oraclecloud.com/load-balancer-type: "nlb"
           oci-network-load-balancer.oraclecloud.com/is-preserve-source: "false"
-          oci-network-load-balancer.oraclecloud.com/node-label-selector: node-role=worker
+          oci-network-load-balancer.oraclecloud.com/node-label-selector: "node-role=worker"
           oci-network-load-balancer.oraclecloud.com/security-list-management-mode: "All"
-          oci-network-load-balancer.oraclecloud.com/oci-network-security-groups: ${dependency.allow_https_from_all.outputs.id}
+          oci-network-load-balancer.oraclecloud.com/oci-network-security-groups: "${dependency.allow_https_from_all.outputs.id}"
         ports:
         - name: status-port
           port: 15021

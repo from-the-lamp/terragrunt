@@ -59,7 +59,7 @@ inputs = {
           - key: cloudflare_api_token
             value: ${dependency.gitlab_vars.outputs.variables.cloudflare_api_token}
           - key: cloudflare_zone_name
-            value: "from-the-lamp.com"
+            value: "{{domen}}"
       providers:
         cloudflare:
           enabled: true

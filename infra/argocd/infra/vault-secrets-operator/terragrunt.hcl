@@ -20,6 +20,7 @@ inputs = {
       defaultVaultConnection:
         enabled: true
         address: "http://vault.infra.svc.cluster.local:8200"
+        skipTLSVerify: false
       EOT
     }
   ]

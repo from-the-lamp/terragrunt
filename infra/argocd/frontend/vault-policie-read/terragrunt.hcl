@@ -40,11 +40,11 @@ inputs = {
           dir: policy
           varmap:
             policy_value:
-            - path: "*"
-              capabilities: ["create", "read", "update", "delete", "list", "sudo"]
+            - path: "secrets/*"
+              capabilities: ["read"]
           vars:
           - key: policy_name
-            value: "admin"
+            value: "read"
       providers:
         vault:
           enabled: true
