@@ -38,6 +38,7 @@ locals {
   vault_base_url = "vault.from-the-lamp.com"
   grafana_openid_client_id = "913608a80a8f71ed9a73d9baa2662033cc570a0f473b29e10c7dd34ace8a0524"
   argocd_openid_client_id = "2fd7eebea2c98fcc945b386fef203dfdc21b066f53cd23307baa9844264ff32e"
+  oauth2_proxy_openid_client_id = "5703099d64bb707c5a08fd269065057ff6f8b16198241fbdc3fc04119875e0b4"
 }
 
 inputs = {

@@ -26,6 +26,38 @@ inputs = {
     {
       helm_repo_url = "https://istio-release.storage.googleapis.com/charts"
       helm_chart_version = local.istio_system_version
+      values = <<EOT
+      meshConfig:
+        extensionProviders:
+          - name: "oauth2-proxy"
+            envoyExtAuthzHttp:
+              service: oauth2-proxy.istio-system.svc.cluster.local
+              port: 80
+              headersToDownstreamOnDeny:
+                - content-type
+                - set-cookie
+              headersToUpstreamOnAllow:
+                - authorization
+                - cookie
+                - path
+              includeHeadersInCheck:
+                - "cookie"
+                - "x-forwarded-access-token"
+                - "x-forwarded-user"
+                - "x-forwarded-email"
+                - "authorization"
+                - "x-forwarded-proto"
+                - "proxy-authorization"
+                - "user-agent"
+                - "x-forwarded-host"
+                - "from"
+                - "x-forwarded-for"
+                - "x-forwarded-uri"
+                - "x-auth-request-redirect"
+                - "accept"
+              includeAdditionalHeadersInCheck:
+                X-Auth-Request-Redirect: https://%REQ(Host)%
+      EOT
     }
   ]
 }

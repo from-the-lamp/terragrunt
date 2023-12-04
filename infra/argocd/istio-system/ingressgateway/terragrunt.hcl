@@ -28,7 +28,21 @@ dependency "allow_https_from_all" {
   }
 }
 
+dependency "allow_https_from_all_prod" {
+  config_path = "${get_repo_root()}/prod/oracle/nsg/allow_https_from_all"
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    id = "fake-id"
+  }
+}
+
 inputs = {
+  dest_cluster_list = [
+    {
+      cluster = "in-cluster"
+      domen = "from-the-lamp.work"
+    }
+  ]
   project = "infra"
   apps = [
     { 
@@ -53,7 +67,7 @@ inputs = {
           oci-network-load-balancer.oraclecloud.com/is-preserve-source: "false"
           oci-network-load-balancer.oraclecloud.com/node-label-selector: "node-role=worker"
           oci-network-load-balancer.oraclecloud.com/security-list-management-mode: "All"
-          oci-network-load-balancer.oraclecloud.com/oci-network-security-groups: "${dependency.allow_https_from_all.outputs.id}"
+          oci-network-load-balancer.oraclecloud.com/oci-network-security-groups: "${dependency.allow_https_from_all.outputs.id},${dependency.allow_https_from_all_prod.outputs.id}"
         ports:
         - name: status-port
           port: 15021
