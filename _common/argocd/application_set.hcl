@@ -10,7 +10,6 @@ locals {
   module_version = "main"
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  dns_zone_name = local.environment_vars.locals.dns_zone_name
   env = local.environment_vars.locals.environment
 }
 

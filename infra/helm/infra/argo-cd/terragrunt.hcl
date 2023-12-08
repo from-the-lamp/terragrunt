@@ -9,7 +9,6 @@ include "common" {
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
-  dns_zone_name = local.environment_vars.locals.dns_zone_name
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
   argocd_openid_client_id = local.common_settings.locals.argocd_openid_client_id
@@ -41,7 +40,7 @@ inputs = {
   helm_values_file = <<-EOF
   configs:
     cm:
-      url: https://argocd.${local.dns_zone_name}
+      url: https://argocd.from-the-lamp.work
       admin.enabled: "false"
       exec.enabled: true
       accounts.gitlab-ci-user: apiKey
@@ -55,7 +54,7 @@ inputs = {
           useLoginAsID: false
           config:
             baseURL: https://gitlab.com
-            redirectURI: https://argocd.${local.dns_zone_name}/api/dex/callback
+            redirectURI: https://argocd.from-the-lamp.work/api/dex/callback
             clientID: ${local.argocd_openid_client_id}
             clientSecret: $webhook.gitlab.secret
             useLoginAsID: false

@@ -9,7 +9,6 @@ include "common" {
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
-  dns_zone_name = local.environment_vars.locals.dns_zone_name
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   gitlab_base_url = local.common_settings.locals.gitlab_base_url
   kiali_openid_client_id = local.common_settings.locals.kiali_openid_client_id
