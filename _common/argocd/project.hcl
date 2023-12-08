@@ -8,17 +8,35 @@ locals {
   module_name = "argocd"
   module_dir = "project"
   module_version = "main"
-  infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
-  infra_zone = local.environment_vars.locals.infra_zone
-  versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
-  base_helm_chart_version = local.versions.locals.base_helm_chart
 }
 
+dependency "ssh_read_file_content" {
+  config_path = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    file_contents = {
+      "/etc/rancher/k3s/server-ip" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/server-certificate-authority-data" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/client-certificate-data" = "ZmFrZS1kYXRhCg==",
+      "/etc/rancher/k3s/client-key-data" = "ZmFrZS1kYXRhCg==",
+    }
+  }
+}
 
 inputs = {
-  server_addr = "argocd.from-the-lamp.work:443"
+  host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
+  cluster_ca_certificate = <<-EOF
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data"))}
+    EOF
+  client_certificate = <<-EOF
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
+    EOF
+  client_key = <<-EOF
+${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
+    EOF
+  forward_namespace = "infra"
   auth_token = get_env("argo_auth_token")
   name = basename(dirname(get_terragrunt_dir()))
   namespace = "infra"

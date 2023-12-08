@@ -10,7 +10,7 @@ locals {
   module_version = "main"
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
-  infra_zone = local.environment_vars.locals.infra_zone
+  dns_zone_name = local.environment_vars.locals.dns_zone_name
 }
 
 dependency "gitlab_vars" {
@@ -25,6 +25,6 @@ dependency "gitlab_vars" {
 
 inputs = {
   cloudflare_api_token = dependency.gitlab_vars.outputs.variables.cloudflare_api_token
-  cloudflare_zone_name = local.infra_zone
+  cloudflare_zone_name = local.dns_zone_name
   cloudflare_token_name = "${local.env}_purge_cache"
 }

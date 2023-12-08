@@ -12,7 +12,7 @@ locals {
   infra_project_id = local.common_settings.locals.infra_project_id
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
-  infra_variables_file = local.environment_vars.locals.infra_variables_file
+  infra_variables_file = local.common_settings.locals.infra_variables_file
 }
 
 inputs = {

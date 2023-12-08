@@ -9,13 +9,6 @@ include "common" {
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
-  common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
-  compartment_ocid = local.common_settings.locals.compartment_ocid
-  helm_repo_url = local.common_settings.locals.infra_helm_repo_url
-  helm_repo_user = local.common_settings.locals.helm_repo_user
-  helm_repo_pass = local.common_settings.locals.helm_repo_pass
-  versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
-  oci_cloud_controller_manager_version = local.versions.locals.oci_cloud_controller_manager
 }
 
 dependency "vcn" {
@@ -34,11 +27,7 @@ dependency "master" {
 }
 
 inputs = {
-  helm_repo_url = local.helm_repo_url
-  helm_repo_user = local.helm_repo_user
-  helm_repo_pass = local.helm_repo_pass
-  helm_chart_version = local.oci_cloud_controller_manager_version
-  k8s_namespace = "kube-system"
+  helm_chart_version = "0.0.1"
   helm_values_file = <<-EOF
   compartment: ${local.compartment_ocid}
   vcn: ${dependency.vcn.outputs.vcn_id}

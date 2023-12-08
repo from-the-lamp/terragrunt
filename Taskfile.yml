@@ -1,7 +1,9 @@
 version: "3"
 
 dotenv: [".env"]
-  
+env:
+  OCI_CONFIG_PATH: "{{.HOME}}/.oci/config"
+
 silent: true
 tasks:
   rm:all:
@@ -35,4 +37,16 @@ tasks:
     - task: terragrunt
       vars: {
         ACTION: "destroy",
+      }
+  validate:
+    cmds:
+    - task: terragrunt
+      vars: {
+        ACTION: "validate",
+      }
+  output:
+    cmds:
+    - task: terragrunt
+      vars: {
+        ACTION: "output",
       }

@@ -10,7 +10,7 @@ locals {
   module_version = "main"
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
-  infra_zone = local.environment_vars.locals.infra_zone
+  dns_zone_name = local.environment_vars.locals.dns_zone_name
 }
 
 dependency "get_infra_variables" {
@@ -48,7 +48,7 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
   EOF
   cloudflare_api_token = dependency.get_infra_variables.outputs.variables.cloudflare_api_token
-  cloudflare_zone_name = local.infra_zone
+  cloudflare_zone_name = local.dns_zone_name
   external_load_balancer = true
   external_lb_svc_name = "ingressgateway"
   external_lb_svc_namespace = "istio-system"

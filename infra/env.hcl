@@ -1,5 +1,6 @@
 locals {
   environment = "infra"
-  infra_variables_file = "TF_VAR_FILE_INFRA"
-  infra_zone = "from-the-lamp.work"
+  ad_number = "1"
+  dns_zone_name = "from-the-lamp.work"
+  oracle_profile_name = "lamp-infra"
 }

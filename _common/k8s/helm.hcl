@@ -8,11 +8,7 @@ locals {
   module_name = "k8s"
   module_dir = "helm"
   module_version = "main"
-  gitlab_token = local.common_settings.locals.gitlab_token
-  helm_repo_user = local.common_settings.locals.helm_repo_user
-  helm_repo_pass = local.common_settings.locals.helm_repo_pass
-  gitlab_base_url = local.common_settings.locals.gitlab_base_url
-  infra_repo_id = local.common_settings.locals.infra_repo_id
+  infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
 }
@@ -41,10 +37,11 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
   client_key = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
     EOF
-  force_update          = true
-  recreate_pods         = true
-  helm_chart_name       = basename(get_terragrunt_dir())
-  helm_release_name     = basename(get_terragrunt_dir())
+  force_update = true
+  recreate_pods = true
+  helm_repo_url = local.infra_helm_repo_url
+  helm_chart_name = basename(get_terragrunt_dir())
+  helm_release_name = basename(get_terragrunt_dir())
   helm_values_file_path = "values.yml"
-  k8s_namespace         = basename(dirname(get_terragrunt_dir()))
+  k8s_namespace = basename(dirname(get_terragrunt_dir()))
 }

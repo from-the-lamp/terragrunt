@@ -10,8 +10,6 @@ locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
-  versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
-  istio_system_version = local.versions.locals.istio_system
 }
 
 dependency "oci-cloud-controller-manager" {
@@ -26,17 +24,7 @@ inputs = {
     {
       helm_repo_url = "https://istio-release.storage.googleapis.com/charts"
       helm_chart_name = "base"
-      helm_chart_version = local.istio_system_version
-    }
-  ]
-  ignore_difference = [
-    {
-      name = "istiod-default-validator"
-      group = "admissionregistration.k8s.io"
-      kind = "ValidatingWebhookConfiguration"
-      jq_path_expressions = [
-        ".webhooks[].failurePolicy"
-      ]
+      helm_chart_version = "1.20.0"
     }
   ]
 }

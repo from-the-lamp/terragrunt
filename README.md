@@ -3,9 +3,9 @@
 Prepare
 ---
 
-Get **API** keys:
-- Go to Oracle Cloud -> My Profle
-- API keys -> Add API key
+Get API keys:
+- Go to **Oracle Cloud** -> **My Profle**
+- **API keys** -> **Add API key**
 ```
 mkdir ~/.oci
 touch ~/.oci/config
@@ -14,28 +14,26 @@ chmod -R 0600 ~/.oci
 - Put your **.pem** file to ~/.oci directory
 - Put your profile data in ~/.oci/config (change path to **.pem** file)
 
-Get **S3** keys:
-- Go to Oracle Cloud -> My Profle
-- Customer secret keys -> Generate secret key
-- Copy **Secret key** and close window
-- Now copy **Access key**
-- Add aws_access_key_id and aws_secret_access_key to ~/.oci/config
-
 Exapmle **~/.oci/config**:
 ```
-[lamp-prod]
-aws_access_key_id=
-aws_secret_access_key=
+[lamp-infra]
 user=
-compartment_ocid=
 fingerprint=
 tenancy=
-region=
-availability_domain=
 key_file=
-s3_namespace=
+compartment_ocid=
+region=
 ```
 
 Create **.env** file for local usage:
 
 - Just look at **.env.example**
+
+Run
+---
+Install [Taskfile](https://taskfile.dev)
+
+```
+DIR=infra/oracle/k3s task apply
+etc...
+```

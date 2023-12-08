@@ -9,8 +9,6 @@ include "common" {
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
-  versions = read_terragrunt_config("${get_repo_root()}/_common/versions.hcl")
-  origin_ca_issuer_version = local.versions.locals.origin_ca_issuer
 }
 
 dependency "origin-ca-issuer-controller" {
@@ -33,7 +31,7 @@ inputs = {
   project = "infra"
   apps = [
     {
-      helm_chart_version = local.origin_ca_issuer_version
+      helm_chart_version = "0.0.1"
       values = <<EOT
       originCAissuerKey: ${dependency.get_infra_variables.outputs.variables.cloudflare_originCAissuerKey}
       EOT
