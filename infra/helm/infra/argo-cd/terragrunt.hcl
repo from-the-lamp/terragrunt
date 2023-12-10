@@ -11,7 +11,7 @@ locals {
   env = local.environment_vars.locals.environment
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
-  argocd_openid_client_id = local.common_settings.locals.argocd_openid_client_id
+  openid_client_id_argocd = local.common_settings.locals.openid_client_id_argocd
 }
 
 dependency "get_infra_variables" {
@@ -35,7 +35,7 @@ inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
   helm_chart_version = "5.41.2"
   helm_set_sensitive = {
-    "configs.secret.gitlabSecret" = dependency.get_infra_variables.outputs.variables.argocd_openid_client_secret
+    "configs.secret.gitlabSecret" = dependency.get_infra_variables.outputs.variables.openid_client_secret_argocd
   }
   helm_values_file = <<-EOF
   configs:
@@ -55,7 +55,7 @@ inputs = {
           config:
             baseURL: https://gitlab.com
             redirectURI: https://argocd.from-the-lamp.work/api/dex/callback
-            clientID: ${local.argocd_openid_client_id}
+            clientID: ${local.openid_client_id_argocd}
             clientSecret: $webhook.gitlab.secret
             useLoginAsID: false
     params:

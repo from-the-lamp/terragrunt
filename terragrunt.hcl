@@ -29,10 +29,11 @@ locals {
   admin_ssh_pub = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILtNvLcjDTFxc/v03D93cyeEa77jxNC/u2DfqM9gn0k6"
   helm_repo_user = "gitlab-ci-token"
   helm_repo_pass = get_env("TF_HTTP_PASSWORD")
-  vault_openid_client_id = "6c818bd896fabe3395fc48379925a2e1fa0432b821312228585886fb9e244f64"
   vault_base_url = "vault.from-the-lamp.com"
-  kiali_openid_client_id = "34abbfae423ab9f382c578bd1953ea5b68dd055af9cc349dbb748c5def2cb1bd"
-  grafana_openid_client_id = "913608a80a8f71ed9a73d9baa2662033cc570a0f473b29e10c7dd34ace8a0524"
-  argocd_openid_client_id = "2fd7eebea2c98fcc945b386fef203dfdc21b066f53cd23307baa9844264ff32e"
-  oauth2_proxy_openid_client_id = "5703099d64bb707c5a08fd269065057ff6f8b16198241fbdc3fc04119875e0b4"
+  openid_client_id_vault = "6c818bd896fabe3395fc48379925a2e1fa0432b821312228585886fb9e244f64"
+  openid_client_id_kiali = "34abbfae423ab9f382c578bd1953ea5b68dd055af9cc349dbb748c5def2cb1bd"
+  openid_client_id_grafana = "913608a80a8f71ed9a73d9baa2662033cc570a0f473b29e10c7dd34ace8a0524"
+  openid_client_id_argocd = "2fd7eebea2c98fcc945b386fef203dfdc21b066f53cd23307baa9844264ff32e"
+  openid_client_id_oauth2_proxy = "5703099d64bb707c5a08fd269065057ff6f8b16198241fbdc3fc04119875e0b4"
+  openid_client_id_pgadmin4 = "8a4514b7270384f4626b70fc3ed039fe1eecacc80d94082d45ebcab197bc29a5"
 }

@@ -9,7 +9,7 @@ include "common" {
 locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   vault_base_url = local.common_settings.locals.vault_base_url
-  vault_openid_client_id = local.common_settings.locals.vault_openid_client_id
+  openid_client_id_vault = local.common_settings.locals.openid_client_id_vault
   gitlab_base_url = local.common_settings.locals.gitlab_base_url
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
@@ -20,7 +20,7 @@ dependency "get_infra_variables" {
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {
-      vault_token = "fake-token"
+      openid_client_secret_vault = "fake-secret"
     }
   }
 }
@@ -48,9 +48,9 @@ inputs = {
           - key: bound_issuer
             value: "https://${local.gitlab_base_url}"
           - key: oidc_client_id
-            value: "${local.vault_openid_client_id}"
+            value: "${local.openid_client_id_vault}"
           - key: oidc_client_secret
-            value: "${dependency.get_infra_variables.outputs.variables.vault_openid_client_secret}"
+            value: "${dependency.get_infra_variables.outputs.variables.openid_client_secret_vault}"
           - key: oidc_discovery_url
             value: "https://${local.gitlab_base_url}"
           - key: role_name

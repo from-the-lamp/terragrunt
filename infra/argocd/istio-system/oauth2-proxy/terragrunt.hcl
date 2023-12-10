@@ -10,7 +10,7 @@ locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env = local.environment_vars.locals.environment
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
-  oauth2_proxy_openid_client_id = local.common_settings.locals.oauth2_proxy_openid_client_id
+  openid_client_id_oauth2_proxy = local.common_settings.locals.openid_client_id_oauth2_proxy
 }
 
 dependency "get_infra_variables" {
@@ -18,7 +18,7 @@ dependency "get_infra_variables" {
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {
-      oauth2_proxy_openid_client_secret = "fake-secret"
+      openid_client_secret_oauth2_proxy = "fake-secret"
     }
   }
 }
@@ -35,8 +35,8 @@ inputs = {
     {
       values = <<EOT
       config:
-        clientID: ${local.oauth2_proxy_openid_client_id}
-        clientSecret: ${dependency.get_infra_variables.outputs.variables.oauth2_proxy_openid_client_secret}
+        clientID: ${local.openid_client_id_oauth2_proxy}
+        clientSecret: ${dependency.get_infra_variables.outputs.variables.openid_client_secret_oauth2_proxy}
         cookieSecret: ${run_cmd("--terragrunt-quiet", "sh", "-c", "openssl rand -base64 32 | head -c 32 | base64")}
       extraArgs:
         provider: "gitlab"

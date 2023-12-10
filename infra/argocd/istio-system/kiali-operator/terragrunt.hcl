@@ -11,7 +11,7 @@ locals {
   env = local.environment_vars.locals.environment
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   gitlab_base_url = local.common_settings.locals.gitlab_base_url
-  kiali_openid_client_id = local.common_settings.locals.kiali_openid_client_id
+  openid_client_id_kiali = local.common_settings.locals.openid_client_id_kiali
 }
 
 dependency "istiod" {
@@ -51,7 +51,7 @@ inputs = {
           auth:
             strategy: "openid"
             openid:
-              client_id: ${local.kiali_openid_client_id}
+              client_id: ${local.openid_client_id_kiali}
               issuer_uri: "https://${local.gitlab_base_url}"
               authorization_endpoint: "https://${local.gitlab_base_url}/oauth/authorize"
               scopes: ["openid", "email"]
