@@ -5,14 +5,11 @@ terraform {
 locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   modules_url = local.common_settings.locals.private_modules_base_url
-  module_name = "gitlab"
-  module_dir = "gitlab_user_runner"
+  module_name = "rancher"
+  module_dir = "bootstrap"
   module_version = "main"
-  gitlab_token = local.common_settings.locals.gitlab_token
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env = local.environment_vars.locals.environment
 }
 
 inputs = {
-  gitlab_token = local.gitlab_token
+  api_url = "https://rancher.from-the-lamp.work"
 }

@@ -13,8 +13,8 @@ locals {
   openid_client_id_pgadmin4 = local.common_settings.locals.openid_client_id_pgadmin4
 }
 
-dependency "get_infra_variables" {
-  config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
+dependency "infra_variables" {
+  config_path = "${get_repo_root()}/${local.env}/gitlab/infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {
@@ -39,7 +39,7 @@ inputs = {
       global:
         secret:
           OAUTH2_CLIENT_ID: ${local.openid_client_id_pgadmin4}
-          OAUTH2_CLIENT_SECRET: "${dependency.get_infra_variables.outputs.variables.openid_client_secret_pgadmin4}"
+          OAUTH2_CLIENT_SECRET: "${dependency.infra_variables.outputs.variables.openid_client_secret_pgadmin4}"
           pgpassfile: |
             postgresql-hl:5432:*:postgres:postgres
         env: 

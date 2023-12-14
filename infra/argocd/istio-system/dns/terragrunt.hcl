@@ -12,7 +12,7 @@ locals {
 }
 
 dependency "gitlab_vars" {
-  config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
+  config_path = "${get_repo_root()}/${local.env}/gitlab/infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {

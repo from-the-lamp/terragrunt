@@ -9,11 +9,11 @@ include "common" {
 inputs = {
   destinations = [
     {
-      name = "prod"
+      name = "*"
       namespace = basename(dirname(get_terragrunt_dir()))
     },
     {
-      name = "prod"
+      name = "*"
       namespace = "istio-system"
     }
   ]

@@ -23,6 +23,10 @@ inputs = {
     {
       name = "*"
       namespace = "monitoring"
+    },
+    {
+      name = "in-cluster"
+      namespace = "cattle-system"
     }
   ]
   cluster_resource_whitelist = [
@@ -65,6 +69,10 @@ inputs = {
     {
       group = "tf.upbound.io"
       kind = "Workspace"
+    },
+    {
+      group = "scheduling.k8s.io"
+      kind = "PriorityClass"
     }
   ]
 }

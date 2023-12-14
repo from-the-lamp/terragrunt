@@ -13,8 +13,8 @@ locals {
   openid_client_id_oauth2_proxy = local.common_settings.locals.openid_client_id_oauth2_proxy
 }
 
-dependency "get_infra_variables" {
-  config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
+dependency "infra_variables" {
+  config_path = "${get_repo_root()}/${local.env}/gitlab/infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {
@@ -36,7 +36,7 @@ inputs = {
       values = <<EOT
       config:
         clientID: ${local.openid_client_id_oauth2_proxy}
-        clientSecret: ${dependency.get_infra_variables.outputs.variables.openid_client_secret_oauth2_proxy}
+        clientSecret: ${dependency.infra_variables.outputs.variables.openid_client_secret_oauth2_proxy}
         cookieSecret: ${run_cmd("--terragrunt-quiet", "sh", "-c", "openssl rand -base64 32 | head -c 32 | base64")}
       extraArgs:
         provider: "gitlab"

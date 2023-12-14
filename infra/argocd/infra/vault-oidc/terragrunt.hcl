@@ -15,8 +15,8 @@ locals {
   env = local.environment_vars.locals.environment
 }
 
-dependency "get_infra_variables" {
-  config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
+dependency "infra_variables" {
+  config_path = "${get_repo_root()}/${local.env}/gitlab/infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {
@@ -29,7 +29,7 @@ inputs = {
   apps = [
     {
       helm_chart_name = "crossplane-workspaces"
-      helm_chart_version = "0.0.18"
+      helm_chart_version = "0.1.0"
       values = <<EOT
       workspaces:
         vault:
@@ -50,14 +50,11 @@ inputs = {
           - key: oidc_client_id
             value: "${local.openid_client_id_vault}"
           - key: oidc_client_secret
-            value: "${dependency.get_infra_variables.outputs.variables.openid_client_secret_vault}"
+            value: "${dependency.infra_variables.outputs.variables.openid_client_secret_vault}"
           - key: oidc_discovery_url
             value: "https://${local.gitlab_base_url}"
           - key: role_name
             value: "admin"
-      providers:
-        vault:
-          enabled: true
       EOT
     }
   ]

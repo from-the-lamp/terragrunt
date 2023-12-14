@@ -14,8 +14,8 @@ locals {
   openid_client_id_argocd = local.common_settings.locals.openid_client_id_argocd
 }
 
-dependency "get_infra_variables" {
-  config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
+dependency "infra_variables" {
+  config_path = "${get_repo_root()}/${local.env}/gitlab/infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {
@@ -35,7 +35,7 @@ inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
   helm_chart_version = "5.41.2"
   helm_set_sensitive = {
-    "configs.secret.gitlabSecret" = dependency.get_infra_variables.outputs.variables.openid_client_secret_argocd
+    "configs.secret.gitlabSecret" = dependency.infra_variables.outputs.variables.openid_client_secret_argocd
   }
   helm_values_file = <<-EOF
   configs:
@@ -58,9 +58,31 @@ inputs = {
             clientID: ${local.openid_client_id_argocd}
             clientSecret: $webhook.gitlab.secret
             useLoginAsID: false
+      resource.customizations: |
+        crossplane.io/CompositeResourceDefinition:
+          health.lua: |
+            hs = {}
+            if obj.status ~= nil then
+                if obj.status.conditions ~= nil then
+                    for i, condition in ipairs(obj.status.conditions) do
+                        if condition.type == "Ready" and condition.status == "True" then
+                            hs.status = "Healthy"
+                            hs.message = "Workspace is ready"
+                            return hs
+                        elseif condition.type == "Synced" and condition.status == "False" then
+                            hs.status = "Degraded"
+                            hs.message = condition.message
+                            return hs
+                        end
+                    end
+                end
+            end
+            hs.status = "Progressing"
+            hs.message = "Waiting for workspace to be ready"
+            return hs
     params:
       server.insecure: true
-      dexserver.disable.tls: "true"
+      dexserver.disable.tls: true
       application.namespaces: "*"
       createClusterRoles: true
     rbac:

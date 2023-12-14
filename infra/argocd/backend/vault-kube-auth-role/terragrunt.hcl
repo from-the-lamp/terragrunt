@@ -13,8 +13,8 @@ locals {
   env = local.environment_vars.locals.environment
 }
 
-dependency "get_infra_variables" {
-  config_path = "${get_repo_root()}/${local.env}/gitlab/get_infra_variables"
+dependency "infra_variables" {
+  config_path = "${get_repo_root()}/${local.env}/gitlab/infra_variables"
   mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     variables = {
@@ -33,7 +33,7 @@ inputs = {
   apps = [
     {
       helm_chart_name = "crossplane-workspaces"
-      helm_chart_version = "0.0.18"
+      helm_chart_version = "0.1.0"
       values = <<EOT
       workspaces:
         vault:
@@ -41,17 +41,14 @@ inputs = {
           dir: kubernetes_auth_role
           varmap:
             service_account_names:
-            - frontend-app
+            - default
             service_account_namespaces:
-            - frontend-app
+            - backend
             token_policies:
-            - frontend-read
+            - read
           vars:
           - key: role_name
-            value: "frontend-app"
-      providers:
-        vault:
-          enabled: true
+            value: "backend-app"
       EOT
     }
   ]

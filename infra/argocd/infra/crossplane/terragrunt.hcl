@@ -9,7 +9,6 @@ include "common" {
 inputs = {
   apps = [
     {
-      helm_chart_name = "crossplane"
       helm_chart_version = "1.14.3"
       helm_repo_url = "https://charts.crossplane.io/stable"
     }
