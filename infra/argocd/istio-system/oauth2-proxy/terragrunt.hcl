@@ -27,12 +27,14 @@ inputs = {
   project = "infra"
   dest_cluster_list = [
     {
-      cluster = "in-cluster"
+      cluster = "prod-0"
       domen = "from-the-lamp.com"
     }
   ]
   apps = [
     {
+      helm_repo_url = "https://oauth2-proxy.github.io/manifests"
+      helm_chart_version = "6.23.1"
       values = <<EOT
       config:
         clientID: ${local.openid_client_id_oauth2_proxy}
@@ -42,6 +44,10 @@ inputs = {
         provider: "gitlab"
         cookie-secure: false
         reverse-proxy: true
+        cookie-csrf-per-request: true
+        cookie-csrf-expire: "5m"
+        cookie-domain: ".{{domen}}"
+        reverse-proxy: true
         set-xauthrequest: true
         set-authorization-header: true
         pass-authorization-header: true
@@ -49,11 +55,25 @@ inputs = {
         skip-provider-button: true
         upstream: static://200
         gitlab-group: "from-the-lamp"
-        whitelist-domain: ".from-the-lamp.com"
+        whitelist-domain: ".{{domen}}"
         email-domain: "*"
         oidc-issuer-url: "https://gitlab.com"
-        redirect-url: "https://oauth2.from-the-lamp.com/oauth2/callback"
+        redirect-url: "https://oauth2.{{domen}}/oauth2/callback"
         scope: "openid email"
+      EOT
+    },
+    {
+      app_name = "oauth2-proxy-gateway"
+      helm_chart_name = "istio-gateway"
+      helm_chart_version = "0.0.8"
+      values = <<EOT
+      hosts:
+      - oauth2.{{domen}}
+      external: true
+      virtualService:
+        destination:
+          host: oauth2-proxy
+          port: 80
       EOT
     }
   ]
