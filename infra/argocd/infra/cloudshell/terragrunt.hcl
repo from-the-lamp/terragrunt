@@ -21,7 +21,6 @@ inputs = {
         runAsUser: "root"
         commandAction: "bash"
         exposureMode: "ClusterIP"
-        ttl: 500
         once: false
       EOT
     },

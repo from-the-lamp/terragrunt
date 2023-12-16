@@ -16,7 +16,7 @@ inputs = {
   apps = [
     {
       helm_chart_name = "cloudtty"
-      helm_chart_version = "0.5.0"
+      helm_chart_version = "0.5.7"
       helm_repo_url = "https://cloudtty.github.io/cloudtty"
       values = <<EOT
       cloudshellImage:
