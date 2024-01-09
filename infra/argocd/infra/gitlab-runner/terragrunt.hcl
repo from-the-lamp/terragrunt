@@ -28,7 +28,7 @@ inputs = {
   ]
   apps = [
     {
-      helm_chart_version = "0.59.2"
+      helm_chart_version = "0.60.0"
       helm_repo_url = "https://charts.gitlab.io"
       values = <<EOT
       runnerRegistrationToken: ${dependency.runner_token.outputs.token}

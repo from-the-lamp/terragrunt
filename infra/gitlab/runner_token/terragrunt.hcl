@@ -8,4 +8,5 @@ include "common" {
 
 inputs = {
   group_id = "59383214"
+  tag_list = ["micro-arm64"]
 }

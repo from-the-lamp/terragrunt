@@ -15,8 +15,9 @@ inputs = {
   ]
   apps = [
     {
-      helm_chart_name = "base"
-      helm_chart_version = "0.1.29"
+      helm_chart_path = "base"
+      helm_chart_name = ""
+      helm_chart_version = "HEAD"
       remote_value_file = true
       value_file_repo_url = "https://gitlab.com/from-the-lamp/frontend/book.git"
       value_file = "$values/values.yml"
