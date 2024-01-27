@@ -8,28 +8,30 @@ include "common" {
 
 inputs = {
   helm_chart_name = "role-with-rolebinding"
-  helm_chart_version = "0.0.3" 
+  helm_chart_version = "0.0.4" 
   helm_values_file = <<-EOF
   roles:
-    - kind: ClusterRole
+    - kind: Role
       name: argocd-access
-      namespace: default
+      namespace: argocd
       rules:
       - apiGroups: ["argoproj.io"]
         resources: ["applications", "applicationsets", "appprojects"]
         verbs: ["get", "list", "watch", "create", "update", "delete"]
       - apiGroups: [""]
-        resources: ["configmaps", "secrets"]
-        verbs: ["get", "list"]
+        resources: ["configmaps", "secrets", "pods", "pods/portforward", "events"]
+        verbs: ["get", "list", "create"]
   roleBindings:
-    - kind: ClusterRoleBinding
+    - kind: RoleBinding
+      namespace: argocd
       subjects:
       - kind: ServiceAccount
         name: gitlab-runner-infra
         namespace: gitlab
       roleRef:
-        kind: ClusterRole
+        kind: Role
         name: argocd-access
+        namespace: 
         apiGroup: rbac.authorization.k8s.io
   EOF
 }
