@@ -37,7 +37,7 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
   client_key = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
     EOF
-  forward_namespace = "infra"
+  forward_namespace = "argocd"
   auth_token = get_env("argo_auth_token")
   repositories = [
     {

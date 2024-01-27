@@ -36,10 +36,10 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
   client_key = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
     EOF
-  forward_namespace = "infra"
+  forward_namespace = "argocd"
   auth_token = get_env("argo_auth_token")
   name = basename(dirname(get_terragrunt_dir()))
-  namespace = "infra"
+  namespace = "argocd"
   source_namespaces = ["infra"]
   source_repos = [
     "!https://gitlab.com/group/from-the-lamp/${basename(dirname(get_terragrunt_dir()))}/**",

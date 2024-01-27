@@ -37,18 +37,18 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
   client_key = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
     EOF
-  forward_namespace = "infra"
+  forward_namespace = "argocd"
   auth_token = get_env("argo_auth_token")
   app_name = "${basename(dirname(get_terragrunt_dir()))}-${basename(get_terragrunt_dir())}"
   release_name = basename(get_terragrunt_dir())
-  app_namespace = "infra"
+  app_namespace = "argocd"
   dest_namespace = basename(dirname(get_terragrunt_dir()))
   helm_repo_url = local.infra_helm_repo_url
   helm_chart_name = basename(get_terragrunt_dir())
   project = basename(dirname(get_terragrunt_dir()))
   sync_options = ["CreateNamespace=true"]
   namespace_labels = {
-    "istio-injection" = "enabled"
+    "istio-injection" = "disabled"
   }
   dest_cluster_list = [
     {

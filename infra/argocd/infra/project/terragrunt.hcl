@@ -14,6 +14,50 @@ inputs = {
     },
     {
       name = "*"
+      namespace = "vault"
+    },
+    {
+      name = "*"
+      namespace = "oauth2-proxy"
+    },
+    {
+      name = "*"
+      namespace = "cert-manager"
+    },
+    {
+      name = "*"
+      namespace = "postgresql"
+    },
+    {
+      name = "*"
+      namespace = "argocd"
+    },
+    {
+      name = "*"
+      namespace = "cloudtty"
+    },
+    {
+      name = "*"
+      namespace = "crossplane"
+    },
+    {
+      name = "*"
+      namespace = "gitlab"
+    },
+    {
+      name = "*"
+      namespace = "teleport"
+    },
+    {
+      name = "*"
+      namespace = "backend"
+    },
+    {
+      name = "*"
+      namespace = "frontend"
+    },
+    {
+      name = "*"
       namespace = "istio-system"
     },
     {

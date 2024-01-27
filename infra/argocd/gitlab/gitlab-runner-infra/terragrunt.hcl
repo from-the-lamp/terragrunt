@@ -20,6 +20,7 @@ dependency "runner_token" {
 }
 
 inputs = {
+  project = "infra"
   dest_cluster_list = [
     {
       cluster = "in-cluster"
@@ -28,7 +29,8 @@ inputs = {
   ]
   apps = [
     {
-      helm_chart_version = "0.60.0"
+      helm_chart_name = "gitlab-runner"
+      helm_chart_version = "0.61.0"
       helm_repo_url = "https://charts.gitlab.io"
       values = <<EOT
       runnerRegistrationToken: ${dependency.runner_token.outputs.token}
@@ -53,6 +55,7 @@ inputs = {
               image = "arm64v8/ubuntu:23.04"
               helper_image = "gitlab/gitlab-runner-helper:arm-latest"
               node_selector_overwrite_allowed = ".*"
+              service_account = "gitlab-runner-infra"
       rbac:
         create: true
         rules:
