@@ -22,6 +22,10 @@ inputs = {
     },
     {
       name = "*"
+      namespace = "velero"
+    },
+    {
+      name = "*"
       namespace = "cert-manager"
     },
     {
