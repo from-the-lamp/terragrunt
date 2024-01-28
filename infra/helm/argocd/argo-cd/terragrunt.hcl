@@ -238,8 +238,7 @@ inputs = {
     params:
       server.insecure: true
       dexserver.disable.tls: true
-      application.namespaces: "*"
-      createClusterRoles: true
+      applicationsetcontroller.enable.progressive.syncs: true
     rbac:
       policy.default: role:readonly
       policy.csv: |
