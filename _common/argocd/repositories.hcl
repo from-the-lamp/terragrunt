@@ -43,6 +43,12 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
     {
       name = "infra"
       repo = local.infra_helm_repo_url
+      enable_oci = false
+    },
+    {
+      name = "origin-ca-issuer-charts"
+      repo = "ghcr.io/cloudflare/origin-ca-issuer-charts"
+      enable_oci = true
     }
   ]
 }
