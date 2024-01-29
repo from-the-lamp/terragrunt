@@ -15,7 +15,7 @@ inputs = {
       AVP_TYPE: "vault"
       VAULT_ADDR: "http://vault.vault.svc.cluster.local:8200"
       AVP_AUTH_TYPE: "k8s"
-      AVP_K8S_ROLE: "argocd-app"
+      AVP_K8S_ROLE: "argocd"
     env:
       plugin.yaml: |
         ---

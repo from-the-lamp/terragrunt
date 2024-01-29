@@ -46,6 +46,9 @@ inputs = {
   helm_values_file = <<-EOF
   env:
     ARGOCD_K8S_CLIENT_QPS: 300
+  controller:
+    args:
+      appResyncPeriod: "180"
   repoServer:
     volumes:
       - configMap:
