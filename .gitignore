@@ -9,3 +9,4 @@ inventory
 _modules
 .tmp
 terraform.tfstate
+.DS_Store
