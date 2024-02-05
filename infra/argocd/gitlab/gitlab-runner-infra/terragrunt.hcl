@@ -33,7 +33,7 @@ inputs = {
       helm_chart_version = "0.61.0"
       helm_repo_url = "https://charts.gitlab.io"
       values = <<EOT
-      runnerRegistrationToken: ${dependency.runner_token.outputs.token}
+      runnerToken: ${dependency.runner_token.outputs.token}
       gitlabUrl: "https://gitlab.com"
       concurrent: "5"
       nodeSelector:
