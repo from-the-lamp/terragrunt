@@ -43,11 +43,19 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
     {
       name = "infra"
       repo = local.infra_helm_repo_url
+      type = "helm"
       enable_oci = false
     },
     {
-      name = "origin-ca-issuer-charts"
+      name = "origin-ca-issuer"
       repo = "ghcr.io/cloudflare/origin-ca-issuer-charts"
+      type = "helm"
+      enable_oci = true
+    },
+    {
+      name = "bitnami"
+      repo = "registry-1.docker.io/bitnamicharts"
+      type = "helm"
       enable_oci = true
     }
   ]
