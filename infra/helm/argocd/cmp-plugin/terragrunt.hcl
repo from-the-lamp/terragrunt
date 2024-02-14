@@ -43,7 +43,7 @@ inputs = {
               - bash
               - "-c"
               - |
-                helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
+                helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
                 argocd-vault-plugin generate -s cmp-plugin -
           lockRepo: false
   EOF
