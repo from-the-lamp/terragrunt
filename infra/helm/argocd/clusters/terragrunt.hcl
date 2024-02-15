@@ -6,6 +6,12 @@ include "common" {
   path = "${dirname(find_in_parent_folders())}/_common/k8s/helm.hcl"
 }
 
+dependency "argocd" {
+  config_path = "../argocd"
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
+  skip_outputs = true
+}
+
 dependency "k8s_data_prod_0" {
   config_path = "${get_repo_root()}/prod-0/oracle/k3s/masters/ssh_read_file_content"
   mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]

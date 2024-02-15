@@ -11,6 +11,12 @@ locals {
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
 }
 
+dependency "argocd" {
+  config_path = "../argocd"
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
+  skip_outputs = true
+}
+
 inputs = {
   helm_chart_name = "argocd-repositories"
   helm_chart_version = "0.0.2" 

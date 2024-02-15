@@ -39,7 +39,8 @@ dependency "oci_cloud_controller_manager" {
 
 inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
-  helm_chart_version = "5.53.4"
+  helm_chart_name = "argo-cd"
+  helm_chart_version = "6.0.14"
   helm_set_sensitive = {
     "configs.secret.gitlabSecret" = dependency.infra_variables.outputs.variables.openid_client_secret_argocd
   }
