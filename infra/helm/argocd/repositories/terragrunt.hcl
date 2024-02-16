@@ -34,5 +34,13 @@ inputs = {
       type: helm
       url: registry-1.docker.io/bitnamicharts
       enableOCI: "true"
+    prometheus-community:
+      type: helm
+      url: https://prometheus-community.github.io/helm-charts
+      enableOCI: "false"
+    grafana:
+      type: helm
+      url: https://grafana.github.io/helm-charts
+      enableOCI: "false"
   EOF
 }
