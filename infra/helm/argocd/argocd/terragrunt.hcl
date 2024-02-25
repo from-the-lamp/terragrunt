@@ -40,7 +40,7 @@ dependency "oci_cloud_controller_manager" {
 inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
   helm_chart_name = "argo-cd"
-  helm_chart_version = "6.0.6"
+  helm_chart_version = "6.3.1"
   helm_set_sensitive = {
     "configs.secret.gitlabSecret" = dependency.infra_variables.outputs.variables.openid_client_secret_argocd
   }
@@ -59,6 +59,15 @@ inputs = {
         emptyDir: {}
       - name: tmp-dir
         emptyDir: {}
+    rbac:
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - get
+      - list
+      - watch
     initContainers:
     - name: download-tools
       image: registry.access.redhat.com/ubi8
@@ -83,9 +92,9 @@ inputs = {
         - mountPath: /custom-tools
           name: custom-tools
     extraContainers:
-      - name: avp-helm
+      - name: avp
         command: [/var/run/argocd/argocd-cmp-server]
-        image: quay.io/argoproj/argocd:v2.4.8
+        image: quay.io/argoproj/argocd:v2.10.1
         securityContext:
           runAsNonRoot: true
           runAsUser: 999
@@ -96,11 +105,32 @@ inputs = {
             name: plugins
           - mountPath: /tmp
             name: tmp-dir
-          - mountPath: /home/argocd/cmp-server/config
+          - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+            subPath: avp.yaml
             name: cmp-plugin
           - name: custom-tools
             subPath: argocd-vault-plugin
             mountPath: /usr/local/bin/argocd-vault-plugin
+      - name: avp-helm
+        command: [/var/run/argocd/argocd-cmp-server]
+        image: quay.io/argoproj/argocd:v2.10.1
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+        volumeMounts:
+          - mountPath: /var/run/argocd
+            name: var-files
+          - mountPath: /home/argocd/cmp-server/plugins
+            name: plugins
+          - mountPath: /tmp
+            name: tmp-dir
+          - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+            subPath: avp-helm.yaml
+            name: cmp-plugin
+          - name: custom-tools
+            subPath: argocd-vault-plugin
+            mountPath: /usr/local/bin/argocd-vault-plugin
+
   configs:
     cm:
       url: https://argocd.from-the-lamp.work

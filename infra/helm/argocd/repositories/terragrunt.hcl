@@ -30,10 +30,14 @@ inputs = {
       type: helm
       url: ghcr.io/cloudflare/origin-ca-issuer-charts
       enableOCI: "true"
-    bitnami:
+    bitnamiOCI:
       type: helm
       url: registry-1.docker.io/bitnamicharts
       enableOCI: "true"
+    bitnami:
+      type: helm
+      url: https://charts.bitnami.com/bitnami
+      enableOCI: "false"
     prometheus-community:
       type: helm
       url: https://prometheus-community.github.io/helm-charts

@@ -17,7 +17,28 @@ inputs = {
       AVP_AUTH_TYPE: "k8s"
       AVP_K8S_ROLE: "argocd"
     env:
-      plugin.yaml: |
+      avp.yaml: |
+        ---
+        apiVersion: argoproj.io/v1alpha1
+        kind: ConfigManagementPlugin
+        metadata:
+          name: argocd-vault-plugin
+        spec:
+          allowConcurrency: true
+          discover:
+            find:
+              command:
+                - sh
+                - "-c"
+                - "find . -name '*.yaml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep ."
+          generate:
+            command:
+              - bash
+              - "-c"
+              - |
+                argocd-vault-plugin generate -s cmp-plugin . 
+          lockRepo: false
+      avp-helm.yaml: |
         ---
         apiVersion: argoproj.io/v1alpha1
         kind: ConfigManagementPlugin
@@ -36,7 +57,9 @@ inputs = {
               - sh
               - "-c"
               - |
+                helm repo add bitnami https://charts.bitnami.com/bitnami
                 helm repo add infra https://gitlab.com/api/v4/projects/40582099/packages/helm/stable
+                helm repo update
                 helm dependency build 
           generate:
             command:
@@ -46,5 +69,6 @@ inputs = {
                 helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
                 argocd-vault-plugin generate -s cmp-plugin -
           lockRepo: false
+
   EOF
 }
