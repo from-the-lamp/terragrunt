@@ -52,15 +52,6 @@ inputs = {
                 - sh
                 - "-c"
                 - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
-          init:
-            command:
-              - sh
-              - "-c"
-              - |
-                helm repo add bitnami https://charts.bitnami.com/bitnami
-                helm repo add infra https://gitlab.com/api/v4/projects/40582099/packages/helm/stable
-                helm repo update
-                helm dependency build 
           generate:
             command:
               - bash

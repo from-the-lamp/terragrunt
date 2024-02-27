@@ -40,7 +40,7 @@ dependency "oci_cloud_controller_manager" {
 inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
   helm_chart_name = "argo-cd"
-  helm_chart_version = "6.3.1"
+  helm_chart_version = "6.4.0"
   helm_set_sensitive = {
     "configs.secret.gitlabSecret" = dependency.infra_variables.outputs.variables.openid_client_secret_argocd
   }
@@ -130,7 +130,8 @@ inputs = {
           - name: custom-tools
             subPath: argocd-vault-plugin
             mountPath: /usr/local/bin/argocd-vault-plugin
-
+          - name: helm-working-dir
+            mountPath: /helm-working-dir
   configs:
     cm:
       url: https://argocd.from-the-lamp.work
