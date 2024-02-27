@@ -52,12 +52,25 @@ inputs = {
                 - sh
                 - "-c"
                 - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
+          init:
+            command:
+              - /bin/sh
+              - -c
+              - |
+                COUNTER=1
+                for REPO_URL in $(helm dependency list | tail -n+2 | tr -s '[:space:]' | cut -f3)
+                  do
+                    REPO_NAME=$(printf "repo%03d" $COUNTER)
+                    helm repo add "$${REPO_NAME}" "$${REPO_URL}"
+                    ((COUNTER++))
+                done
+                helm dependency build
           generate:
             command:
               - bash
               - "-c"
               - |
-                helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
+                helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} --include-crds -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
                 argocd-vault-plugin generate -s cmp-plugin -
           lockRepo: false
 

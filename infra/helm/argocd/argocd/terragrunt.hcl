@@ -117,6 +117,13 @@ inputs = {
         securityContext:
           runAsNonRoot: true
           runAsUser: 999
+        env:
+        - name: HELM_CACHE_HOME
+          value: /helm-working-dir
+        - name: HELM_CONFIG_HOME
+          value: /helm-working-dir
+        - name: HELM_DATA_HOME
+          value: /helm-working-dir
         volumeMounts:
           - mountPath: /var/run/argocd
             name: var-files
