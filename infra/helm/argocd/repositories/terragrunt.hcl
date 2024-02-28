@@ -9,8 +9,9 @@ include "common" {
 locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
+  gitlab_token = local.common_settings.locals.gitlab_token
 }
-
+  
 dependency "argocd" {
   config_path = "../argocd"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
@@ -21,6 +22,12 @@ inputs = {
   helm_chart_name = "argocd-repositories"
   helm_chart_version = "0.0.2" 
   helm_values_file = <<-EOF
+  credentials:
+    freqtrade:
+      type: git
+      url: https://gitlab.com/djinno/freqtrade
+      username: gitlab-ci-user
+      password: ${local.gitlab_token}
   repositories:
     infra:
       type: helm
@@ -30,7 +37,7 @@ inputs = {
       type: helm
       url: ghcr.io/cloudflare/origin-ca-issuer-charts
       enableOCI: "true"
-    bitnamiOCI:
+    bitnami-oci:
       type: helm
       url: registry-1.docker.io/bitnamicharts
       enableOCI: "true"
