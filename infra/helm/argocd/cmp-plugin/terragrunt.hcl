@@ -55,7 +55,7 @@ inputs = {
                 - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
           init:
             command:
-              - /bin/sh
+              - /bin/bash
               - -c
               - |
                 COUNTER=1
@@ -71,7 +71,7 @@ inputs = {
               - bash
               - "-c"
               - |
-                helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
+                helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} -n $ARGOCD_APP_NAMESPACE $${ARGOCD_ENV_HELM_ARGS} -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
                 argocd-vault-plugin generate -s cmp-plugin -
   EOF
 }
