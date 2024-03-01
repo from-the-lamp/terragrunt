@@ -50,8 +50,8 @@ inputs = {
           discover:
             find:
               command:
-                - sh
-                - "-c"
+                - /bin/bash
+                - -c
                 - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
           init:
             command:
@@ -68,8 +68,8 @@ inputs = {
                 helm dependency build
           generate:
             command:
-              - bash
-              - "-c"
+              - /bin/bash
+              - -c
               - |
                 helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} -n $ARGOCD_APP_NAMESPACE $${ARGOCD_ENV_HELM_ARGS} -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
                 argocd-vault-plugin generate -s cmp-plugin -
