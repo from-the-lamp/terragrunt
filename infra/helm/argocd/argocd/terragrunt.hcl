@@ -180,6 +180,26 @@ inputs = {
           kinds:
           - ProviderConfigUsages
       resource.customizations: |
+        PersistentVolumeClaim:
+          health.lua: |
+            hs = {}
+            if obj.status ~= nil then
+              if obj.status.phase ~= nil then
+                if obj.status.phase == "Pending" then
+                  hs.status = "Healthy"
+                  hs.message = obj.status.phase
+                  return hs
+                end
+                if obj.status.phase == "Bound" then
+                  hs.status = "Healthy"
+                  hs.message = obj.status.phase
+                  return hs
+                end
+              end
+            end
+            hs.status = "Progressing"
+            hs.message = "Waiting for certificate"
+            return hs
         "*.upbound.io/*":
           health.lua: |
             health_status = {
