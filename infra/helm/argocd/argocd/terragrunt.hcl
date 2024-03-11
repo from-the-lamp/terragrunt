@@ -46,6 +46,8 @@ inputs = {
   }
   helm_values_file = <<-EOF
   global:
+    nodeSelector:
+      node-role: worker
     domain: argocd.from-the-lamp.work
   env:
     ARGOCD_K8S_CLIENT_QPS: 300
