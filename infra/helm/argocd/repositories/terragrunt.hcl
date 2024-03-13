@@ -23,16 +23,12 @@ inputs = {
   helm_chart_version = "0.0.2" 
   helm_values_file = <<-EOF
   credentials:
-    freqtrade:
+    djinno0:
       type: git
-      url: https://gitlab.com/djinno/freqtrade
+      url: https://gitlab.com/djinno0
       username: gitlab-ci-user
       password: ${local.gitlab_token}
-    3commas:
-      type: git
-      url: https://gitlab.com/djinno/3commas
-      username: gitlab-ci-user
-      password: ${local.gitlab_token}
+
   repositories:
     infra:
       type: helm
