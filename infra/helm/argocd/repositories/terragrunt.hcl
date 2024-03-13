@@ -28,6 +28,11 @@ inputs = {
       url: https://gitlab.com/djinno/freqtrade
       username: gitlab-ci-user
       password: ${local.gitlab_token}
+    3commas:
+      type: git
+      url: https://gitlab.com/djinno/3commas
+      username: gitlab-ci-user
+      password: ${local.gitlab_token}
   repositories:
     infra:
       type: helm
