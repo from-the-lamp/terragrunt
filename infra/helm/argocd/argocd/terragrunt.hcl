@@ -3,7 +3,7 @@ include "root" {
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/k8s/helm.hcl"
+  path = "${dirname(find_in_parent_folders())}/_common/kubernetes/helm.hcl"
 }
 
 locals {
@@ -12,17 +12,6 @@ locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
   openid_client_id_argocd = local.common_settings.locals.openid_client_id_argocd
-}
-
-dependency "infra_variables" {
-  config_path = "${get_repo_root()}/${local.env}/gitlab/infra_variables"
-  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
-  mock_outputs = {
-    variables = {
-      cloudflare_api_token = "fake-token"
-      gitlab_openid_secret = "fake-secret"
-    }
-  }
 }
 
 dependency "cmp-plugin" {
@@ -42,7 +31,7 @@ inputs = {
   helm_chart_name = "argo-cd"
   helm_chart_version = "6.7.1"
   helm_set_sensitive = {
-    "configs.secret.gitlabSecret" = dependency.infra_variables.outputs.variables.openid_client_secret_argocd
+    "configs.secret.gitlabSecret" = get_env("OPENID_CLIENT_SECRET_ARGOCD")
   }
   helm_values_file = <<-EOF
   global:
