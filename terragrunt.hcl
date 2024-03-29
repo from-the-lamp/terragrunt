@@ -10,7 +10,6 @@ locals {
   admin_ssh_pub = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILtNvLcjDTFxc/v03D93cyeEa77jxNC/u2DfqM9gn0k6"
   helm_repo_user = "gitlab-ci-token"
   helm_repo_pass = get_env("TF_HTTP_PASSWORD")
-  openid_client_id_argocd = "2fd7eebea2c98fcc945b386fef203dfdc21b066f53cd23307baa9844264ff32e"
 }
 
 remote_state {

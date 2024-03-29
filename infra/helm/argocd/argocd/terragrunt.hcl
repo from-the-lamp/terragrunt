@@ -11,7 +11,6 @@ locals {
   env = local.environment_vars.locals.environment
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
-  openid_client_id_argocd = local.common_settings.locals.openid_client_id_argocd
 }
 
 dependency "cmp-plugin" {
@@ -156,7 +155,7 @@ inputs = {
             config:
               baseURL: https://gitlab.com
               redirectURI: https://argocd.from-the-lamp.work/api/dex/callback
-              clientID: ${local.openid_client_id_argocd}
+              clientID: ${get_env("OPENID_CLIENT_ID_ARGOCD")}
               clientSecret: $webhook.gitlab.secret
               useLoginAsID: false
           staticClients:

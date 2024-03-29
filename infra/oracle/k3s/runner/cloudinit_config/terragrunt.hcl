@@ -12,6 +12,7 @@ locals {
   oracle_profile_name = local.environment_vars.locals.oracle_profile_name
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   k3s_cluster_version = local.common_settings.locals.k3s_cluster_version
+  compartment_ocid = run_cmd("--terragrunt-quiet", "${get_repo_root()}/.kek.sh", "compartment_ocid", "${get_env("OCI_CONFIG_PATH")}", "${local.oracle_profile_name}")
 }
 
 dependency "token" {
