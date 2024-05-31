@@ -28,7 +28,7 @@ dependency "oci_cloud_controller_manager" {
 inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
   helm_chart_name = "argo-cd"
-  helm_chart_version = "6.7.13"
+  helm_chart_version = "6.11.1"
   helm_set_sensitive = {
     "configs.secret.gitlabSecret" = get_env("OPENID_CLIENT_SECRET_ARGOCD")
   }
@@ -40,9 +40,42 @@ inputs = {
   env:
     ARGOCD_K8S_CLIENT_QPS: 300
   controller:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
     args:
       appResyncPeriod: "180"
+  dex:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  redis:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  server:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  applicationSet:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  notifications:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
   repoServer:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
     volumes:
       - configMap:
           name: cmp-plugin
