@@ -18,5 +18,5 @@ inputs = {
   config_file_profile = local.oracle_profile_name
   compartment_ocid = local.compartment_ocid
   namespace = run_cmd("--terragrunt-quiet", "/usr/bin/env", "bash", "-c", "oci --profile lamp-infra os ns get | jq '.data' -r")
-  name = "velero"
+  name = basename(get_terragrunt_dir())
 }
