@@ -57,6 +57,13 @@ inputs = {
       serviceMonitor:
         enabled: true
   server:
+    extensions:
+      enabled: true
+      extensionList:
+        - name: rollout-extension
+          env:
+            - name: EXTENSION_URL
+              value: https://github.com/argoproj-labs/rollout-extension/releases/download/v0.3.5/extension.tar
     metrics:
       enabled: true
       serviceMonitor:

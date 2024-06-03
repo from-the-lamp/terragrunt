@@ -68,8 +68,14 @@ inputs = {
               - /bin/bash
               - -c
               - |
-                helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} \
-                  -n $ARGOCD_APP_NAMESPACE $${ARGOCD_ENV_HELM_ARGS} \
-                  -f <(echo "$ARGOCD_ENV_HELM_VALUES") . --include-crds | argocd-vault-plugin generate -s cmp-plugin -
+                rendered_templates=$(helm template $${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} -n $ARGOCD_APP_NAMESPACE $${ARGOCD_ENV_HELM_ARGS} -f <(echo "$ARGOCD_ENV_HELM_VALUES") . --include-crds)
+                additional_manifest=$${ARGOCD_ENV_ADDITIONAL_MANIFEST}
+                if [ -n "$additional_manifest" ]; then
+                  echo "$rendered_templates"
+                  echo "---"
+                  echo "$additional_manifest"
+                else
+                  echo "$rendered_templates"
+                fi | argocd-vault-plugin generate -s cmp-plugin -
   EOF
 }
