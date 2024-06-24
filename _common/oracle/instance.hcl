@@ -1,5 +1,5 @@
 terraform {
-  source = "${local.modules_url}/${local.module_name}//${local.module_dir}?ref=${local.module_version}"
+  source = "${local.modules_url}//${local.module_dir}?ref=${local.module_version}"
 }
 
 locals {
@@ -8,8 +8,7 @@ locals {
   oracle_profile_name = local.environment_vars.locals.oracle_profile_name
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   modules_url = local.common_settings.locals.private_modules_base_url
-  module_name = "oracle"
-  module_dir = "instance"
+  module_dir = "oracle/instance"
   module_version = "main"
   admin_ssh_pub = local.common_settings.locals.admin_ssh_pub
   ad_number = local.environment_vars.locals.ad_number
