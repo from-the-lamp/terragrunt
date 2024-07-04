@@ -1,24 +1,76 @@
 applicationsets:
-  infra:
+  platform:
     namespace: argocd
-    additionalLabels: {}
-    additionalAnnotations: {}
     generators:
     - list:
         elements:
+        - name: argo
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: cloudflare
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: cloudtty
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: crossplane
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: gitlab
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: image-pull-secret
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
         - name: istio-system
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: minio
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: oauth2-proxy
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: observability
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: postgresql
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: reloader
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: teleport
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: vault
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: velero
           url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
     template:
       metadata:
-        name: '{{name}}'
+        name: "{{name}}"
       spec:
         project: default
         source:
-          repoURL: '{{url}}'
+          repoURL: "{{url}}"
           targetRevision: HEAD
-          path: infra/istio-system
+          path: "infra/{{name}}"
         destination:
-          name: in-clusters
+          name: in-cluster
+          namespace: argocd
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+
+  product:
+    namespace: argocd
+    generators:
+    - list:
+        elements:
+        - name: backend
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+        - name: frontend
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+    template:
+      metadata:
+        name: "{{name}}"
+      spec:
+        project: default
+        source:
+          repoURL: "{{url}}"
+          targetRevision: HEAD
+          path: "{{name}}"
+        destination:
+          name: in-cluster
           namespace: argocd
         syncPolicy:
           automated:

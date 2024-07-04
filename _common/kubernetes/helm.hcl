@@ -36,11 +36,12 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
   kubernetes_client_key = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
     EOF
-  force_update = true
-  recreate_pods = true
+  helm_force_update = true
+  helm_recreate_pods = true
   helm_repo_url = local.infra_helm_repo_url
   helm_chart_name = basename(get_terragrunt_dir())
   helm_release_name = basename(get_terragrunt_dir())
   helm_values_file = "values.yml"
-  k8s_namespace = basename(dirname(get_terragrunt_dir()))
+  helm_namespace = basename(dirname(get_terragrunt_dir()))
+  helm_create_namespace = true
 }

@@ -13,8 +13,17 @@ locals {
   compartment_ocid = run_cmd("--terragrunt-quiet", "${get_repo_root()}/.kek.sh", "compartment_ocid", "${get_env("OCI_CONFIG_PATH")}", "${local.oracle_profile_name}")
 }
 
+generate "provider" {
+  path = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents = <<EOF
+provider "oci" {
+  config_file_profile = "${local.oracle_profile_name}"
+}
+EOF
+}
+
 inputs = {
-  config_file_profile = local.oracle_profile_name
   compartment_ocid = local.compartment_ocid
   namespace = run_cmd("--terragrunt-quiet", "/usr/bin/env", "bash", "-c", "oci --profile lamp-infra os ns get | jq '.data' -r")
   name = basename(get_terragrunt_dir())

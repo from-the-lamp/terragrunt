@@ -210,26 +210,6 @@ inputs = {
           kinds:
           - ProviderConfigUsages
       resource.customizations: |
-        PersistentVolumeClaim:
-          health.lua: |
-            hs = {}
-            if obj.status ~= nil then
-              if obj.status.phase ~= nil then
-                if obj.status.phase == "Pending" then
-                  hs.status = "Healthy"
-                  hs.message = obj.status.phase
-                  return hs
-                end
-                if obj.status.phase == "Bound" then
-                  hs.status = "Healthy"
-                  hs.message = obj.status.phase
-                  return hs
-                end
-              end
-            end
-            hs.status = "Progressing"
-            hs.message = "Waiting for certificate"
-            return hs
         "*.upbound.io/*":
           health.lua: |
             health_status = {
@@ -251,13 +231,13 @@ inputs = {
               "ProviderConfigUsage"
             }
 
-            if obj.status == nil and contains(has_no_status, obj.kind) then
+            if obj.status == nil or next(obj.status) == nil and contains(has_no_status, obj.kind) then
               health_status.status = "Healthy"
               health_status.message = "Resource is up-to-date."
               return health_status
             end
 
-            if obj.status == nil or obj.status.conditions == nil then
+            if obj.status == nil or next(obj.status) == nil or obj.status.conditions == nil then
               if obj.kind == "ProviderConfig" and obj.status.users ~= nil then
                 health_status.status = "Healthy"
                 health_status.message = "Resource is in use."
@@ -314,15 +294,22 @@ inputs = {
               "Composition",
               "CompositionRevision",
               "DeploymentRuntimeConfig",
-              "ControllerConfig"
+              "ControllerConfig",
+              "ProviderConfig",
+              "ProviderConfigUsage"
             }
-            if obj.status == nil and contains(has_no_status, obj.kind) then
+            if obj.status == nil or next(obj.status) == nil and contains(has_no_status, obj.kind) then
                 health_status.status = "Healthy"
                 health_status.message = "Resource is up-to-date."
               return health_status
             end
 
-            if obj.status == nil or obj.status.conditions == nil then
+            if obj.status == nil or next(obj.status) == nil or obj.status.conditions == nil then
+              if obj.kind == "ProviderConfig" and obj.status.users ~= nil then
+                health_status.status = "Healthy"
+                health_status.message = "Resource is in use."
+                return health_status
+              end
               return health_status
             end
 
@@ -352,7 +339,8 @@ inputs = {
               end
             end
 
-            return health_status 
+            return health_status  
+
     params:
       server.insecure: true
       dexserver.disable.tls: true
