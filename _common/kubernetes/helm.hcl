@@ -26,14 +26,14 @@ dependency "ssh_read_file_content" {
 }
 
 inputs = {
-  host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
-  cluster_ca_certificate = <<-EOF
+  kubernetes_host = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
+  kubernetes_cluster_ca_certificate = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data"))}
     EOF
-  client_certificate = <<-EOF
+  kubernetes_client_certificate = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
     EOF
-  client_key = <<-EOF
+  kubernetes_client_key = <<-EOF
 ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
     EOF
   force_update = true
@@ -41,6 +41,6 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
   helm_repo_url = local.infra_helm_repo_url
   helm_chart_name = basename(get_terragrunt_dir())
   helm_release_name = basename(get_terragrunt_dir())
-  helm_values_file_path = "values.yml"
+  helm_values_file = "values.yml"
   k8s_namespace = basename(dirname(get_terragrunt_dir()))
 }

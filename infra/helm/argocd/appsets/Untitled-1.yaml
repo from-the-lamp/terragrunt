@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: infra
+spec:
+  generators:
+  - list:
+      elements:
+      - name: istio-system
+        url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: default
+      source:
+        repoURL: '{{url}}'
+        targetRevision: HEAD
+        path: infra/istio-system
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

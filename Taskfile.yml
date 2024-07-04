@@ -17,8 +17,7 @@ tasks:
   terragrunt:
     dir: $DIR
     cmds:
-    - task: rm:all
-    - terragrunt run-all {{ .ACTION }} --terragrunt-non-interactive
+    - terragrunt run-all {{ .ACTION }} --terragrunt-non-interactive {{ .CLI_ARGS }}
 
   plan:
     cmds:

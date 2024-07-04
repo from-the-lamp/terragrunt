@@ -1,0 +1,26 @@
+applicationsets:
+  infra:
+    namespace: argocd
+    additionalLabels: {}
+    additionalAnnotations: {}
+    generators:
+    - list:
+        elements:
+        - name: istio-system
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+    template:
+      metadata:
+        name: '{{name}}'
+      spec:
+        project: default
+        source:
+          repoURL: '{{url}}'
+          targetRevision: HEAD
+          path: infra/istio-system
+        destination:
+          name: in-clusters
+          namespace: argocd
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
