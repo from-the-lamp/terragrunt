@@ -28,7 +28,7 @@ dependency "oci_cloud_controller_manager" {
 inputs = {
   helm_repo_url = "https://argoproj.github.io/argo-helm"
   helm_chart_name = "argo-cd"
-  helm_chart_version = "6.11.1"
+  helm_chart_version = "7.3.4"
   helm_set_sensitive = {
     "configs.secret.gitlabSecret" = get_env("OPENID_CLIENT_SECRET_ARGOCD")
   }
@@ -126,7 +126,7 @@ inputs = {
     extraContainers:
       - name: avp
         command: [/var/run/argocd/argocd-cmp-server]
-        image: quay.io/argoproj/argocd:v2.10.1
+        image: quay.io/argoproj/argocd:v2.11.4
         securityContext:
           runAsNonRoot: true
           runAsUser: 999
@@ -145,7 +145,7 @@ inputs = {
             mountPath: /usr/local/bin/argocd-vault-plugin
       - name: avp-helm
         command: [/var/run/argocd/argocd-cmp-server]
-        image: quay.io/argoproj/argocd:v2.10.1
+        image: quay.io/argoproj/argocd:v2.11.4
         securityContext:
           runAsNonRoot: true
           runAsUser: 999

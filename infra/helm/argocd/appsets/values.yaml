@@ -4,6 +4,8 @@ applicationsets:
     generators:
     - list:
         elements:
+        - name: kube-system
+          url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
         - name: argo
           url: https://gitlab.com/from-the-lamp/infra/argo-apps.git
         - name: cloudflare
