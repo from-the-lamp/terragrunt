@@ -54,6 +54,10 @@ inputs = {
       kind: StorageClass
     - group: "cert-manager.io"
       kind: ClusterIssuer
+    - group: "vault.upbound.io"
+      kind: StoreConfig
+    - group: "vault.upbound.io"
+      kind: ProviderConfig            
     namespaceResourceWhitelist:
     - group: "*"
       kind: "*"
