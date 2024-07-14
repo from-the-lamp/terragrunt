@@ -57,7 +57,9 @@ inputs = {
     - group: "vault.upbound.io"
       kind: StoreConfig
     - group: "vault.upbound.io"
-      kind: ProviderConfig            
+      kind: ProviderConfig
+    - group: "cert-manager.k8s.cloudflare.com"
+      kind: ClusterOriginIssuer
     namespaceResourceWhitelist:
     - group: "*"
       kind: "*"

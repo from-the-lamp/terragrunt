@@ -21,6 +21,8 @@ applicationsets:
         - name: velero
         - name: external-dns
         - name: external-secrets
+        - name: cert-manager
+        - name: origin-ca-issuer
     template:
       metadata:
         name: "{{name}}"
