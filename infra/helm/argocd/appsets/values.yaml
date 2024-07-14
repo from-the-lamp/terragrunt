@@ -22,6 +22,7 @@ applicationsets:
         - name: external-dns
         - name: cert-manager
         - name: origin-ca-issuer
+        - name: longhorn
     template:
       metadata:
         name: "{{name}}"
