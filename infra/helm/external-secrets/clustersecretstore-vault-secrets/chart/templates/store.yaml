@@ -10,8 +10,9 @@ spec:
       version: {{ .Values.vault.engine.version }}
       auth:
         tokenSecretRef:
-          name: "vault-token"
-          key: "token"
+          namespace: external-secrets
+          name: vault-token
+          key: token
 ---
 apiVersion: v1
 kind: Secret

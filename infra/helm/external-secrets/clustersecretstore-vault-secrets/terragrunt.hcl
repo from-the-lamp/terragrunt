@@ -11,7 +11,7 @@ inputs = {
   helm_repo_url = ""
   helm_values_file = <<-EOF
   vault:
-    url: http://vault.vault.svc.default.cluster.local
+    url: http://vault.vault:8200
     token: ${get_env("VAULT_TOKEN")}
     engine:
       version: v2
