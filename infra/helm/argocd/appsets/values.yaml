@@ -10,7 +10,6 @@ applicationsets:
         - name: cloudtty
         - name: crossplane
         - name: gitlab
-        - name: image-pull-secret
         - name: istio-system
         - name: minio
         - name: oauth2-proxy
@@ -21,6 +20,7 @@ applicationsets:
         - name: vault
         - name: velero
         - name: external-dns
+        - name: external-secrets
     template:
       metadata:
         name: "{{name}}"
