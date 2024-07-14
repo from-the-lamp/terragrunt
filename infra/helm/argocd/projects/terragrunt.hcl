@@ -60,6 +60,8 @@ inputs = {
       kind: ProviderConfig
     - group: "cert-manager.k8s.cloudflare.com"
       kind: ClusterOriginIssuer
+    - group: "external-secrets.io"
+      kind: ClusterSecretStore
     namespaceResourceWhitelist:
     - group: "*"
       kind: "*"
