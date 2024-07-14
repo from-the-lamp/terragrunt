@@ -62,6 +62,8 @@ inputs = {
       kind: ClusterOriginIssuer
     - group: "external-secrets.io"
       kind: ClusterSecretStore
+    - group: "snapshot.storage.k8s.io"
+      kind: VolumeSnapshotClass
     namespaceResourceWhitelist:
     - group: "*"
       kind: "*"
