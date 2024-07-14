@@ -1,0 +1,21 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  provider:
+    vault:
+      server: {{ .Values.vault.url }}
+      path: {{ .Values.vault.engine.path }}
+      version: {{ .Values.vault.engine.version }}
+      auth:
+        tokenSecretRef:
+          name: "vault-token"
+          key: "token"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-token
+stringData:
+  token: {{ .Values.vault.token }}
