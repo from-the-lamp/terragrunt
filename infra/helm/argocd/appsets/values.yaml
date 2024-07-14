@@ -20,7 +20,6 @@ applicationsets:
         - name: vault
         - name: velero
         - name: external-dns
-        - name: external-secrets
         - name: cert-manager
         - name: origin-ca-issuer
     template:
