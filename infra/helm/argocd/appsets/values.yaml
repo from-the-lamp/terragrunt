@@ -23,6 +23,7 @@ applicationsets:
         - name: cert-manager
         - name: origin-ca-issuer
         - name: longhorn
+        - name: botkube
     template:
       metadata:
         name: "{{name}}"
