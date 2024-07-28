@@ -32,7 +32,7 @@ applicationsets:
         source:
           repoURL: https://gitlab.com/from-the-lamp/infra/argo-apps.git
           targetRevision: HEAD
-          path: "infra/{{name}}"
+          path: "platform/{{name}}"
         destination:
           name: in-cluster
           namespace: argocd
