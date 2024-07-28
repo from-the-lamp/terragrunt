@@ -4,7 +4,7 @@ terraform {
 
 locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
-  modules_url = local.common_settings.locals.private_modules_base_url
-  module_dir = "tools/random_password"
-  module_version = "main"
+  modules_url     = local.common_settings.locals.private_modules_base_url
+  module_dir      = "tools/random_password"
+  module_version  = "main"
 }

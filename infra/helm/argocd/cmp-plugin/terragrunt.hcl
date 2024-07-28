@@ -7,9 +7,9 @@ include "common" {
 }
 
 inputs = {
-  helm_chart_name = "config"
-  helm_chart_version = "0.0.5" 
-  helm_values_file = <<-EOF
+  helm_chart_name    = "config"
+  helm_chart_version = "0.0.5"
+  helm_values_file   = <<-EOF
   global:
     secret:
       AVP_TYPE: "vault"

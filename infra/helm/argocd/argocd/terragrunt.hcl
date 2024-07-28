@@ -7,27 +7,27 @@ include "common" {
 }
 
 locals {
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env = local.environment_vars.locals.environment
-  common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  environment_vars    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env                 = local.environment_vars.locals.environment
+  common_settings     = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
 }
 
 dependency "cmp-plugin" {
-  config_path = "../cmp-plugin"
+  config_path                             = "../cmp-plugin"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
-  skip_outputs = true
+  skip_outputs                            = true
 }
 
 dependency "oci_cloud_controller_manager" {
-  config_path = "${get_repo_root()}/${local.env}/helm/kube-system/oci-cloud-controller-manager"
-  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
-  skip_outputs = true
+  config_path                             = "${get_repo_root()}/${local.env}/helm/kube-system/oci-cloud-controller-manager"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
+  skip_outputs                            = true
 }
 
 inputs = {
-  helm_repo_url = "https://argoproj.github.io/argo-helm"
-  helm_chart_name = "argo-cd"
+  helm_repo_url      = "https://argoproj.github.io/argo-helm"
+  helm_chart_name    = "argo-cd"
   helm_chart_version = "7.3.4"
   helm_set_sensitive = {
     "configs.secret.gitlabSecret" = get_env("OPENID_CLIENT_SECRET_ARGOCD")

@@ -3,21 +3,21 @@ terraform {
 }
 
 locals {
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env = local.environment_vars.locals.environment
+  environment_vars    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env                 = local.environment_vars.locals.environment
   oracle_profile_name = local.environment_vars.locals.oracle_profile_name
-  common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
-  modules_url = local.common_settings.locals.private_modules_base_url
-  module_dir = "oracle/instance_pool"
-  module_version = "main"
-  ad_number = local.environment_vars.locals.ad_number
-  compartment_ocid = run_cmd("--terragrunt-quiet", "${get_repo_root()}/.kek.sh", "compartment_ocid", "${get_env("OCI_CONFIG_PATH")}", "${local.oracle_profile_name}")
+  common_settings     = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  modules_url         = local.common_settings.locals.private_modules_base_url
+  module_dir          = "oracle/instance_pool"
+  module_version      = "main"
+  ad_number           = local.environment_vars.locals.ad_number
+  compartment_ocid    = run_cmd("--terragrunt-quiet", "${get_repo_root()}/.kek.sh", "compartment_ocid", "${get_env("OCI_CONFIG_PATH")}", "${local.oracle_profile_name}")
 }
 
 generate "provider" {
-  path = "provider.tf"
+  path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  contents = <<EOF
+  contents  = <<EOF
 provider "oci" {
   config_file_profile = "${local.oracle_profile_name}"
 }
@@ -26,5 +26,5 @@ EOF
 
 inputs = {
   compartment_ocid = local.compartment_ocid
-  ad_number = local.ad_number
+  ad_number        = local.ad_number
 }

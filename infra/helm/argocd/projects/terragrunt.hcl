@@ -7,16 +7,16 @@ include "common" {
 }
 
 dependency "argocd" {
-  config_path = "../argocd"
+  config_path                             = "../argocd"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
-  skip_outputs = true
+  skip_outputs                            = true
 }
 
 inputs = {
-  helm_chart_name = "argocd-apps"
-  helm_repo_url = "https://argoproj.github.io/argo-helm"
+  helm_chart_name    = "argocd-apps"
+  helm_repo_url      = "https://argoproj.github.io/argo-helm"
   helm_chart_version = "1.6.1"
-  helm_values_file = <<-EOF
+  helm_values_file   = <<-EOF
   projects:
   - name: infra
     namespace: argocd

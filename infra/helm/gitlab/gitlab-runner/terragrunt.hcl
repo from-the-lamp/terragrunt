@@ -8,12 +8,12 @@ include "common" {
 
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env = local.environment_vars.locals.environment
+  env              = local.environment_vars.locals.environment
 }
 
 dependency "runner_token" {
-  config_path = "${get_repo_root()}/${local.env}/gitlab/runner_token"
-  mock_outputs_allowed_terraform_commands = ["apply" ,"plan", "validate", "output", "init", "destroy"]
+  config_path                             = "${get_repo_root()}/${local.env}/gitlab/runner_token"
+  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     token = "fake-token"
   }
@@ -21,8 +21,8 @@ dependency "runner_token" {
 
 inputs = {
   helm_chart_version = "0.61.2"
-  helm_repo_url = "https://charts.gitlab.io"
-  helm_values_file = <<-EOF
+  helm_repo_url      = "https://charts.gitlab.io"
+  helm_values_file   = <<-EOF
   runnerToken: ${dependency.runner_token.outputs.token}
   gitlabUrl: "https://gitlab.com"
   concurrent: "5"

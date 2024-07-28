@@ -7,23 +7,23 @@ include "common" {
 }
 
 locals {
-  environment_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env                      = local.environment_vars.locals.environment
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env              = local.environment_vars.locals.environment
 }
 
 dependency "vcn" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/vcn"
+  config_path                             = "${get_repo_root()}/${local.env}/oracle/vcn"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    subnets_ids = {"k3s" = "fake-data"}
+    subnets_ids = { "k3s" = "fake-data" }
   }
 }
 
 dependency "cloudinit_config" {
-  config_path = "../cloudinit_config"
+  config_path                             = "../cloudinit_config"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
-    config = {"rendered"="fake-data"}
+    config = { "rendered" = "fake-data" }
   }
 }
 

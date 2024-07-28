@@ -7,7 +7,7 @@ include "common" {
 }
 
 dependency "instance_pool" {
-  config_path = "../instance_pool"
+  config_path                             = "../instance_pool"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     instance_ids = ["fake-id"]
@@ -16,9 +16,9 @@ dependency "instance_pool" {
 
 inputs = {
   display_name = "k3s"
-  instance_id = dependency.instance_pool.outputs.instance_ids[0]
-  private_key = file("~/.ssh/id_rsa")
-  use_sudo = true
+  instance_id  = dependency.instance_pool.outputs.instance_ids[0]
+  private_key  = file("~/.ssh/id_rsa")
+  use_sudo     = true
   remote_files_paths = [
     "/etc/rancher/k3s/server-ip",
     "/etc/rancher/k3s/server-port",

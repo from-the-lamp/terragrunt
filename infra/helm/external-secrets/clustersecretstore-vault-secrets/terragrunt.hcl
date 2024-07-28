@@ -7,8 +7,8 @@ include "common" {
 }
 
 inputs = {
-  helm_chart_name = "./chart"
-  helm_repo_url = ""
+  helm_chart_name  = "./chart"
+  helm_repo_url    = ""
   helm_values_file = <<-EOF
   vault:
     url: http://vault.vault:8200

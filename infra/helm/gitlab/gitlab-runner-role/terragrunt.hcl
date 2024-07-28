@@ -7,9 +7,9 @@ include "common" {
 }
 
 inputs = {
-  helm_chart_name = "role-with-rolebinding"
+  helm_chart_name    = "role-with-rolebinding"
   helm_chart_version = "0.0.4"
-  helm_values_file = <<-EOF
+  helm_values_file   = <<-EOF
   roles:
     - kind: Role
       name: argocd-access

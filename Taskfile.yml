@@ -49,82 +49,12 @@ tasks:
       vars: {
         ACTION: "output",
       }
+      
+  unlock:
+    dir: $DIR
+    cmds:
+    - terragrunt force-unlock {{.CLI_ARGS}}
 
-  teleport:login:
+  fmt:
     cmds:
-    - tsh login --proxy=tp.from-the-lamp.work:443 --user=admin --auth local 
-  teleport:admin:
-    cmds:
-    - |
-      kubectl -n teleport exec -i deployment/teleport-cluster-auth -- tctl create -f - <<EOF
-        kind: role
-        version: v6
-        metadata:
-          name: member
-        spec:
-          allow:
-            kubernetes_groups: ["system:masters"]
-            kubernetes_labels:
-              '*': '*'
-            kubernetes_resources:
-              - kind: 'pod'
-                namespace: '*'
-                name: '*'
-      EOF
-    - kubectl -n teleport exec -ti deployment/teleport-cluster-auth -- tctl users add admin --roles=member || true
-    - kubectl -n teleport exec -ti deployment/teleport-cluster-auth -- tctl users reset admin
-  teleport:terraform:
-    cmds:
-    - |
-      kubectl -n teleport exec -i deployment/teleport-cluster-auth -- tctl create -f - <<EOF
-      kind: role
-      version: v7
-      metadata:
-        name: terraform
-      spec:
-        allow:
-          db_labels:
-            '*': '*'
-          app_labels:
-            '*': '*'
-          rules:
-            - resources:
-              - app
-              - cluster_auth_preference
-              - cluster_networking_config
-              - db
-              - device
-              - github
-              - login_rule
-              - oidc
-              - okta_import_rule
-              - role
-              - saml
-              - session_recording_config
-              - token
-              - trusted_cluster
-              - user
-              verbs: ['list','create','read','update','delete']
-      EOF
-    - |
-      kubectl -n teleport exec -i deployment/teleport-cluster-auth -- tctl create -f - <<EOF
-      kind: user
-      version: v2
-      metadata:
-        name: terraform
-      spec:
-        roles: ['terraform']
-      EOF
-    - |
-      kubectl -n teleport exec -i deployment/teleport-cluster-auth -- tctl create -f - <<EOF
-      kind: role
-      version: v7
-      metadata:
-        name: terraform-impersonator
-      spec:
-        allow:
-          impersonate:
-            users: ['terraform']
-            roles: ['terraform']
-      EOF
-  
+    - terragrunt hclfmt

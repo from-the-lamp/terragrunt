@@ -7,21 +7,21 @@ include "common" {
 }
 
 locals {
-  common_settings = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  common_settings     = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
   infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
-  gitlab_token = local.common_settings.locals.gitlab_token
+  gitlab_token        = local.common_settings.locals.gitlab_token
 }
-  
+
 dependency "argocd" {
-  config_path = "../argocd"
+  config_path                             = "../argocd"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
-  skip_outputs = true
+  skip_outputs                            = true
 }
 
 inputs = {
-  helm_chart_name = "argocd-repositories"
-  helm_chart_version = "0.0.2" 
-  helm_values_file = <<-EOF
+  helm_chart_name    = "argocd-repositories"
+  helm_chart_version = "0.0.2"
+  helm_values_file   = <<-EOF
   credentials:
     djinno0:
       type: git

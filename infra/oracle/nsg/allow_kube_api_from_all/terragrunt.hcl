@@ -12,7 +12,7 @@ locals {
 }
 
 dependency "vcn" {
-  config_path = "${get_repo_root()}/${local.env}/oracle/vcn"
+  config_path                             = "${get_repo_root()}/${local.env}/oracle/vcn"
   mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
   mock_outputs = {
     vcn_id = "fake-id"
@@ -20,7 +20,7 @@ dependency "vcn" {
 }
 
 inputs = {
-  vcn_id = dependency.vcn.outputs.vcn_id
+  vcn_id       = dependency.vcn.outputs.vcn_id
   display_name = "kube_api"
   tcp_rules = {
     default = {
@@ -28,7 +28,7 @@ inputs = {
         max = "6443"
         min = "6443"
       }
-    } 
+    }
   }
 }
 
