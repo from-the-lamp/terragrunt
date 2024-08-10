@@ -19,7 +19,51 @@ applicationsets:
           notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-platform'
           argocd.argoproj.io/compare-options: ServerSideDiff=true
       spec:
-        project: platform
+        project: platform-preprod
+        source:
+          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
+          targetRevision: HEAD
+          path: "{{.path.path}}"
+          helm:
+            releaseName: "{{.path.basename}}"
+        destination:
+          name: in-cluster
+          namespace: "{{.path.basename}}"
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - CreateNamespace=true
+            - ServerSideApply=true
+
+  product-preprod:
+    namespace: argocd
+    goTemplate: true
+    generators:
+      - git:
+          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
+          revision: HEAD
+          directories:
+            - path: 'preprod/product/*'
+    ignoreApplicationDifferences:
+      - jsonPointers:
+          - /spec/syncPolicy
+    template:
+      metadata:
+        name: "preprod-{{.path.basename}}"
+        annotations:
+          argocd-image-updater.argoproj.io/git-branch: main
+          argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/git-creds
+          argocd-image-updater.argoproj.io/image-list: app=registry.gitlab.com/from-the-lamp/frontend/{{.path.basename}}:latest
+          argocd-image-updater.argoproj.io/app.force-update: "true"
+          argocd-image-updater.argoproj.io/app.update-strategy: digest
+          argocd-image-updater.argoproj.io/app.helm.image-name: global.image.name
+          argocd-image-updater.argoproj.io/app.helm.image-tag: global.image.tag
+          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-product'
+          argocd.argoproj.io/compare-options: ServerSideDiff=true
+      spec:
+        project: product-preprod
         source:
           repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           targetRevision: HEAD

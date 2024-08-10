@@ -1,7 +1,7 @@
 projects:
-  platform:
+  platform-preprod:
     namespace: argocd
-    description: Platform apps Stage
+    description: Platform apps Preprod
     sourceRepos:
     - '*'
     destinations:
@@ -11,9 +11,33 @@ projects:
     - group: '*'
       kind: '*'
 
-  product:
+  product-preprod:
     namespace: argocd
-    description: Business apps Stage 
+    description: Business apps Preprod 
+    sourceRepos:
+    - '*'
+    destinations:
+    - name: in-cluster
+      namespace: product
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  platform-prod:
+    namespace: argocd
+    description: Platform apps Prod
+    sourceRepos:
+    - '*'
+    destinations:
+    - name: in-cluster
+      namespace: '*'
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  product-prod:
+    namespace: argocd
+    description: Business apps Prod 
     sourceRepos:
     - '*'
     destinations:
