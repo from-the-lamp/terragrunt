@@ -1,0 +1,24 @@
+projects:
+  platform:
+    namespace: argocd
+    description: Platform apps Stage
+    sourceRepos:
+    - '*'
+    destinations:
+    - name: in-cluster
+      namespace: '*'
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  product:
+    namespace: argocd
+    description: Business apps Stage 
+    sourceRepos:
+    - '*'
+    destinations:
+    - name: in-cluster
+      namespace: product
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

@@ -1,66 +1,38 @@
 applicationsets:
-  platform:
-    namespace: argocd
-    generators:
-    - list:
-        elements:
-        - name: kube-system
-        - name: argo
-        - name: cloudflare
-        - name: cloudtty
-        - name: crossplane
-        - name: gitlab
-        - name: istio-system
-        - name: minio
-        - name: oauth2-proxy
-        - name: observability
-        - name: postgresql
-        - name: reloader
-        - name: teleport
-        - name: vault
-        - name: velero
-        - name: external-dns
-        - name: cert-manager
-        - name: origin-ca-issuer
-        - name: longhorn
-        - name: botkube
-    template:
-      metadata:
-        name: "{{name}}"
-      spec:
-        project: default
-        source:
-          repoURL: https://gitlab.com/from-the-lamp/infra/argo-apps.git
-          targetRevision: HEAD
-          path: "platform/{{name}}"
-        destination:
-          name: in-cluster
-          namespace: argocd
-        syncPolicy:
-          automated:
-            prune: true
-            selfHeal: true
 
-  product:
+  platform-preprod:
     namespace: argocd
+    goTemplate: true
     generators:
-    - list:
-        elements:
-        - name: backend
-        - name: frontend
+      - git:
+          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
+          revision: HEAD
+          directories:
+            - path: 'preprod/platform/*'
+    ignoreApplicationDifferences:
+      - jsonPointers:
+          - /spec/syncPolicy
     template:
       metadata:
-        name: "{{name}}"
+        name: "preprod-{{.path.basename}}"
+        annotations:
+          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-platform'
+          argocd.argoproj.io/compare-options: ServerSideDiff=true
       spec:
-        project: default
+        project: platform
         source:
-          repoURL: https://gitlab.com/from-the-lamp/infra/argo-apps.git
+          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           targetRevision: HEAD
-          path: "{{name}}"
+          path: "{{.path.path}}"
+          helm:
+            releaseName: "{{.path.basename}}"
         destination:
           name: in-cluster
-          namespace: argocd
+          namespace: "{{.path.basename}}"
         syncPolicy:
           automated:
             prune: true
             selfHeal: true
+          syncOptions:
+            - CreateNamespace=true
+            - ServerSideApply=true
