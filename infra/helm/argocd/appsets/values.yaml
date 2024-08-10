@@ -72,7 +72,7 @@ applicationsets:
             releaseName: "{{.path.basename}}"
         destination:
           name: in-cluster
-          namespace: "{{.path.basename}}"
+          namespace: "product"
         syncPolicy:
           automated:
             prune: true

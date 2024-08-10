@@ -29,7 +29,7 @@ projects:
     sourceRepos:
     - '*'
     destinations:
-    - name: in-cluster
+    - name: prod
       namespace: '*'
     clusterResourceWhitelist:
     - group: '*'
@@ -41,7 +41,7 @@ projects:
     sourceRepos:
     - '*'
     destinations:
-    - name: in-cluster
+    - name: prod
       namespace: product
     clusterResourceWhitelist:
     - group: '*'
