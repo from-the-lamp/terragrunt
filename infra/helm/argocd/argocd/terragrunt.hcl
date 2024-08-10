@@ -23,9 +23,9 @@ inputs = {
   helm_repo_url      = "https://argoproj.github.io/argo-helm"
   helm_chart_name    = "argo-cd"
   helm_chart_version = "7.3.4"
-  helm_values_file = file("values.yaml")
+  helm_values_file   = file("values.yaml")
   helm_set_sensitive = {
-    "configs.cm.dex\\.config" = <<-EOT
+    "configs.cm.dex\\.config"                      = <<-EOT
         connectors:
         - type: gitlab
           id: ArgoCD
