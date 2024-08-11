@@ -19,6 +19,8 @@ projects:
     destinations:
     - name: in-cluster
       namespace: product
+    - name: in-cluster
+      namespace: istio-system
     clusterResourceWhitelist:
     - group: '*'
       kind: '*'
@@ -29,7 +31,7 @@ projects:
     sourceRepos:
     - '*'
     destinations:
-    - name: prod
+    - name: prod-0
       namespace: '*'
     clusterResourceWhitelist:
     - group: '*'
@@ -41,8 +43,10 @@ projects:
     sourceRepos:
     - '*'
     destinations:
-    - name: prod
+    - name: prod-0
       namespace: product
+    - name: prod-0
+      namespace: istio-system
     clusterResourceWhitelist:
     - group: '*'
       kind: '*'
