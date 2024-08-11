@@ -41,7 +41,12 @@ applicationsets:
           syncOptions:
             - CreateNamespace=true
             - ServerSideApply=true
-
+        ignoreDifferences:
+          - group: admissionregistration.k8s.io
+            kind: ValidatingWebhookConfiguration
+            jsonPointers:
+              - /webhooks/0/failurePolicy
+              
   product-preprod:
     namespace: argocd
     goTemplate: true
