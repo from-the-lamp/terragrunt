@@ -1,7 +1,0 @@
-clusters:
-- name: asdasd 
-  insecure: asdasd
-  server: asdasd
-  caData: asdasd
-  certData: asdasd
-  keyData: asdasd
