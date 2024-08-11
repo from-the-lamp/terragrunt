@@ -67,7 +67,7 @@ repoServer:
       command: [ sh, -c ]
       args:
         - >-
-          curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_linux_amd64 -o argocd-vault-plugin &&
+          curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_linux_arm64 -o argocd-vault-plugin &&
           chmod +x argocd-vault-plugin &&
           mv argocd-vault-plugin /custom-tools/
       volumeMounts:
@@ -276,12 +276,11 @@ configs:
           command: [ "bash", "-c" ]
           args:
           - >
-            echo $PRODUCT_HELM_REPO_TOKEN | helm registry login -u $PRODUCT_HELM_REPO_USER --password-stdin $PRODUCT_HELM_REPO_URL &&
             helm dependency build
         generate:
           args:
             - |
-              helm template $ARGOCD_APP_NAME --namespace $ARGOCD_APP_NAMESPACE --create-namespace --include-crds $ARGOCD_ENV_HELM_ARGS . | argocd-vault-plugin generate -
+              helm template ${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} --namespace $ARGOCD_APP_NAMESPACE --create-namespace --include-crds $ARGOCD_ENV_HELM_ARGS . | argocd-vault-plugin generate -
           command:
             - bash
             - -c

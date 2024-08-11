@@ -24,8 +24,13 @@ applicationsets:
           repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           targetRevision: HEAD
           path: "{{.path.path}}"
-          helm:
-            releaseName: "{{.path.basename}}"
+          plugin:
+            name: avp-helm
+            env:
+              - name: HELM_ARGS
+                value: "-f values.yaml"
+              - name: HELM_RELEASE_NAME
+                value: "{{.path.basename}}"
         destination:
           name: in-cluster
           namespace: "{{.path.basename}}"
@@ -68,8 +73,13 @@ applicationsets:
           repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           targetRevision: HEAD
           path: "{{.path.path}}"
-          helm:
-            releaseName: "{{.path.basename}}"
+          plugin:
+            name: avp-helm
+            env:
+              - name: HELM_ARGS
+                value: "-f values.yaml"
+              - name: HELM_RELEASE_NAME
+                value: "{{.path.basename}}"
         destination:
           name: in-cluster
           namespace: "product"

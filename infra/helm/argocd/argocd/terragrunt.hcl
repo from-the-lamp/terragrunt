@@ -25,7 +25,7 @@ inputs = {
   helm_chart_version = "7.3.4"
   helm_values_file   = file("values.yaml")
   helm_set_sensitive = {
-    "configs.cm.dex\\.config"                      = <<-EOT
+    "configs.cm.dex\\.config"                = <<-EOT
         connectors:
         - type: gitlab
           id: ArgoCD
@@ -44,9 +44,6 @@ inputs = {
               - https://workflow.from-the-lamp.work/oauth2/callback
             secretEnv: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
     EOT
-    "notifications.secret.items.slack-token"       = get_env("ARGOCD_SLACK_TOKEN")
-    "configs.secret.extra.PRODUCT_HELM_REPO_URL"   = "ghcr.io/ok1dok1/app-values/charts"
-    "configs.secret.extra.PRODUCT_HELM_REPO_USER"  = "x-token-auth"
-    "configs.secret.extra.PRODUCT_HELM_REPO_TOKEN" = get_env("TF_HTTP_PASSWORD")
+    "notifications.secret.items.slack-token" = get_env("ARGOCD_SLACK_TOKEN")
   }
 }
