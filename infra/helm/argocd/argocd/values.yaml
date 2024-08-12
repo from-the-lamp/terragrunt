@@ -74,6 +74,30 @@ repoServer:
         - mountPath: /custom-tools
           name: custom-tools
   extraContainers:
+    - name: default-helm
+      image: quay.io/argoproj/argocd:v2.12.0
+      command: [ /var/run/argocd/argocd-cmp-server ]
+      envFrom:
+        - secretRef:
+            name: argocd-secret
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+      volumeMounts:
+        - mountPath: /var/run/argocd
+          name: var-files
+        - mountPath: /home/argocd/cmp-server/plugins
+          name: plugins
+        - mountPath: /tmp
+          name: tmp
+        # Register plugins into sidecar
+        - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+          subPath: default-helm.yaml
+          name: argocd-cmp-cm
+        # Important: Mount tools into $PATH
+        - name: custom-tools
+          subPath: argocd-vault-plugin
+          mountPath: /usr/local/bin/argocd-vault-plugin
     - name: avp-helm
       image: quay.io/argoproj/argocd:v2.12.0
       command: [ /var/run/argocd/argocd-cmp-server ]
@@ -255,15 +279,37 @@ configs:
 
   secret:
     createSecret: true
-    extra:
-      AVP_AUTH_TYPE: k8s
-      AVP_K8S_ROLE: argocd
-      AVP_TYPE: vault
-      VAULT_ADDR: http://vault.vault.svc.cluster.local:8200
+    # extra:
+    #   AVP_AUTH_TYPE: k8s
+    #   AVP_K8S_ROLE: argocd
+    #   AVP_TYPE: vault
+    #   VAULT_ADDR: http://vault.vault.svc.cluster.local:8200
 
   cmp:
     create: true
     plugins:
+      default-helm:
+        allowConcurrency: true
+        discover:
+          find:
+            command:
+              - bash
+              - "-c"
+              - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
+        init:
+          command: [ "bash", "-c" ]
+          args:
+          - >
+            helm dependency build
+        generate:
+          args:
+            - |
+              helm template ${ARGOCD_ENV_HELM_RELEASE_NAME:-$ARGOCD_APP_NAME} --namespace $ARGOCD_APP_NAMESPACE --create-namespace --include-crds $ARGOCD_ENV_HELM_ARGS . 
+          command:
+            - bash
+            - -c
+        lockRepo: false
+
       avp-helm:
         allowConcurrency: true
         discover:
