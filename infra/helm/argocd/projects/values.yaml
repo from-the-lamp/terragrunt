@@ -1,26 +1,12 @@
 projects:
-  platform-preprod:
+  platform-infra:
     namespace: argocd
-    description: Platform apps Preprod
+    description: Platform apps Infra
     sourceRepos:
     - '*'
     destinations:
     - name: in-cluster
       namespace: '*'
-    clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-
-  product-preprod:
-    namespace: argocd
-    description: Business apps Preprod 
-    sourceRepos:
-    - '*'
-    destinations:
-    - name: in-cluster
-      namespace: product
-    - name: in-cluster
-      namespace: istio-system
     clusterResourceWhitelist:
     - group: '*'
       kind: '*'
