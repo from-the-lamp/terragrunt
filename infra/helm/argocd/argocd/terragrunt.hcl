@@ -22,7 +22,7 @@ dependency "oci_cloud_controller_manager" {
 inputs = {
   helm_repo_url      = "https://argoproj.github.io/argo-helm"
   helm_chart_name    = "argo-cd"
-  helm_chart_version = "7.4.2"
+  helm_chart_version = "7.4.3"
   helm_values_file   = file("values.yaml")
   helm_set_sensitive = {
     "configs.cm.dex\\.config"                = <<-EOT
