@@ -111,7 +111,7 @@ applicationsets:
         name: "prod-0-{{.path.basename}}"
         annotations:
           argocd-image-updater.argoproj.io/git-branch: main
-          argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/git-creds
+          argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/argocd-image-updater-git-creds
           argocd-image-updater.argoproj.io/image-list: app=registry.gitlab.com/from-the-lamp/frontend/{{.path.basename}}:latest
           argocd-image-updater.argoproj.io/app.force-update: "true"
           argocd-image-updater.argoproj.io/app.update-strategy: digest
@@ -125,13 +125,8 @@ applicationsets:
           repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           targetRevision: HEAD
           path: "{{.path.path}}"
-          plugin:
-            name: default-helm
-            env:
-              - name: HELM_ARGS
-                value: "-f values.yaml"
-              - name: HELM_RELEASE_NAME
-                value: "{{.path.basename}}"
+          helm:
+            releaseName: "{{.path.basename}}"
         destination:
           name: prod-0
           namespace: "product"
