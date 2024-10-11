@@ -41,7 +41,7 @@ ${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/
   helm_repo_url                     = local.infra_helm_repo_url
   helm_chart_name                   = basename(get_terragrunt_dir())
   helm_release_name                 = basename(get_terragrunt_dir())
-  helm_values_file                  = "values.yml"
+  helm_values_file                  = file("${get_terragrunt_dir()}/values.yaml")
   helm_namespace                    = basename(dirname(get_terragrunt_dir()))
   helm_create_namespace             = true
 }
