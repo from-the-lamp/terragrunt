@@ -7,7 +7,7 @@ locals {
   modules_url         = local.common_settings.locals.private_modules_base_url
   module_dir          = "kubernetes/helm"
   module_version      = "main"
-  infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
+  infra_helm_repo_url = "oci://registry.gitlab.com/from-the-lamp/infra/helm-charts"
   environment_vars    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                 = local.environment_vars.locals.environment
 }

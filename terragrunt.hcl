@@ -1,7 +1,6 @@
 locals {
   gitlab_base_url          = "gitlab.com"
   gitlab_token             = get_env("TF_HTTP_PASSWORD")
-  infra_helm_repo_url      = "oci://registry.gitlab.com/from-the-lamp/infra/helm-charts"
   k3s_cluster_version      = "v1.25.11+k3s1"
   infra_repo_id            = "40541314"
   private_modules_path     = "from-the-lamp/infra/terraform/modules"

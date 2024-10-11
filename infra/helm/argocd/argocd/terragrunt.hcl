@@ -7,10 +7,8 @@ include "common" {
 }
 
 locals {
-  environment_vars    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  env                 = local.environment_vars.locals.environment
-  common_settings     = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
-  infra_helm_repo_url = local.common_settings.locals.infra_helm_repo_url
+  env                 = include.common.locals.env
+  infra_helm_repo_url = include.common.locals.env
 }
 
 dependency "oci_cloud_controller_manager" {
