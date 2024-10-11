@@ -3,12 +3,12 @@ include "root" {
 }
 
 include "common" {
-  path   = "${dirname(find_in_parent_folders())}/_common/cloudflare/tunnel.hcl"
-  expose = true
+  path = "${dirname(find_in_parent_folders())}/_common/cloudflare/tunnel.hcl"
 }
 
 locals {
-  env = include.common.locals.env
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env              = local.environment_vars.locals.environment
 }
 
 inputs = {

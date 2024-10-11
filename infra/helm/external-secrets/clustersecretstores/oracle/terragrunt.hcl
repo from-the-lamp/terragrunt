@@ -7,11 +7,6 @@ include "common" {
 }
 
 locals {
-  env                 = include.common.locals.env
-  infra_helm_repo_url = include.common.locals.env
-}
-
-locals {
   environment_vars    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                 = local.environment_vars.locals.environment
   oracle_profile_name = local.environment_vars.locals.oracle_profile_name
