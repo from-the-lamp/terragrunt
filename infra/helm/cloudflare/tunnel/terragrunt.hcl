@@ -36,16 +36,16 @@ inputs = {
       description = "Private Istio Gateway"
     },
     {
-      address     = "10.43.131.35/32"
+      address     = "10.43.201.23/32"
       description = "Private DNS resolver"
     },
   ]
 
   private_domains = [
     {
-      suffix      = "from-the-lamp.org"
+      suffix      = "from-the-lamp.work"
       description = "Private DNS"
-      dns_servers = ["10.43.131.35"]
+      dns_servers = ["10.43.201.23"]
     },
   ]
 }

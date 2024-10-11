@@ -1,9 +1,10 @@
 version: "3"
 
 dotenv: [".env"]
-env:
+vars:
+  LOG_LEVEL: info
   OCI_CONFIG_PATH: "{{.HOME}}/.oci/config"
-
+  
 silent: true
 tasks:
   cleanup:
@@ -11,13 +12,17 @@ tasks:
     - find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \;
     - find . -type d -name ".terraform" -prune -exec rm -rf {} \;
     - find . -iname "*generated*" -delete;
-    - find . -iname ".terraform.lock.hcl" -delete;
     - find . -iname ".helmignore" -delete;
+    - find . -iname ".terraform.lock.hcl" -delete;
 
   terragrunt:
     dir: $DIR
     cmds:
-    - terragrunt run-all {{ .ACTION }} --terragrunt-non-interactive {{ .CLI_ARGS }}
+    - |
+      terragrunt run-all {{ .ACTION }} \
+        -compact-warnings --terragrunt-non-interactive  \
+        --terragrunt-log-level {{.LOG_LEVEL}} \
+        {{.CLI_ARGS}} {{ .ADDITION_ARGS }}
 
   plan:
     cmds:
@@ -43,13 +48,24 @@ tasks:
       vars: {
         ACTION: "validate",
       }
+  migrate-state:
+    dir: $DIR
+    cmds:
+    - task: terragrunt
+      vars: {
+        ACTION: "init",
+        ADDITION_ARGS: "-migrate-state -input=true"
+      }
   output:
     cmds:
     - task: terragrunt
       vars: {
         ACTION: "output",
       }
-      
+  outputs:
+    cmds:
+    - task: output
+
   unlock:
     dir: $DIR
     cmds:
