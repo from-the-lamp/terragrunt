@@ -1,9 +1,9 @@
 include "root" {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/oracle/ssh_read_file_content.hcl"
+  path = "${get_repo_root()}/_common/oracle/ssh_read_file_content.hcl"
 }
 
 dependency "instance_pool" {

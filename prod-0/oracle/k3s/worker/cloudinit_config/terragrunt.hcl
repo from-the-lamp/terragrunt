@@ -1,16 +1,16 @@
 include "root" {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/tools/cloudinit_config.hcl"
+  path = "${get_repo_root()}/_common/tools/cloudinit_config.hcl"
 }
 
 locals {
   environment_vars    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                 = local.environment_vars.locals.environment
   oracle_profile_name = local.environment_vars.locals.oracle_profile_name
-  common_settings     = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  common_settings     = read_terragrunt_config("${get_repo_root()}/root.hcl")
   k3s_cluster_version = local.common_settings.locals.k3s_cluster_version
   compartment_ocid    = run_cmd("--terragrunt-quiet", "${get_repo_root()}/.kek.sh", "compartment_ocid", "${get_env("OCI_CONFIG_PATH")}", "${local.oracle_profile_name}")
 }

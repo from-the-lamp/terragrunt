@@ -6,7 +6,7 @@ locals {
   environment_vars    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                 = local.environment_vars.locals.environment
   oracle_profile_name = local.environment_vars.locals.oracle_profile_name
-  common_settings     = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  common_settings     = read_terragrunt_config("${get_repo_root()}/root.hcl")
   modules_url         = local.common_settings.locals.private_modules_base_url
   module_dir          = "oracle/kms_vault"
   module_version      = "main"

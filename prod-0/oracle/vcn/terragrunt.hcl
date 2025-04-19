@@ -1,7 +1,7 @@
 include "root" {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/oracle/vcn.hcl"
+  path = "${get_repo_root()}/_common/oracle/vcn.hcl"
 }

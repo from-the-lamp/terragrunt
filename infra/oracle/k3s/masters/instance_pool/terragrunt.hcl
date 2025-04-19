@@ -1,15 +1,15 @@
 include "root" {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
 }
 
 include "common" {
-  path = "${dirname(find_in_parent_folders())}/_common/oracle/instance_pool.hcl"
+  path = "${get_repo_root()}/_common/oracle/instance_pool.hcl"
 }
 
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env              = local.environment_vars.locals.environment
-  common_settings  = read_terragrunt_config("${get_repo_root()}/terragrunt.hcl")
+  common_settings  = read_terragrunt_config("${get_repo_root()}/root.hcl")
 }
 
 dependency "instance_config" {

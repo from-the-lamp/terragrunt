@@ -1,7 +1,7 @@
 version: "3"
 
 dotenv: [".env"]
-vars:
+env:
   LOG_LEVEL: info
   OCI_CONFIG_PATH: "{{.HOME}}/.oci/config"
   
@@ -20,8 +20,8 @@ tasks:
     cmds:
     - |
       terragrunt run-all {{ .ACTION }} \
-        -compact-warnings --terragrunt-non-interactive  \
-        --terragrunt-log-level {{.LOG_LEVEL}} \
+        -compact-warnings --non-interactive  \
+        --log-level {{.LOG_LEVEL}} \
         {{.CLI_ARGS}} {{ .ADDITION_ARGS }}
 
   plan:
