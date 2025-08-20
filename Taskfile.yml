@@ -4,10 +4,16 @@ dotenv: [".env"]
 env:
   LOG_LEVEL: info
   OCI_CONFIG_PATH: "{{.HOME}}/.oci/config"
-  
+   
 silent: true
 tasks:
+
+  default:
+    desc: List all available tasks
+    cmd: task --list-all
+
   cleanup:
+    desc: Remove temporary files
     cmds:
     - find . -type d -name ".terragrunt-cache" -prune -exec rm -rf {} \;
     - find . -type d -name ".terraform" -prune -exec rm -rf {} \;
@@ -15,62 +21,65 @@ tasks:
     - find . -iname ".helmignore" -delete;
     - find . -iname ".terraform.lock.hcl" -delete;
 
-  terragrunt:
+  fmt:
+    desc: Format all HCL code
+    cmds:
+    - terragrunt hcl format
+
+  .terragrunt:
+    internal: true
     dir: $DIR
     cmds:
     - |
-      terragrunt run-all {{ .ACTION }} \
+      terragrunt {{ .ACTION }} \
         -compact-warnings --non-interactive  \
         --log-level {{.LOG_LEVEL}} \
         {{.CLI_ARGS}} {{ .ADDITION_ARGS }}
 
   plan:
+    desc: Run plan for all modules in subdirectories
     cmds:
-    - task: terragrunt
+    - task: .terragrunt
       vars: {
-        ACTION: "plan",
+        ACTION: "plan --all",
       }
+
   apply:
+    desc: Run apply for all modules in subdirectories
     cmds:
-    - task: terragrunt
+    - task: .terragrunt
       vars: {
-        ACTION: "apply",
+        ACTION: "apply --all",
       }
+
   destroy:
+    desc: Run destroy for all modules in subdirectories
     cmds:
-    - task: terragrunt
+    - task: .terragrunt
       vars: {
-        ACTION: "destroy",
+        ACTION: "destroy --all",
       }
+      
   validate:
+    desc: Run validate for all modules in subdirectories
     cmds:
-    - task: terragrunt
+    - task: .terragrunt
       vars: {
         ACTION: "validate",
       }
-  migrate-state:
-    dir: $DIR
-    cmds:
-    - task: terragrunt
-      vars: {
-        ACTION: "init",
-        ADDITION_ARGS: "-migrate-state -input=true"
-      }
-  output:
-    cmds:
-    - task: terragrunt
-      vars: {
-        ACTION: "output",
-      }
+
   outputs:
+    desc: Show module outputs
     cmds:
-    - task: output
+    - task: .terragrunt
+      vars: {
+        ACTION: "output --all",
+      }
 
   unlock:
-    dir: $DIR
+    desc: Unlock state by ID
     cmds:
-    - terragrunt force-unlock {{.CLI_ARGS}}
-
-  fmt:
-    cmds:
-    - terragrunt hclfmt
+    - task: .terragrunt
+      vars: {
+        ACTION: "force-unlock {{.CLI_ARGS}}",
+      }

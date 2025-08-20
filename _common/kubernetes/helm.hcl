@@ -12,36 +12,28 @@ locals {
   env                 = local.environment_vars.locals.environment
 }
 
-dependency "ssh_read_file_content" {
-  config_path                             = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
-  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
-  mock_outputs = {
-    file_contents = {
-      "/etc/rancher/k3s/server-ip"                         = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/server-certificate-authority-data" = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/client-certificate-data"           = "ZmFrZS1kYXRhCg==",
-      "/etc/rancher/k3s/client-key-data"                   = "ZmFrZS1kYXRhCg==",
-    }
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+provider "helm" {
+  kubernetes {
+    host  = "${get_env("${upper(replace(local.env, "-", "_"))}_K8S_HOST")}"
+    token = "${get_env("${upper(replace(local.env, "-", "_"))}_K8S_TOKEN")}"
+    cluster_ca_certificate = <<EOT
+${base64decode(get_env("${upper(replace(local.env, "-", "_"))}_K8S_CERTIFICATE"))}
+    EOT
   }
+}
+EOF
 }
 
 inputs = {
-  kubernetes_host                   = "https://${lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-ip")}:6443"
-  kubernetes_cluster_ca_certificate = <<-EOF
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/server-certificate-authority-data"))}
-    EOF
-  kubernetes_client_certificate     = <<-EOF
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-certificate-data"))}
-    EOF
-  kubernetes_client_key             = <<-EOF
-${base64decode(lookup(dependency.ssh_read_file_content.outputs.file_contents, "/etc/rancher/k3s/client-key-data"))}
-    EOF
-  helm_force_update                 = true
-  helm_recreate_pods                = true
-  helm_repo_url                     = local.infra_helm_repo_url
-  helm_chart_name                   = basename(get_terragrunt_dir())
-  helm_release_name                 = basename(get_terragrunt_dir())
-  helm_values_file                  = file("${get_terragrunt_dir()}/values.yaml")
-  helm_namespace                    = basename(dirname(get_terragrunt_dir()))
-  helm_create_namespace             = true
+  helm_force_update     = true
+  helm_recreate_pods    = true
+  helm_repo_url         = local.infra_helm_repo_url
+  helm_chart_name       = basename(get_terragrunt_dir())
+  helm_release_name     = basename(get_terragrunt_dir())
+  helm_namespace        = basename(dirname(get_terragrunt_dir()))
+  helm_create_namespace = true
 }
