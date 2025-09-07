@@ -48,6 +48,8 @@ inputs = {
   assign_public_ip = true
   subnet_id        = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
   user_data        = dependency.cloudinit_config.outputs.config.rendered
-  nsg_ids = [dependency.allow_ssh_from_all.outputs.id,
-  dependency.allow_kube_api_from_all.outputs.id]
+  nsg_ids = [
+    dependency.allow_ssh_from_all.outputs.id,
+    dependency.allow_kube_api_from_all.outputs.id
+  ]
 }

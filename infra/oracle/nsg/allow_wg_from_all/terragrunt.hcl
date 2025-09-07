@@ -20,8 +20,8 @@ dependency "vcn" {
 }
 
 inputs = {
-  vcn_id       = dependency.vcn.outputs.vcn_id
-  display_name = "wg"
+  vcn_id        = dependency.vcn.outputs.vcn_id
+  display_name  = "wg"
   rule_protocol = 17
   udp_rules = {
     default = {
