@@ -17,7 +17,7 @@ generate "provider" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host  = "${get_env("${upper(replace(local.env, "-", "_"))}_K8S_HOST")}"
     token = "${get_env("${upper(replace(local.env, "-", "_"))}_K8S_TOKEN")}"
     cluster_ca_certificate = <<EOT

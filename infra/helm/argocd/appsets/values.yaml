@@ -17,7 +17,6 @@ applicationsets:
         name: "infra-{{.path.basename}}"
         annotations:
           notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-platform'
-          argocd.argoproj.io/compare-options: ServerSideDiff=true
       spec:
         project: platform-infra
         source:
@@ -35,7 +34,6 @@ applicationsets:
             selfHeal: true
           syncOptions:
             - CreateNamespace=true
-            - ServerSideApply=true
         ignoreDifferences:
           - group: admissionregistration.k8s.io
             kind: ValidatingWebhookConfiguration
@@ -59,7 +57,6 @@ applicationsets:
         name: "prod-0-{{.path.basename}}"
         annotations:
           notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-platform'
-          argocd.argoproj.io/compare-options: ServerSideDiff=true
       spec:
         project: platform-prod
         source:
@@ -77,7 +74,6 @@ applicationsets:
             selfHeal: true
           syncOptions:
             - CreateNamespace=true
-            - ServerSideApply=true
         ignoreDifferences:
           - group: admissionregistration.k8s.io
             kind: ValidatingWebhookConfiguration
@@ -108,7 +104,6 @@ applicationsets:
           argocd-image-updater.argoproj.io/app.helm.image-name: global.image.name
           argocd-image-updater.argoproj.io/app.helm.image-tag: global.image.tag
           notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-product'
-          argocd.argoproj.io/compare-options: ServerSideDiff=true
       spec:
         project: product-prod
         source:
@@ -126,4 +121,3 @@ applicationsets:
             selfHeal: true
           syncOptions:
             - CreateNamespace=true
-            - ServerSideApply=true
