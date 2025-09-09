@@ -23,12 +23,11 @@ dependency "vcn" {
 }
 
 inputs = {
+  helm_chart_name    = "lamp-oci-cloud-controller-manager"
   helm_chart_version = "0.0.1"
-  helm_values_file   = <<-EOF
-  compartment: ${local.compartment_ocid}
-  vcn: ${dependency.vcn.outputs.vcn_id}
-  loadBalancer:
-    subnet1: ${lookup(dependency.vcn.outputs.subnets_ids, "k3s")}
-  external: true
-  EOF
+  helm_set_sensitive = {
+    "config.compartment" = local.compartment_ocid
+    "config.vcn"         = dependency.vcn.outputs.vcn_id
+    "config.subnet1"     = lookup(dependency.vcn.outputs.subnets_ids, "k3s")
+  }
 }
