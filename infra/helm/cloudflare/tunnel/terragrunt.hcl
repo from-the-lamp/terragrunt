@@ -32,7 +32,7 @@ inputs = {
   ]
   split_tunnels = [
     {
-      address     = "10.43.248.121/32"
+      address     = "10.43.173.155/32"
       description = "Private Istio Gateway"
     },
     {
@@ -40,7 +40,6 @@ inputs = {
       description = "Private DNS resolver"
     },
   ]
-
   private_domains = [
     {
       suffix      = "from-the-lamp.work"
