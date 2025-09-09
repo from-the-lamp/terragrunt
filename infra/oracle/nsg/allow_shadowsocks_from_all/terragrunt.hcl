@@ -20,8 +20,8 @@ dependency "vcn" {
 }
 
 inputs = {
-  vcn_id        = dependency.vcn.outputs.vcn_id
-  display_name  = "shadowsocks"
+  vcn_id       = dependency.vcn.outputs.vcn_id
+  display_name = "shadowsocks"
   tcp_rules = {
     default = {
       destination_port_range = {

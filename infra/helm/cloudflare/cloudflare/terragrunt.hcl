@@ -17,6 +17,7 @@ inputs = {
   helm_chart_name    = "cloudflare-tunnel-remote"
   helm_chart_version = "0.1.2"
   helm_repo_url      = "https://cloudflare.github.io/helm-charts"
+  helm_values        = [file("./values.yaml")]
   helm_set_sensitive = {
     "cloudflare.tunnel_token" = dependency.tunnel.outputs.token
   }

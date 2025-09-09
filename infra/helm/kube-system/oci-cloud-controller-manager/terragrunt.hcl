@@ -22,12 +22,6 @@ dependency "vcn" {
   }
 }
 
-dependency "master" {
-  config_path                             = "${get_repo_root()}/${local.env}/oracle/k3s/masters/ssh_read_file_content"
-  mock_outputs_allowed_terraform_commands = ["apply", "plan", "validate", "output", "init", "destroy"]
-  skip_outputs                            = true
-}
-
 inputs = {
   helm_chart_version = "0.0.1"
   helm_values_file   = <<-EOF

@@ -5,7 +5,7 @@ projects:
     sourceRepos:
     - '*'
     destinations:
-    - name: in-cluster
+    - name: infra
       namespace: '*'
     clusterResourceWhitelist:
     - group: '*'

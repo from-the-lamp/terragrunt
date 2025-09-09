@@ -7,9 +7,6 @@ include "common" {
 }
 
 inputs = {
-  helm_chart_name    = "external-secrets"
-  helm_chart_version = "0.10.0"
-  helm_repo_url      = "https://charts.external-secrets.io"
-  helm_values_file   = <<-EOF
-EOF
+  helm_chart_name    = "lamp-external-secrets"
+  helm_chart_version = "0.0.1"
 }

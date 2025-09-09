@@ -26,7 +26,7 @@ applicationsets:
           helm:
             releaseName: "{{.path.basename}}"
         destination:
-          name: in-cluster
+          name: infra
           namespace: "{{.path.basename}}"
         syncPolicy:
           automated:

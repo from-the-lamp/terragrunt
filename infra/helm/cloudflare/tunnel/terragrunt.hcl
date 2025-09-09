@@ -33,17 +33,17 @@ inputs = {
   split_tunnels = [
     {
       address     = "10.43.173.155/32"
-      description = "Private Istio Gateway"
+      description = "Infra: Private Istio Gateway"
     },
     {
       address     = "10.43.201.23/32"
-      description = "Private DNS resolver"
+      description = "Infra: Private DNS resolver"
     },
   ]
   private_domains = [
     {
-      suffix      = "from-the-lamp.work"
-      description = "Private DNS"
+      suffix      = "internal.from-the-lamp.work"
+      description = "Infra: Private DNS resolver"
       dns_servers = ["10.43.201.23"]
     },
   ]

@@ -18,30 +18,24 @@ dependency "oci_cloud_controller_manager" {
 }
 
 inputs = {
-  helm_repo_url      = "https://argoproj.github.io/argo-helm"
-  helm_chart_name    = "argo-cd"
-  helm_chart_version = "7.6.8"
-  helm_values_file   = file("./values.yaml")
+  helm_chart_name    = "lamp-argocd"
+  helm_chart_version = "0.0.2"
+  helm_values        = [file("./values.yaml")]
   helm_set_sensitive = {
-    "configs.cm.dex\\.config"                = <<-EOT
-        connectors:
+    "defaultClusterName"              = local.env
+    "argo-cd.global.domain"           = "argocd.internal.from-the-lamp.work"
+    "argo-cd.configs.cm.dex\\.config" = <<-EOT
+      connectors:
         - type: gitlab
           id: ArgoCD
           name: GitLab
           useLoginAsID: false
           config:
             baseURL: https://gitlab.com
-            redirectURI: https://argocd.from-the-lamp.work/api/dex/callback
-            clientID: ${get_env("OPENID_CLIENT_ID_ARGOCD")}
-            clientSecret: ${get_env("OPENID_CLIENT_SECRET_ARGOCD")}
+            redirectURI: https://argocd.internal.from-the-lamp.work/api/dex/callback
+            clientID: $argocd-sso-secrets:clientId
+            clientSecret: $argocd-sso-secrets:clientSecret
             useLoginAsID: false
-        staticClients:
-          - id: argo-workflows-sso
-            name: Argo Workflow
-            redirectURIs:
-              - https://workflow.from-the-lamp.work/oauth2/callback
-            secretEnv: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
     EOT
-    "notifications.secret.items.slack-token" = get_env("ARGOCD_SLACK_TOKEN")
   }
 }
