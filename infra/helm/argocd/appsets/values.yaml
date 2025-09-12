@@ -39,6 +39,12 @@ applicationsets:
             kind: ValidatingWebhookConfiguration
             jsonPointers:
               - /webhooks/0/failurePolicy
+          - group: postgresql.cnpg.io
+            kind: Cluster
+            name: postgres
+            namespace: postgres
+            jqPathExpressions:
+              - .spec.managed.roles[].passwordSecret.remoteSecretKey
 
   platform-prod-0:
     namespace: argocd
