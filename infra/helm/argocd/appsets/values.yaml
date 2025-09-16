@@ -142,8 +142,8 @@ applicationsets:
           argocd-image-updater.argoproj.io/image-list: app=registry.gitlab.com/from-the-lamp/frontend/{{.path.basename}}:latest
           argocd-image-updater.argoproj.io/app.force-update: "true"
           argocd-image-updater.argoproj.io/app.update-strategy: digest
-          argocd-image-updater.argoproj.io/app.helm.image-name: global.image.name
-          argocd-image-updater.argoproj.io/app.helm.image-tag: global.image.tag
+          argocd-image-updater.argoproj.io/app.helm.image-name: image.name
+          argocd-image-updater.argoproj.io/app.helm.image-tag: image.tag
           notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-product'
       spec:
         project: product-prod
