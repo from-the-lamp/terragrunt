@@ -46,6 +46,41 @@ applicationsets:
             jqPathExpressions:
               - .spec.managed.roles[].passwordSecret.remoteSecretKey
 
+  product-infra:
+    namespace: argocd
+    goTemplate: true
+    generators:
+      - git:
+          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
+          revision: HEAD
+          directories:
+            - path: 'infra/product/*'
+    ignoreApplicationDifferences:
+      - jsonPointers:
+          - /spec/syncPolicy
+    template:
+      metadata:
+        name: "infra-{{.path.basename}}"
+        annotations:
+          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-product'
+      spec:
+        project: product-infra
+        source:
+          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
+          targetRevision: HEAD
+          path: "{{.path.path}}"
+          helm:
+            releaseName: "{{.path.basename}}"
+        destination:
+          name: infra
+          namespace: "product"
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - CreateNamespace=true
+
   platform-prod-0:
     namespace: argocd
     goTemplate: true

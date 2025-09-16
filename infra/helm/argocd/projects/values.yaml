@@ -11,6 +11,20 @@ projects:
     - group: '*'
       kind: '*'
 
+  product-infra:
+    namespace: argocd
+    description: Business apps Infra 
+    sourceRepos:
+    - '*'
+    destinations:
+    - name: infra
+      namespace: product
+    - name: infra
+      namespace: istio-system
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
   platform-prod:
     namespace: argocd
     description: Platform apps Prod
