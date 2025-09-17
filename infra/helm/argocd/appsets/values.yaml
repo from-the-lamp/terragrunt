@@ -144,7 +144,7 @@ applicationsets:
           argocd-image-updater.argoproj.io/app.update-strategy: digest
           argocd-image-updater.argoproj.io/app.helm.image-name: image.name
           argocd-image-updater.argoproj.io/app.helm.image-tag: image.tag
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-product'
+          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-product
       spec:
         project: product-prod
         source:
