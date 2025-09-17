@@ -45,7 +45,11 @@ applicationsets:
             namespace: postgres
             jqPathExpressions:
               - .spec.managed.roles[].passwordSecret.remoteSecretKey
-
+          - group: ""
+            kind: Service
+            jsonPointers:
+              - /spec/externalName
+              
   product-infra:
     namespace: argocd
     goTemplate: true
@@ -120,7 +124,17 @@ applicationsets:
             kind: ValidatingWebhookConfiguration
             jsonPointers:
               - /webhooks/0/failurePolicy
-              
+          - group: postgresql.cnpg.io
+            kind: Cluster
+            name: postgres
+            namespace: postgres
+            jqPathExpressions:
+              - .spec.managed.roles[].passwordSecret.remoteSecretKey
+          - group: ""
+            kind: Service
+            jsonPointers:
+              - /spec/externalName
+
   product-prod-0:
     namespace: argocd
     goTemplate: true
