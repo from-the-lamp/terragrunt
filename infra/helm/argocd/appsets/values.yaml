@@ -34,6 +34,11 @@ applicationsets:
             selfHeal: true
           syncOptions:
             - CreateNamespace=true
+          managedNamespaceMetadata:
+            labels:
+              kargo.akuity.io/project: "true"
+            annotations:
+              kargo.akuity.io/keep-namespace: "true"
         ignoreDifferences:
           - group: admissionregistration.k8s.io
             kind: ValidatingWebhookConfiguration
@@ -84,6 +89,11 @@ applicationsets:
             selfHeal: true
           syncOptions:
             - CreateNamespace=true
+          managedNamespaceMetadata:
+            labels:
+              kargo.akuity.io/project: "true"
+            annotations:
+              kargo.akuity.io/keep-namespace: "true"
 
   platform-prod-0:
     namespace: argocd
