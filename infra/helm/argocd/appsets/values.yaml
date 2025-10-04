@@ -54,7 +54,11 @@ applicationsets:
             kind: Service
             jsonPointers:
               - /spec/externalName
-              
+          - group: apiextensions.k8s.io
+            kind: CustomResourceDefinition
+            jsonPointers:
+              - /spec/preserveUnknownFields
+
   product-infra:
     namespace: argocd
     goTemplate: true
@@ -148,7 +152,11 @@ applicationsets:
             kind: Service
             jsonPointers:
               - /spec/externalName
-
+          - group: apiextensions.k8s.io
+            kind: CustomResourceDefinition
+            jsonPointers:
+              - /spec/preserveUnknownFields 
+              
   product-prod-0:
     namespace: argocd
     goTemplate: true
