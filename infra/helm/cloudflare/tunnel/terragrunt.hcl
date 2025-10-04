@@ -39,6 +39,14 @@ inputs = {
       address     = "10.43.201.23/32"
       description = "Infra: Private DNS resolver"
     },
+    {
+      address     = "10.43.5.63/32"
+      description = "Prod-0: Private Istio Gateway"
+    },
+    {
+      address     = "10.43.172.229/32"
+      description = "Prod-0: Private DNS resolver"
+    }
   ]
   private_domains = [
     {
@@ -46,5 +54,10 @@ inputs = {
       description = "Infra: Private DNS resolver"
       dns_servers = ["10.43.201.23"]
     },
+    {
+      suffix      = "internal.from-the-lamp.com"
+      description = "Prod-0: Private DNS resolver"
+      dns_servers = ["10.43.172.229"]
+    }
   ]
 }
