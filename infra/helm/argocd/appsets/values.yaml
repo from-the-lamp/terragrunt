@@ -80,6 +80,9 @@ applicationsets:
           path: "{{.path.path}}"
           helm:
             releaseName: "{{.path.basename}}"
+            valueFiles:
+              - values.yaml
+              - .kargo.values.yaml
         destination:
           name: infra
           namespace: "product"
@@ -171,6 +174,9 @@ applicationsets:
           path: "{{.path.path}}"
           helm:
             releaseName: "{{.path.basename}}"
+            valueFiles:
+              - values.yaml
+              - .kargo.values.yaml
         destination:
           name: prod-0
           namespace: "product"
