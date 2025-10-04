@@ -162,7 +162,7 @@ applicationsets:
         name: "prod-0-{{.path.basename}}"
         annotations:
           notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-product
-          kargo.akuity.io/authorized-stage: "kargo:prod"
+          kargo.akuity.io/authorized-stage: "kargo-project:prod"
       spec:
         project: product-prod
         source:
