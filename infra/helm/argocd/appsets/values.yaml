@@ -16,7 +16,7 @@ applicationsets:
       metadata:
         name: "infra-{{.path.basename}}"
         annotations:
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-platform'
+          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-platform
       spec:
         project: platform-infra
         source:
@@ -71,7 +71,8 @@ applicationsets:
       metadata:
         name: "infra-{{.path.basename}}"
         annotations:
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-product'
+          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-product
+          kargo.akuity.io/authorized-stage: "kargo-projects:infra"
       spec:
         project: product-infra
         source:
@@ -114,7 +115,7 @@ applicationsets:
       metadata:
         name: "prod-0-{{.path.basename}}"
         annotations:
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: 'argocd-platform'
+          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-platform
       spec:
         project: platform-prod
         source:
@@ -165,7 +166,7 @@ applicationsets:
         name: "prod-0-{{.path.basename}}"
         annotations:
           notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-product
-          kargo.akuity.io/authorized-stage: "kargo-project:prod"
+          kargo.akuity.io/authorized-stage: "kargo-projects:prod"
       spec:
         project: product-prod
         source:
