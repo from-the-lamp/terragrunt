@@ -19,7 +19,7 @@ dependency "oci_cloud_controller_manager" {
 
 inputs = {
   helm_chart_name    = "lamp-argocd"
-  helm_chart_version = "0.0.3"
+  helm_chart_version = "0.0.4"
   helm_values        = [file("./values.yaml")]
   helm_set_sensitive = {
     "defaultClusterName"              = local.env
@@ -29,13 +29,11 @@ inputs = {
         - type: gitlab
           id: ArgoCD
           name: GitLab
-          useLoginAsID: false
           config:
             baseURL: https://gitlab.com
             redirectURI: https://argocd.internal.from-the-lamp.work/api/dex/callback
             clientID: $argocd-sso-secrets:clientId
             clientSecret: $argocd-sso-secrets:clientSecret
-            useLoginAsID: false
     EOT
   }
 }
