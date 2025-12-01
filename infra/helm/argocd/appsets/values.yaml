@@ -204,7 +204,7 @@ applicationsets:
           repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           revision: HEAD
           directories:
-            - path: 'prod-0/apiflow/api'
+            - path: 'prod-0/apiflow/*'
     ignoreApplicationDifferences:
       - jsonPointers:
           - /spec/syncPolicy
@@ -215,7 +215,7 @@ applicationsets:
           notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-product
           kargo.akuity.io/authorized-stage: "kargo-projects:prod"
       spec:
-        project: product-prod
+        project: product-apiflow
         source:
           repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           targetRevision: HEAD

@@ -50,3 +50,15 @@ projects:
     clusterResourceWhitelist:
     - group: '*'
       kind: '*'
+
+  product-apiflow:
+    namespace: argocd
+    description: Business apps Prod 
+    sourceRepos:
+    - '*'
+    destinations:
+    - name: prod-0
+      namespace: '*'
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
