@@ -195,3 +195,42 @@ applicationsets:
             selfHeal: true
           syncOptions:
             - CreateNamespace=true
+
+  product-apiflow:
+    namespace: argocd
+    goTemplate: true
+    generators:
+      - git:
+          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
+          revision: HEAD
+          directories:
+            - path: 'prod-0/apiflow/api'
+    ignoreApplicationDifferences:
+      - jsonPointers:
+          - /spec/syncPolicy
+    template:
+      metadata:
+        name: "apiflow-{{.path.basename}}"
+        annotations:
+          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-product
+          kargo.akuity.io/authorized-stage: "kargo-projects:prod"
+      spec:
+        project: product-prod
+        source:
+          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
+          targetRevision: HEAD
+          path: "{{.path.path}}"
+          helm:
+            releaseName: "{{.path.basename}}"
+            valueFiles:
+              - values.yaml
+              - .kargo.values.yaml
+        destination:
+          name: prod-0
+          namespace: "apiflow-{{.path.basename}}"
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - CreateNamespace=true

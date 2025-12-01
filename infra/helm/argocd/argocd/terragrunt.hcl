@@ -19,7 +19,7 @@ dependency "oci_cloud_controller_manager" {
 
 inputs = {
   helm_chart_name    = "lamp-argocd"
-  helm_chart_version = "0.0.4"
+  helm_chart_version = "0.1.1"
   helm_values        = [file("./values.yaml")]
   helm_set_sensitive = {
     "defaultClusterName"              = local.env

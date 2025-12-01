@@ -11,6 +11,14 @@ locals {
   env              = local.environment_vars.locals.environment
 }
 
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+provider "cloudflare" {}
+EOF
+}
+
 inputs = {
   account_id = "4d8e4b7ec68f30bbfd757f0b484c4a5c"
 }
