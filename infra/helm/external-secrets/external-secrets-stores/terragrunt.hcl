@@ -28,13 +28,14 @@ dependency "vault_infra" {
 
 inputs = {
   helm_chart_name    = "lamp-external-secrets-stores"
-  helm_chart_version = "0.0.1"
+  helm_chart_version = "0.0.2"
   helm_set_sensitive = {
-    "clusterStore.privateKey"  = base64encode(file(local.key_file))
-    "clusterStore.fingerprint" = local.fingerprint
-    "clusterStore.user"        = local.user
-    "clusterStore.tenancy"     = local.tenancy
-    "clusterStore.ocid"        = dependency.vault_infra.outputs.vault_id
-    "clusterStore.region"      = local.region
+    "clusterStores[0].name"        = "oracle"
+    "clusterStores[0].privateKey"  = base64encode(file(local.key_file))
+    "clusterStores[0].fingerprint" = local.fingerprint
+    "clusterStores[0].user"        = local.user
+    "clusterStores[0].tenancy"     = local.tenancy
+    "clusterStores[0].ocid"        = dependency.vault_infra.outputs.vault_id
+    "clusterStores[0].region"      = local.region
   }
 }
