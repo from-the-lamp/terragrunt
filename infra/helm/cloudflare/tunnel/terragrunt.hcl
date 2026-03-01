@@ -27,37 +27,25 @@ inputs = {
   tunnel_routes = [
     {
       network = "10.43.0.0/16"
-      comment = "Canal service-cidr"
+      comment = "Services"
     },
   ]
   split_tunnels = [
     {
-      address     = "10.43.173.155/32"
-      description = "Infra: Private Istio Gateway"
+      address     = "10.43.0.0/16"
+      description = "Services"
     },
-    {
-      address     = "10.43.201.23/32"
-      description = "Infra: Private DNS resolver"
-    },
-    {
-      address     = "10.43.5.63/32"
-      description = "Prod-0: Private Istio Gateway"
-    },
-    {
-      address     = "10.43.172.229/32"
-      description = "Prod-0: Private DNS resolver"
-    }
   ]
   private_domains = [
     {
       suffix      = "internal.from-the-lamp.work"
       description = "Infra: Private DNS resolver"
-      dns_servers = ["10.43.201.23"]
+      dns_servers = ["10.43.41.154"]
     },
     {
       suffix      = "internal.from-the-lamp.com"
       description = "Prod-0: Private DNS resolver"
-      dns_servers = ["10.43.172.229"]
+      dns_servers = ["10.43.93.137"]
     }
   ]
 }
