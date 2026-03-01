@@ -9,7 +9,7 @@ locals {
   module_version   = "main"
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env              = local.environment_vars.locals.environment
-  helm_repo        = "oci://registry.gitlab.com/from-the-lamp/infra/argo-apps/charts"
+  helm_repo        = "oci://registry.gitlab.com/from-the-lamp/infra/helm-charts"
 }
 
 generate "provider" {
