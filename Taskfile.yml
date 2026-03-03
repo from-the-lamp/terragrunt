@@ -37,35 +37,51 @@ tasks:
         {{.CLI_ARGS}} {{ .ADDITION_ARGS }}
 
   plan:
-    desc: Run plan for all modules in subdirectories
+    desc: Run plan in the specified DIR (set DIR=...)
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "plan",
+      }
+
+  apply:
+    desc: Run apply in the specified DIR (set DIR=...)
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "apply",
+      }
+
+  destroy:
+    desc: Run destroy in the specified DIR (set DIR=...)
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "destroy",
+      }
+      
+  validate:
+    desc: Run validate in the specified DIR (set DIR=...)
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "validate",
+      }
+
+  plan:all:
+    desc: Run plan for all modules in subdirectories of DIR (set DIR=...)
     cmds:
     - task: .terragrunt
       vars: {
         ACTION: "plan --all",
       }
 
-  apply:
-    desc: Run apply for all modules in subdirectories
+  apply:all:
+    desc: Run apply for all modules in subdirectories of DIR (set DIR=...)
     cmds:
     - task: .terragrunt
       vars: {
         ACTION: "apply --all",
-      }
-
-  destroy:
-    desc: Run destroy for all modules in subdirectories
-    cmds:
-    - task: .terragrunt
-      vars: {
-        ACTION: "destroy --all",
-      }
-      
-  validate:
-    desc: Run validate for all modules in subdirectories
-    cmds:
-    - task: .terragrunt
-      vars: {
-        ACTION: "validate",
       }
 
   outputs:
