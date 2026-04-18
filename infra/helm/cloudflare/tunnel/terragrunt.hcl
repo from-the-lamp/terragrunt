@@ -40,7 +40,7 @@ inputs = {
     {
       suffix      = "internal.from-the-lamp.work"
       description = "Infra: Private DNS resolver"
-      dns_servers = ["10.43.41.154"]
+      dns_servers = ["10.43.148.0"]
     },
     {
       suffix      = "internal.from-the-lamp.com"
