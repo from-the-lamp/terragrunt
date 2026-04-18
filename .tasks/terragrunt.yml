@@ -1,0 +1,77 @@
+version: '3'
+
+env:
+  OCI_CONFIG_PATH: "{{.HOME}}/.oci/config"
+
+silent: true
+tasks:  
+  .terragrunt:
+    internal: true
+    dir: $DIR
+    cmds:
+    - |
+      terragrunt {{ .ACTION }} \
+        -compact-warnings --all \
+        --log-level {{.LOG_LEVEL}} \
+        {{.CLI_ARGS}} {{ .ADDITION_ARGS }}
+
+  plan:
+    desc: Run plan for all modules in subdirectories
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "plan",
+      }
+
+  apply:
+    desc: Run apply for all modules in subdirectories
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "apply",
+      }
+
+  destroy:
+    desc: Run destroy for all modules in subdirectories
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "destroy",
+      }
+      
+  validate:
+    desc: Run validate for all modules in subdirectories
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "validate",
+      }
+
+  outputs:
+    desc: Show module outputs
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "output",
+      }
+
+  unlock:
+    dir: $DIR
+    desc: Unlock state by ID
+    cmds:
+      - terragrunt force-unlock {{ .CLI_ARGS }}
+
+  migrate-state:
+    desc: Migrate state (usually required during project initialization)
+    dir: $DIR
+    cmds:
+    - task: .terragrunt
+      vars: {
+        ACTION: "init",
+        ADDITION_ARGS: "-migrate-state -input=true"
+      }
+
+  fmt:
+    desc: Format all HCL code
+    cmds:
+    - terragrunt hcl format

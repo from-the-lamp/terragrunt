@@ -8,5 +8,5 @@ include "common" {
 
 inputs = {
   helm_chart_name    = "lamp-external-secrets"
-  helm_chart_version = "0.0.1"
+  helm_chart_version = "1.1.0"
 }

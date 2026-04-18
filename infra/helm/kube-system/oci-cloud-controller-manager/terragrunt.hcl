@@ -24,7 +24,7 @@ dependency "vcn" {
 
 inputs = {
   helm_chart_name    = "lamp-oci-cloud-controller-manager"
-  helm_chart_version = "0.0.1"
+  helm_chart_version = "0.0.3"
   helm_set_sensitive = {
     "config.compartment" = local.compartment_ocid
     "config.vcn"         = dependency.vcn.outputs.vcn_id

@@ -26,6 +26,12 @@ dependency "vault_infra" {
   }
 }
 
+dependency "external-secrets" {
+  config_path                             = "../external-secrets"
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
+  skip_outputs                            = true
+}
+
 inputs = {
   helm_chart_name    = "lamp-external-secrets-stores"
   helm_chart_version = "0.0.2"
