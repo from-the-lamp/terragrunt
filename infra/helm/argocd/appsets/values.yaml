@@ -1,24 +1,23 @@
 applicationsets:
-
-  platform-infra:
+  default:
     namespace: argocd
+    syncPolicy:
+      preserveResourcesOnDeletion: false
     goTemplate: true
     generators:
       - git:
           repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           revision: HEAD
           directories:
-            - path: 'infra/platform/*'
+            - path: 'default/*'
     ignoreApplicationDifferences:
       - jsonPointers:
           - /spec/syncPolicy
     template:
       metadata:
         name: "infra-{{.path.basename}}"
-        annotations:
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-platform
       spec:
-        project: platform-infra
+        project: default
         source:
           repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
           targetRevision: HEAD
@@ -34,202 +33,3 @@ applicationsets:
             selfHeal: true
           syncOptions:
             - CreateNamespace=true
-          managedNamespaceMetadata:
-            labels:
-              kargo.akuity.io/project: "true"
-            annotations:
-              kargo.akuity.io/keep-namespace: "true"
-        ignoreDifferences:
-          - group: admissionregistration.k8s.io
-            kind: ValidatingWebhookConfiguration
-            jsonPointers:
-              - /webhooks/0/failurePolicy
-          - group: postgresql.cnpg.io
-            kind: Cluster
-            name: postgres
-            namespace: postgres
-            jqPathExpressions:
-              - .spec.managed.roles[].passwordSecret.remoteSecretKey
-          - group: ""
-            kind: Service
-            jsonPointers:
-              - /spec/externalName
-          - group: apiextensions.k8s.io
-            kind: CustomResourceDefinition
-            jsonPointers:
-              - /spec/preserveUnknownFields
-
-  product-infra:
-    namespace: argocd
-    goTemplate: true
-    generators:
-      - git:
-          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
-          revision: HEAD
-          directories:
-            - path: 'infra/product/*'
-    ignoreApplicationDifferences:
-      - jsonPointers:
-          - /spec/syncPolicy
-    template:
-      metadata:
-        name: "infra-{{.path.basename}}"
-        annotations:
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-product
-          kargo.akuity.io/authorized-stage: "kargo-projects:infra"
-      spec:
-        project: product-infra
-        source:
-          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
-          targetRevision: HEAD
-          path: "{{.path.path}}"
-          helm:
-            releaseName: "{{.path.basename}}"
-            valueFiles:
-              - values.yaml
-              - .kargo.values.yaml
-        destination:
-          name: infra
-          namespace: "product"
-        syncPolicy:
-          automated:
-            prune: true
-            selfHeal: true
-          syncOptions:
-            - CreateNamespace=true
-          managedNamespaceMetadata:
-            labels:
-              kargo.akuity.io/project: "true"
-            annotations:
-              kargo.akuity.io/keep-namespace: "true"
-        ignoreDifferences:
-          - group: admissionregistration.k8s.io
-            kind: ValidatingWebhookConfiguration
-            jsonPointers:
-              - /webhooks/0/failurePolicy
-          - group: postgresql.cnpg.io
-            kind: Cluster
-            name: postgres
-            namespace: postgres
-            jqPathExpressions:
-              - .spec.managed.roles[].passwordSecret.remoteSecretKey
-          - group: ""
-            kind: Service
-            jsonPointers:
-              - /spec/externalName
-          - group: apiextensions.k8s.io
-            kind: CustomResourceDefinition
-            jsonPointers:
-              - /spec/preserveUnknownFields
-              
-  platform-prod-0:
-    namespace: argocd
-    goTemplate: true
-    generators:
-      - git:
-          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
-          revision: HEAD
-          directories:
-            - path: 'prod-0/platform/*'
-    ignoreApplicationDifferences:
-      - jsonPointers:
-          - /spec/syncPolicy
-    template:
-      metadata:
-        name: "prod-0-{{.path.basename}}"
-        annotations:
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-platform
-      spec:
-        project: platform-prod
-        source:
-          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
-          targetRevision: HEAD
-          path: "{{.path.path}}"
-          helm:
-            releaseName: "{{.path.basename}}"
-        destination:
-          name: prod-0
-          namespace: "{{.path.basename}}"
-        syncPolicy:
-          automated:
-            prune: true
-            selfHeal: true
-          syncOptions:
-            - CreateNamespace=true
-        ignoreDifferences:
-          - group: admissionregistration.k8s.io
-            kind: ValidatingWebhookConfiguration
-            jsonPointers:
-              - /webhooks/0/failurePolicy
-          - group: postgresql.cnpg.io
-            kind: Cluster
-            name: postgres
-            namespace: postgres
-            jqPathExpressions:
-              - .spec.managed.roles[].passwordSecret.remoteSecretKey
-          - group: ""
-            kind: Service
-            jsonPointers:
-              - /spec/externalName
-          - group: apiextensions.k8s.io
-            kind: CustomResourceDefinition
-            jsonPointers:
-              - /spec/preserveUnknownFields
-              
-  product-prod-0:
-    namespace: argocd
-    goTemplate: true
-    generators:
-      - git:
-          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
-          revision: HEAD
-          directories:
-            - path: 'prod-0/product/*'
-    ignoreApplicationDifferences:
-      - jsonPointers:
-          - /spec/syncPolicy
-    template:
-      metadata:
-        name: "prod-0-{{.path.basename}}"
-        annotations:
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: argocd-product
-          kargo.akuity.io/authorized-stage: "kargo-project-{{.path.basename}}:prod-0-{{.path.basename}}"
-      spec:
-        project: product-prod
-        source:
-          repoURL: "https://gitlab.com/from-the-lamp/infra/argo-apps.git"
-          targetRevision: HEAD
-          path: "{{.path.path}}"
-          helm:
-            releaseName: "{{.path.basename}}"
-            valueFiles:
-              - values.yaml
-              - .kargo.values.yaml
-        destination:
-          name: prod-0
-          namespace: "product"
-        syncPolicy:
-          automated:
-            prune: true
-            selfHeal: true
-          syncOptions:
-            - CreateNamespace=true
-        ignoreDifferences:
-          - group: admissionregistration.k8s.io
-            kind: ValidatingWebhookConfiguration
-            jsonPointers:
-              - /webhooks/0/failurePolicy
-          - group: postgresql.cnpg.io
-            kind: Cluster
-            name: postgres
-            namespace: postgres
-            jqPathExpressions:
-              - .spec.managed.roles[].passwordSecret.remoteSecretKey
-          - group: ""
-            kind: Service
-            jsonPointers:
-              - /spec/externalName
-          - group: apiextensions.k8s.io
-            kind: CustomResourceDefinition
-            jsonPointers:
-              - /spec/preserveUnknownFields
