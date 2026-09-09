@@ -10,9 +10,11 @@ inputs = {
   overwrite_existing_content = true
 
   tag_owners = {
-    "tag:exit"               = ["autogroup:admin"]
-    "tag:k3s-operator-infra" = ["autogroup:admin"]
-    "tag:k3s-proxy-infra"    = ["autogroup:admin"]
+    "tag:exit"                = ["autogroup:admin"]
+    "tag:k3s-operator-infra"  = ["autogroup:admin"]
+    "tag:k3s-proxy-infra"     = ["autogroup:admin"]
+    "tag:k3s-operator-prod-0" = ["autogroup:admin"]
+    "tag:k3s-proxy-prod-0"    = ["autogroup:admin"]
   }
 
   auto_approvers_routes = {
@@ -31,6 +33,11 @@ inputs = {
       dst = ["autogroup:internet"]
       ip  = ["*"]
       via = ["tag:exit"]
+    },
+    {
+      src = ["tag:k3s-proxy-prod-0"]
+      dst = ["tag:exit"]
+      ip  = ["*"]
     },
   ]
 }
