@@ -10,3 +10,4 @@ _modules
 .tmp
 terraform.tfstate
 .DS_Store
+/hetzner/talos/access/kubeconfig.yaml

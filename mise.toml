@@ -1,0 +1,25 @@
+[tools]
+opentofu = "1.12.6"
+terragrunt = "1.1.3"
+kubectl = "1.31.4"
+# Keep in sync with hetzner/env.hcl's talos_version — a mismatched talosctl
+# (even a newer one) silently fails some RPCs (get/logs/dmesg) against an
+# older Talos server while others (services) keep working, which reads as
+# random flakiness instead of a version mismatch.
+talosctl = "1.9.0"
+hcloud = "1.68.0"
+jq = "1.8.2"
+
+[hooks]
+postinstall = '''
+set -uo pipefail
+if [ ! -f .env ]; then
+  cp .env.example .env
+  echo "mise: created .env from .env.example - fill in the secrets before running terragrunt"
+fi
+for var in TF_HTTP_PASSWORD HETZNER_API_TOKEN; do
+  if ! grep -q "^${var}=..*" .env 2>/dev/null; then
+    echo "mise: warning - ${var} is not set in .env"
+  fi
+done
+'''
