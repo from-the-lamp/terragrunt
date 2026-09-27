@@ -29,11 +29,11 @@ inputs = {
       defaultClusterName = "in-cluster"
       # Top-level (not under argo-cd:) — this chart's own "global" key,
       # propagated by Helm into every subchart including the nested argo-cd
-      # dependency. Chart default is the internal-only domain — dex derives
-      # its issuer/redirect URIs from this, so it has to match wherever the
-      # login flow is actually reachable from (the public route).
+      # dependency. Dex derives its issuer/redirect URIs from this, so it has
+      # to match wherever the login flow is actually reachable from — the
+      # public route was removed, ArgoCD is internal-only now.
       global = {
-        domain = "argocd.from-the-lamp.work"
+        domain = "argocd.internal.from-the-lamp.work"
       }
       # Chart default is "oracle" (infra/prod-0's ClusterSecretStore) — not
       # applicable here. Backs argocd-sso-secrets (GitLab OIDC client
@@ -70,9 +70,10 @@ inputs = {
       ]
       # Reuses the org's existing GitLab OAuth Application (client id/secret
       # already in Vault) — its redirect URI list needs
-      # https://argocd.from-the-lamp.work/api/dex/callback added on the
-      # GitLab side. "from-the-lamp" GitLab group maps to ArgoCD's built-in
-      # admin role (see configs.rbac below), same group oauth2-proxy uses.
+      # https://argocd.internal.from-the-lamp.work/api/dex/callback added on
+      # the GitLab side (and the old public one removed). "from-the-lamp"
+      # GitLab group maps to ArgoCD's built-in admin role (see configs.rbac
+      # below), same group oauth2-proxy uses.
       argo-cd = {
         configs = {
           cm = {
@@ -85,7 +86,7 @@ inputs = {
                     baseURL: https://gitlab.com
                     clientID: $argocd-sso-secrets:clientId
                     clientSecret: $argocd-sso-secrets:clientSecret
-                    redirectURI: https://argocd.from-the-lamp.work/api/dex/callback
+                    redirectURI: https://argocd.internal.from-the-lamp.work/api/dex/callback
                     groups:
                       - from-the-lamp
             EOT
@@ -96,6 +97,51 @@ inputs = {
           # field; that data is inert.)
           rbac = {
             "policy.csv" = "g, from-the-lamp, role:admin\n"
+          }
+        }
+
+        # Chart default leaves every component with no resources at all.
+        # application-controller had grown to ~1.4-2GB with nothing declared
+        # (invisible to the scheduler) and was one of the two biggest
+        # contributors to the node-wide memory exhaustion behind the
+        # recurring hetzner-cp-2 NotReady flaps (the other being
+        # kube-apiserver itself, which isn't ours to size). Sized from
+        # ~6h of real victoria-metrics usage (avg for requests, max*1.5 for
+        # memory limits); no cpu limits per policy - only requests.
+        controller = {
+          resources = {
+            requests = { cpu = "150m", memory = "1536Mi" }
+            limits   = { memory = "3072Mi" }
+          }
+        }
+        server = {
+          resources = {
+            requests = { cpu = "10m", memory = "96Mi" }
+            limits   = { memory = "256Mi" }
+          }
+        }
+        repoServer = {
+          resources = {
+            requests = { cpu = "75m", memory = "128Mi" }
+            limits   = { memory = "256Mi" }
+          }
+        }
+        dex = {
+          resources = {
+            requests = { cpu = "5m", memory = "48Mi" }
+            limits   = { memory = "128Mi" }
+          }
+        }
+        applicationSet = {
+          resources = {
+            requests = { cpu = "15m", memory = "64Mi" }
+            limits   = { memory = "128Mi" }
+          }
+        }
+        notifications = {
+          resources = {
+            requests = { cpu = "5m", memory = "48Mi" }
+            limits   = { memory = "96Mi" }
           }
         }
       }
