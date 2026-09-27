@@ -1,6 +1,0 @@
-argo-cd:
-  configs:
-    rbac:
-      policy.default: admin
-      policy.csv: |
-        g, from-the-lamp, role:admin

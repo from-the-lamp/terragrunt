@@ -10,4 +10,6 @@ _modules
 .tmp
 terraform.tfstate
 .DS_Store
-/hetzner/talos/access/kubeconfig.yaml
+kubeconfig.yaml
+kubeconfig.yaml.lock
+.claude
