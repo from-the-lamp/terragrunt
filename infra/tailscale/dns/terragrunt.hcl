@@ -18,9 +18,12 @@ inputs = {
 
   split_dns = [
     {
+      # Moved from the old "infra" k3s cluster (10.43.148.0, its
+      # private-resolver CoreDNS ClusterIP) to Hetzner's own private-resolver
+      # - that cluster now serves *.internal.from-the-lamp.work.
       domain = "internal.from-the-lamp.work"
       nameservers = [
-        { address = "10.43.148.0", use_with_exit_node = true },
+        { address = "10.107.125.196", use_with_exit_node = true },
       ]
     },
     {

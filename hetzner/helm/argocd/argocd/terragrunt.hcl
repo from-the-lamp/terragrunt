@@ -17,7 +17,7 @@ dependency "external_secrets" {
 
 inputs = {
   helm_chart_name    = "lamp-argocd"
-  helm_chart_version = "0.4.0"
+  helm_chart_version = "0.0.1"
   # Chart default leaves this empty, which registers the in-cluster Secret
   # with no name at all — Applications in any project other than "default"
   # then fail to resolve destination.name: in-cluster (project destination
@@ -49,6 +49,25 @@ inputs = {
         oauthClientSecret         = "argocd"
         oauthClientSecretProperty = "oauth_client_secret"
       }
+      # prod-1 and prod-0 are separate physical clusters this same ArgoCD
+      # also manages. Their kubeconfigs already live in Vault (seeded for
+      # the toolhive kubernetes-mcp servers) - reused as-is rather than
+      # duplicated under new fields. prod-1's kubeconfig carries a long-lived
+      # ServiceAccount bearer token; prod-0's carries a client cert/key pair
+      # instead - the chart's external-clusters.yaml template parses
+      # whichever is present.
+      externalClusters = [
+        {
+          name           = "prod-1"
+          remoteKey      = "toolhive"
+          remoteProperty = "kubeconfig-prod-1"
+        },
+        {
+          name           = "prod-0"
+          remoteKey      = "toolhive"
+          remoteProperty = "kubeconfig-prod-0"
+        },
+      ]
       # Reuses the org's existing GitLab OAuth Application (client id/secret
       # already in Vault) — its redirect URI list needs
       # https://argocd.from-the-lamp.work/api/dex/callback added on the

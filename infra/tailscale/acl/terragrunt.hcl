@@ -10,22 +10,23 @@ inputs = {
   overwrite_existing_content = true
 
   tag_owners = {
-    "tag:exit"                = ["autogroup:admin"]
-    "tag:k3s-operator-infra"  = ["autogroup:admin"]
-    "tag:k3s-proxy-infra"     = ["autogroup:admin"]
-    "tag:k3s-operator-prod-0" = ["autogroup:admin"]
-    "tag:k3s-proxy-prod-0"    = ["autogroup:admin"]
+    "tag:exit"                 = ["autogroup:admin"]
+    "tag:k3s-operator-infra"   = ["autogroup:admin"]
+    "tag:k3s-proxy-infra"      = ["autogroup:admin"]
+    "tag:k3s-operator-prod-0"  = ["autogroup:admin"]
+    "tag:k3s-proxy-prod-0"     = ["autogroup:admin"]
+    "tag:k3s-operator-hetzner" = ["autogroup:admin"]
   }
 
-  auto_approvers_routes = {
-    "10.43.0.0/16" = ["tag:k3s-proxy-infra"]
-  }
+  # No subnet router anywhere right now (Hetzner's and the old infra
+  # cluster's were both dropped - just operators, plus the infra exit-node
+  # below), so no auto-approved routes.
   auto_approvers_exit_node = ["tag:exit"]
 
   grants = [
     {
       src = ["autogroup:member"]
-      dst = ["tag:k3s-proxy-infra", "tag:exit", "10.43.0.0/16"]
+      dst = ["tag:k3s-proxy-infra", "tag:exit"]
       ip  = ["*"]
     },
     {
