@@ -16,11 +16,15 @@ inputs = {
     "tag:k3s-operator-prod-0"  = ["autogroup:admin"]
     "tag:k3s-proxy-prod-0"     = ["autogroup:admin"]
     "tag:k3s-operator-hetzner" = ["autogroup:admin"]
+    "tag:k3s-proxy-hetzner"    = ["autogroup:admin"]
   }
 
-  # No subnet router anywhere right now (Hetzner's and the old infra
-  # cluster's were both dropped - just operators, plus the infra exit-node
-  # below), so no auto-approved routes.
+  # Hetzner's subnet-router (Connector) needs its own auto-approved route -
+  # this cluster's real service CIDR, not the old infra cluster's k3s
+  # default (10.43.0.0/16, dropped along with that cluster's connector).
+  auto_approvers_routes = {
+    "10.96.0.0/12" = ["tag:k3s-proxy-hetzner"]
+  }
   auto_approvers_exit_node = ["tag:exit"]
 
   grants = [
@@ -38,6 +42,11 @@ inputs = {
     {
       src = ["tag:k3s-proxy-prod-0"]
       dst = ["tag:exit"]
+      ip  = ["*"]
+    },
+    {
+      src = ["autogroup:member"]
+      dst = ["tag:k3s-proxy-hetzner", "10.96.0.0/12"]
       ip  = ["*"]
     },
   ]
