@@ -8,7 +8,7 @@ include "common" {
 
 inputs = {
   magic_dns          = true
-  override_local_dns = true
+  override_local_dns = false
 
   global_nameservers = [
     { address = "8.8.8.8" },
