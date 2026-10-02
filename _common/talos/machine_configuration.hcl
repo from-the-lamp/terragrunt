@@ -50,6 +50,12 @@ inputs = {
           cni = {
             name = "none"
           }
+          # Talos/kubeadm defaults (10.244.0.0/16 pod, 10.96.0.0/12 service)
+          # collide with another org's private ranges reachable over the
+          # same tailnet - moved out of 10.0.0.0/8 entirely into
+          # 172.16.0.0/12, which nothing else on the tailnet uses.
+          podSubnets     = ["172.20.0.0/16"]
+          serviceSubnets = ["172.21.0.0/16"]
         }
       }
     })
