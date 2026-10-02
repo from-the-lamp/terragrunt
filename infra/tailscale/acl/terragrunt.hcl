@@ -23,7 +23,7 @@ inputs = {
   # this cluster's real service CIDR, not the old infra cluster's k3s
   # default (10.43.0.0/16, dropped along with that cluster's connector).
   auto_approvers_routes = {
-    "10.96.0.0/12"    = ["tag:k3s-proxy-hetzner"]
+    "172.21.0.0/16"   = ["tag:k3s-proxy-hetzner"]
     "173.245.48.0/20" = ["tag:exit"]
     "103.21.244.0/22" = ["tag:exit"]
     "103.22.200.0/22" = ["tag:exit"]
@@ -69,7 +69,7 @@ inputs = {
     },
     {
       src = ["autogroup:member"]
-      dst = ["tag:k3s-proxy-hetzner", "10.96.0.0/12"]
+      dst = ["tag:k3s-proxy-hetzner", "172.21.0.0/16"]
       ip  = ["*"]
     },
   ]
