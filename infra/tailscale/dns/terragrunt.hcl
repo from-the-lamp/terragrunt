@@ -20,10 +20,13 @@ inputs = {
     {
       # Moved from the old "infra" k3s cluster (10.43.148.0, its
       # private-resolver CoreDNS ClusterIP) to Hetzner's own private-resolver
-      # - that cluster now serves *.internal.from-the-lamp.work.
+      # - that cluster now serves *.internal.from-the-lamp.work. IP updated
+      # again after the Hetzner cluster's service CIDR moved to
+      # 172.21.0.0/16 (external-dns-private-resolver's auto-assigned
+      # ClusterIP changed along with it).
       domain = "internal.from-the-lamp.work"
       nameservers = [
-        { address = "10.107.125.196", use_with_exit_node = true },
+        { address = "172.21.189.156", use_with_exit_node = true },
       ]
     },
     {
