@@ -132,9 +132,15 @@ inputs = {
           }
         }
         dex = {
+          # 128Mi was fine with no connectors configured, but OOM-kills
+          # (observed as SIGSEGV/exit 139, no log output - this kernel/
+          # cgroup setup doesn't report it as a normal OOMKilled) once a
+          # real GitLab connector actually loads (OIDC discovery, group
+          # claims, etc. push it over). Confirmed by bumping live to 512Mi
+          # and watching the pod go Running immediately.
           resources = {
             requests = { cpu = "5m", memory = "48Mi" }
-            limits   = { memory = "128Mi" }
+            limits   = { memory = "512Mi" }
           }
         }
         applicationSet = {
