@@ -38,16 +38,21 @@ inputs = {
       # Chart default is "oracle" (infra/prod-0's ClusterSecretStore) — not
       # applicable here. Backs argocd-sso-secrets (GitLab OIDC client
       # id/secret) from the "argocd" entry in our own Vault (platform
-      # mount) — needs oauthClientID/SecretProperty support added to
-      # sso.yaml first (not yet published as of this pin).
+      # mount).
       externalSecrets = {
         name = "vault"
       }
-      remoteSecretKeys = {
-        oauthClientID             = "argocd"
-        oauthClientIDProperty     = "oauth_client_id"
-        oauthClientSecret         = "argocd"
-        oauthClientSecretProperty = "oauth_client_secret"
+      sso = {
+        enabled    = true
+        secretName = "argocd-sso-secrets"
+        oauthClientID = {
+          key      = "argocd"
+          property = "oauth_client_id"
+        }
+        oauthClientSecret = {
+          key      = "argocd"
+          property = "oauth_client_secret"
+        }
       }
       # prod-1 and prod-0 are separate physical clusters this same ArgoCD
       # also manages. Their kubeconfigs already live in Vault (seeded for
