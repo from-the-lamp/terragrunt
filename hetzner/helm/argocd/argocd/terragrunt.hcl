@@ -132,16 +132,6 @@ inputs = {
           }
         }
         dex = {
-          # Chart default pulls the Alpine/musl dex image, but the
-          # dex-server wrapper is the glibc-linked "argocd" binary copied in
-          # by the initContainer - musl can't exec a glibc binary, so any
-          # pod that actually renders a connector (i.e. SSO gets configured
-          # for the first time) crashes with SIGSEGV/exit 139 and zero log
-          # output. Known upstream chart issue (argoproj/argo-helm#3878);
-          # the distroless variant uses a glibc-compatible base.
-          image = {
-            tag = "v2.45.1-distroless"
-          }
           resources = {
             requests = { cpu = "5m", memory = "48Mi" }
             limits   = { memory = "128Mi" }
