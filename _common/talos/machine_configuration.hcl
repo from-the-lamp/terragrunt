@@ -30,6 +30,39 @@ inputs = {
           nodeIP = {
             validSubnets = [local.private_subnet_cidr]
           }
+          # Pods were overcommitted enough (limits summing to 170%+ of
+          # allocatable) that a memory spike got the kernel OOM killer to
+          # pick kube-apiserver as victim instead of a pod - repeatedly,
+          # cascading into node NotReady flapping. systemReserved/
+          # kubeReserved shrink Allocatable, which shrinks the kubepods
+          # cgroup's cap (kubelet's default enforceNodeAllocatable already
+          # includes "pods") - so an overcommitted pod now gets OOM-killed
+          # inside that cgroup instead of system processes competing for
+          # the same RAM. evictionHard/Soft make kubelet proactively evict
+          # before it gets that far. Deliberately NOT setting
+          # systemReservedCgroup/kubeReservedCgroup - kubelet refuses to
+          # start on an invalid cgroup path, not worth the risk of bricking
+          # all 3 control-plane nodes at once for a guessed Talos cgroup
+          # name.
+          extraConfig = {
+            systemReserved = {
+              cpu    = "250m"
+              memory = "512Mi"
+            }
+            kubeReserved = {
+              cpu    = "250m"
+              memory = "512Mi"
+            }
+            evictionHard = {
+              "memory.available" = "500Mi"
+            }
+            evictionSoft = {
+              "memory.available" = "750Mi"
+            }
+            evictionSoftGracePeriod = {
+              "memory.available" = "1m30s"
+            }
+          }
         }
       }
       cluster = {
