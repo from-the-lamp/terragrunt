@@ -16,6 +16,6 @@ locals {
   talos_architecture = "x86"
 
   # Verify current, non-deprecated values with: hcloud server-type list
-  node_server_type        = "cpx32"
+  node_server_type        = "cpx42"
   image_build_server_type = "cpx22"
 }

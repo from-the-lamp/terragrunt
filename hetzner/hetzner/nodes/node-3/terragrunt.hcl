@@ -47,4 +47,8 @@ inputs = {
     dependency.firewall.outputs.id,
   ]
   user_data = dependency.machine_config.outputs.machine_configuration
+  # Overrides the common node_server_type (cpx42) - resizing this node hit
+  # the account's shared-core limit after cp-1/cp-2 were already bumped.
+  # Deliberately left on the old size rather than resized.
+  server_type = "cpx32"
 }
