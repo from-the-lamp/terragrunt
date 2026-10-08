@@ -67,6 +67,11 @@ inputs = {
       }
       cluster = {
         allowSchedulingOnControlPlanes = true
+        apiServer = {
+          extraArgs = {
+            "anonymous-auth" = "true"
+          }
+        }
         etcd = {
           advertisedSubnets = [local.private_subnet_cidr]
         }
