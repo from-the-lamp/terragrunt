@@ -68,6 +68,17 @@ inputs = {
       ip  = ["*"]
     },
     {
+      # Kelos Task pods' Tailscale sidecar (userspace HTTP proxy, same tag
+      # as the Hetzner subnet-router) - routes only to the destinations
+      # tag:exit actually advertises (Cloudflare edge ranges + the cas
+      # GitLab IP), not full internet egress. Mirrors the autogroup:member
+      # grant below, which is how this already works from a human's laptop.
+      src = ["tag:k3s-proxy-hetzner"]
+      dst = ["autogroup:internet"]
+      ip  = ["*"]
+      via = ["tag:exit"]
+    },
+    {
       src = ["autogroup:member"]
       dst = ["tag:k3s-proxy-hetzner", "172.21.0.0/16"]
       ip  = ["*"]
