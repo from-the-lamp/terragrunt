@@ -95,6 +95,16 @@ inputs = {
           podSubnets     = ["172.20.0.0/16"]
           serviceSubnets = ["172.21.0.0/16"]
         }
+        # Phase 2 of the kube-proxy-replacement migration: stops Talos from
+        # (re)creating the kube-proxy DaemonSet, including on a future
+        # reboot/config sync - Talos 1.9.0 does not auto-prune an already-
+        # running kube-proxy on this flag alone, so this is deliberately
+        # applied BEFORE the live per-node Cilium migration (CiliumNodeConfig)
+        # and well before kube-proxy is actually deleted, to close the
+        # "silent resurrection after a reboot mid-migration" window.
+        proxy = {
+          disabled = true
+        }
       }
     })
   ]
