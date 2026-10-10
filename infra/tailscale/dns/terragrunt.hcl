@@ -36,20 +36,26 @@ inputs = {
       ]
     },
     {
-      # The homelab cluster's own apps live under this subdomain
-      # specifically so this entry can be MORE SPECIFIC than the
-      # "internal.from-the-lamp.work" entry above (Tailscale split-DNS
-      # resolves by longest-match domain, so this one wins for anything
-      # under it) - without a distinct, separately-delegated subdomain,
-      # homelab's apps would resolve via Hetzner's resolver instead of their
-      # own, since both clusters can't share one delegation for the same
-      # name. PLACEHOLDER - address is homelab's own private-resolver
-      # CoreDNS ClusterIP (apps/homelab/platform/coredns, lamp-coredns),
-      # which is auto-assigned and unknowable until that app's Service
-      # actually exists - see apps/homelab/platform/kube-system/templates/
-      # coredns-internal-domain.yaml for the matching in-cluster forward
-      # target that needs the same real value once known.
-      domain = "homelab.internal.from-the-lamp.work"
+      # Deliberately the bare apex, not a homelab-specific subdomain - this
+      # is a "cutover" domain scheme: homelab's apps answer under the same
+      # names Hetzner's own public gateway serves publicly
+      # (*.from-the-lamp.work), and for tailnet members THIS entry makes
+      # homelab's resolver authoritative instead of real public DNS. It
+      # doesn't conflict with the "internal.from-the-lamp.work" entry above
+      # despite being its parent domain - that entry still wins by
+      # longest-match for anything under "internal.", this one only
+      # catches names that aren't. Any given app name is effectively taken
+      # away from Hetzner for tailnet clients once homelab's version of it
+      # exists and answers here - see infra/argo-apps's
+      # apps/homelab/platform/README.md for which names already collide
+      # live (windmill.from-the-lamp.work, currently Hetzner's public
+      # Slack-webhook route). PLACEHOLDER - address is homelab's own
+      # private-resolver CoreDNS ClusterIP (apps/homelab/platform/coredns,
+      # lamp-coredns), auto-assigned and unknowable until that app's
+      # Service actually exists - see apps/homelab/platform/kube-system/
+      # templates/coredns-internal-domain.yaml for the matching in-cluster
+      # forward target that needs the same real value once known.
+      domain = "from-the-lamp.work"
       nameservers = [
         { address = "172.25.189.156", use_with_exit_node = true },
       ]
