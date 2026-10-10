@@ -27,11 +27,11 @@ Not for creating the node - for everything that happens *after* it exists:
   need the node to exist at all; can be applied the moment this directory exists.
 - `homelab/talos/machine_config/node-1` - renders the full machine configuration YAML
   (`data.talos_machine_configuration`, a pure data source, no live node needed either). This
-  output IS what goes on the metal-iso boot media - see the bootstrap steps below.
+  output is what `homelab:publish-config` serves from the router - see the bootstrap steps below.
 - `homelab/talos/access` - runs `talos_machine_bootstrap` (the one-time etcd init, same thing
   `talosctl bootstrap` does) and `talos_cluster_kubeconfig` (fetches kubeconfig to
-  `./kubeconfig.yaml`). Needs the node already up and configured - satisfied by the metal-iso
-  boot, not by Terraform itself.
+  `./kubeconfig.yaml`). Needs the node already up and configured - satisfied by fetching its
+  config from the router at boot, not by Terraform itself.
 - `homelab/talos/apply_config/node-1` - re-applies config to an already-bootstrapped node
   (version bumps, patch changes) via `talosctl apply-config`, reviewable through the same
   git-plan/apply flow as every other change in this repo instead of a one-off manual command.
@@ -49,38 +49,42 @@ or Kubernetes version bump to do. Not needed to get the node running.
    cd ../machine_config/node-1 && terragrunt apply
    ```
 
-2. **Build both boot images** (run from this repo's root, where the `Taskfile.yml` lives - needs
-   `xorriso` installed; this step runs on your own machine, not the cbox devcontainer, since it
-   needs real USB access):
+2. **Build the boot ISO and publish the config to the router** (run from this repo's root, on
+   your own machine, not the cbox devcontainer - needs real USB access and SSH access to the
+   GL.iNet):
 
    ```bash
-   task homelab:media
+   task homelab:boot-iso
+   task homelab:publish-config
    ```
 
-   This registers an Image Factory schematic (`siderolabs/amd-ucode` for the Ryzen CPU, plus the
-   `talos.config=metal-iso` kernel arg baked in so Talos looks for the config automatically - no
-   manual boot-menu edit), downloads the installer as `homelab/_generated/boot.iso`, renders
-   node-1's machine config via `terragrunt output`, and packages it into a second,
-   `metal-iso`-labeled image at `homelab/_generated/config.iso`. Both files contain real cluster
-   secrets or are large binaries - `.gitignore`d, never commit them. Confirm the box's actual NIC
-   chipset once you have it in hand; some Realtek 2.5GbE parts need their own extension added to
-   `.tasks/homelab.yml`'s schematic customization to be recognized at all.
+   `homelab:boot-iso` registers an Image Factory schematic (`siderolabs/amd-ucode` for the Ryzen
+   CPU, plus the kernel arg `talos.config=http://192.168.8.1/config.yaml` baked in) and downloads
+   the installer to `homelab/_generated/boot.iso`. `homelab:publish-config` renders node-1's
+   machine config via `terragrunt output` and `scp`s it straight into the GL.iNet router's web
+   root (`uhttpd` serves `/www` as-is by default, no extra package needed) - assumes SSH is
+   enabled on the router (GL.iNet ships it on by default, `root` + the admin password; override
+   the target with `ROUTER_SSH=user@host` if different). Only ONE USB stick is needed this way -
+   the node gets a DHCP IP from the router at boot, fetches the config over the LAN, then switches
+   to its static IP once the config is applied. Confirm the box's actual NIC chipset once you have
+   it in hand; some Realtek 2.5GbE parts need their own extension added to `.tasks/homelab.yml`'s
+   schematic customization to be recognized at all.
 
-3. **Flash two USB sticks** - one per image, both plugged in at boot (needs two USB ports; most
-   mini PCs have at least that many):
+3. **Flash the USB stick:**
 
    ```bash
-   lsblk                                              # or diskutil list on macOS - find the device paths
-   task homelab:flash-boot DEVICE=/dev/sdX            # the installer
-   task homelab:flash-config DEVICE=/dev/sdY          # the metal-iso config
+   lsblk                                 # or diskutil list on macOS - find the device path
+   task homelab:flash DEVICE=/dev/sdX
    ```
 
-   Both tasks print the target device and the current block device list, then ask you to retype
-   the device path before running `dd` - there's no way to invoke either with a device path that
-   silently goes unconfirmed.
+   This prints the target device and the current block device list, then asks you to retype the
+   device path before running `dd` - there's no way to invoke it with a device path that silently
+   goes unconfirmed.
 
-4. **Boot the node.** Plug in both USB sticks, power on. It installs, applies the config from the
-   `metal-iso` stick, and comes up already configured with its static IP - no console interaction.
+4. **Boot the node.** Plug in the USB stick, power on. It installs, fetches the config from the
+   router over the LAN, applies it, and comes up already configured with its static IP - no
+   console interaction. Once it's up, run `task homelab:unpublish-config` - the file on the router
+   carries real cluster secrets and doesn't need to keep serving after this point.
 
 5. **Bootstrap etcd and fetch kubeconfig:**
 
@@ -140,5 +144,6 @@ or Kubernetes version bump to do. Not needed to get the node running.
 Copy the `node-1` pattern: a new `homelab/talos/machine_config/node-N` with its own
 hostname/IP/interface locals in `env.hcl`, a new `homelab/talos/apply_config/node-N`, and add the
 new node's IP to `access`'s `nodes` list (not `bootstrap_node` - that stays pointed at node-1,
-etcd only needs to be bootstrapped once). Each additional node gets its own metal-iso USB stick
-rendered from its own `machine_config/node-N` output - same process as step 2-4 above, per node.
+etcd only needs to be bootstrapped once). Each additional node gets its own config published to
+the router (`homelab:publish-config` would need a node-selecting variant once there's more than
+one) and its own USB stick with the same boot ISO - same process as step 2-4 above, per node.

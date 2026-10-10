@@ -6,10 +6,10 @@
 #
 # This unit is for RE-applying config to an already-bootstrapped node
 # (version bumps, patch changes) - the very first config application
-# happens outside Terraform, baked into the metal-iso boot media (see
-# homelab/README.md). talos_machine_bootstrap (homelab/talos/access) also
-# needs the node already configured and reachable, which is what the
-# metal-iso boot provides on first power-on.
+# happens outside Terraform: the node fetches it over the LAN from the
+# router at boot (see homelab/README.md). talos_machine_bootstrap
+# (homelab/talos/access) also needs the node already configured and
+# reachable, which that first-boot fetch provides.
 include "root" {
   path = find_in_parent_folders("root.hcl")
 }

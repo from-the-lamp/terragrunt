@@ -7,20 +7,25 @@ vars:
   GEN_DIR: "{{.ROOT_DIR}}/homelab/_generated"
   TALOS_VERSION:
     sh: grep -E '^\s*talos_version\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*"(.*)".*/\1/'
+  LAN_GATEWAY:
+    sh: grep -E '^\s*lan_gateway\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*"(.*)".*/\1/'
+  # The GL.iNet router's own SSH - override if it's not root/default LAN IP,
+  # e.g. `task homelab:publish-config ROUTER_SSH=admin@192.168.8.1`.
+  ROUTER_SSH: 'root@{{.LAN_GATEWAY}}'
 
 tasks:
 
   homelab:schematic:
-    desc: Register the homelab Image Factory schematic (amd-ucode + talos.config=metal-iso), print its ID
+    desc: Register the homelab Image Factory schematic (amd-ucode + talos.config fetched from the router)
     cmds:
     - |
       set -euo pipefail
       curl -sS -X POST -H "Content-Type: application/json" \
-        -d '{"customization":{"extraKernelArgs":["talos.config=metal-iso"],"systemExtensions":{"officialExtensions":["siderolabs/amd-ucode"]}}}' \
+        -d '{"customization":{"extraKernelArgs":["talos.config=http://{{.LAN_GATEWAY}}/config.yaml"],"systemExtensions":{"officialExtensions":["siderolabs/amd-ucode"]}}}' \
         https://factory.talos.dev/schematics | jq -r '.id'
 
   homelab:boot-iso:
-    desc: Download the main homelab boot ISO (installer, talos.config=metal-iso baked in) to homelab/_generated/boot.iso
+    desc: Download the homelab boot ISO (installer; fetches its config from the router at boot) to homelab/_generated/boot.iso
     cmds:
     - mkdir -p "{{.GEN_DIR}}"
     - |
@@ -42,54 +47,33 @@ tasks:
       chmod 600 "{{.GEN_DIR}}/config.yaml"
       echo "wrote {{.GEN_DIR}}/config.yaml (contains real cluster secrets - never commit this)"
 
-  homelab:config-iso:
-    desc: Build the metal-iso-labeled config ISO from homelab/_generated/config.yaml
+  homelab:publish-config:
+    desc: 'Upload config.yaml to the GL.iNet router''s web root (uhttpd serves /www as-is) so the node can fetch it over the LAN at boot'
     deps: [homelab:config]
-    preconditions:
-    - sh: command -v xorriso
-      msg: "xorriso not found - install it first (macOS: brew install xorriso, Debian/Ubuntu: apt install xorriso)"
     cmds:
     - |
       set -euo pipefail
-      cp "{{.GEN_DIR}}/config.yaml" "{{.GEN_DIR}}/config.yaml.tmp"
-      # Talos reads a file literally named config.yaml at the volume root.
-      mv "{{.GEN_DIR}}/config.yaml.tmp" "{{.GEN_DIR}}/iso-root-config.yaml"
-      mkdir -p "{{.GEN_DIR}}/iso-root"
-      mv "{{.GEN_DIR}}/iso-root-config.yaml" "{{.GEN_DIR}}/iso-root/config.yaml"
-      xorriso -as mkisofs -V metal-iso -o "{{.GEN_DIR}}/config.iso" "{{.GEN_DIR}}/iso-root"
-      rm -rf "{{.GEN_DIR}}/iso-root"
-      echo "wrote {{.GEN_DIR}}/config.iso (contains real cluster secrets - never commit this)"
+      scp "{{.GEN_DIR}}/config.yaml" "{{.ROUTER_SSH}}:/www/config.yaml"
+      echo "published: http://{{.LAN_GATEWAY}}/config.yaml"
+      echo "run 'task homelab:unpublish-config' once the node has bootstrapped - it carries real cluster secrets, don't leave it serving indefinitely"
 
-  homelab:media:
-    desc: Build both boot media (boot.iso + config.iso) in one go
+  homelab:unpublish-config:
+    desc: Remove config.yaml from the router once the node has successfully fetched and bootstrapped from it
     cmds:
-    - task: homelab:boot-iso
-    - task: homelab:config-iso
-    - echo "Both images are in {{.GEN_DIR}} - flash each to its own USB stick with homelab:flash-boot / homelab:flash-config"
+    - |
+      set -euo pipefail
+      ssh "{{.ROUTER_SSH}}" 'rm -f /www/config.yaml'
+      echo "removed from {{.ROUTER_SSH}}:/www/config.yaml"
 
-  homelab:flash-boot:
-    desc: 'dd homelab/_generated/boot.iso to a USB stick. Usage: task homelab:flash-boot DEVICE=/dev/sdX'
+  homelab:flash:
+    desc: 'dd homelab/_generated/boot.iso to a USB stick. Usage: task homelab:flash DEVICE=/dev/sdX'
     vars:
       IMG: "{{.GEN_DIR}}/boot.iso"
-    cmds:
-    - task: .homelab:flash
-      vars: { IMG: "{{.IMG}}" }
-
-  homelab:flash-config:
-    desc: 'dd homelab/_generated/config.iso to a SECOND USB stick. Usage: task homelab:flash-config DEVICE=/dev/sdX'
-    vars:
-      IMG: "{{.GEN_DIR}}/config.iso"
-    cmds:
-    - task: .homelab:flash
-      vars: { IMG: "{{.IMG}}" }
-
-  .homelab:flash:
-    internal: true
     preconditions:
     - sh: test -n "{{.DEVICE}}"
       msg: "DEVICE is required, e.g. DEVICE=/dev/sdX (Linux) or DEVICE=/dev/rdiskN (macOS) - run lsblk/diskutil list first to find it"
     - sh: test -f "{{.IMG}}"
-      msg: "{{.IMG}} doesn't exist yet - run the task that builds it first"
+      msg: "{{.IMG}} doesn't exist yet - run `task homelab:boot-iso` first"
     cmds:
     - |
       set -euo pipefail
