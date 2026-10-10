@@ -21,10 +21,18 @@ inputs = {
     # Tailscale API server proxy - deliberately NOT tag:k3s-proxy-hetzner
     # (the subnet-router every pod on hetzner-cp-1 already routes through),
     # so this capability is scoped to ArgoCD specifically rather than to
-    # everything sharing that node's network path. Not yet applied to any
-    # device - see hetzner/helm/argocd/argocd/terragrunt.hcl's comments for
-    # what still needs a live cluster to finish safely.
-    "tag:argocd-egress" = ["autogroup:admin"]
+    # everything sharing that node's network path. Owned by
+    # tag:k3s-operator-hetzner (not just autogroup:admin) so the operator's
+    # EXISTING OAuth client (hetzner/tailscale/oauth/client, already scoped
+    # to tag:k3s-operator-hetzner) can mint tag:argocd-egress keys for the
+    # egress proxies it creates via proxyConfig.defaultTags - no second
+    # OAuth client needed, this is the same ownership-chain mechanism as
+    # Tailscale's own docs example ("tag:k8s": ["tag:k8s-operator"]), not a
+    # same-request-must-exactly-match-client-tags constraint as originally
+    # assumed (that assumption was wrong - see
+    # apps/hetzner-infra/platform/tailscale/values.yaml's comment for the
+    # corrected mechanism).
+    "tag:argocd-egress" = ["autogroup:admin", "tag:k3s-operator-hetzner"]
   }
 
   # Hetzner's subnet-router (Connector) needs its own auto-approved route -
