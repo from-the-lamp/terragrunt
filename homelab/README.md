@@ -80,41 +80,51 @@ or Kubernetes version bump to do. Not needed to get the node running.
    # -> ./kubeconfig.yaml
    ```
 
-6. **Install the CNI** (nothing schedules without this - `cluster.network.cni.name: none` in the
-   machine config deliberately disables Talos's bundled Flannel):
+6. **Install the CNI and External Secrets via Terraform** (nothing schedules without a CNI -
+   `cluster.network.cni.name: none` in the machine config deliberately disables Talos's bundled
+   Flannel; ESO has to exist before most apps' ExternalSecrets can resolve):
 
    ```bash
-   KUBECONFIG=homelab/talos/access/kubeconfig.yaml \
-     helm install lamp-cilium oci://registry.gitlab.com/from-the-lamp/infra/helm-charts/lamp-cilium \
-     --version 0.1.1 -n kube-system
+   cd homelab/helm/kube-system/cilium && terragrunt apply
+   cd ../../external-secrets/external-secrets && terragrunt apply
+   cd ../external-secrets-stores && terragrunt apply
    ```
 
-7. **Install ArgoCD** (same chart Hetzner's Terraform installs via `hetzner/helm/argocd/argocd` -
-   see that `terragrunt.hcl` for the full `helm_values`, notably `defaultClusterName: in-cluster`
-   and the GitLab OIDC wiring):
+   These three mirror `hetzner/helm/kube-system/cilium` and `hetzner/helm/external-secrets/*`
+   exactly (same shared module, same chart names/versions) - only the provider wiring differs
+   (talks to the node's own IP instead of a load balancer).
+
+7. **No ArgoCD gets installed on this cluster.** There is exactly one ArgoCD in this whole org
+   (Hetzner's), and it already manages oracle-prod-0/prod-1 as *external* clusters via registered
+   kubeconfigs rather than running its own ArgoCD per cluster - homelab follows the same pattern,
+   registered in `hetzner/helm/argocd/argocd/terragrunt.hcl`'s `externalClusters` list as
+   `"homelab"`. (An earlier draft of this runbook had homelab running its own ArgoCD via
+   Terraform - that was wrong: the shared `projects` chart in `infra/argo-apps` declares every
+   environment's AppProject/ApplicationSet in one `values.yaml`, applied by that single ArgoCD -
+   a second ArgoCD applying the same chart would also try to manage Hetzner's and prod-0/1's
+   AppProjects with `destination: in-cluster` resolving to *this* cluster instead.)
+
+   Once this node is up, push its kubeconfig into Hetzner's Vault so that `externalClusters`
+   entry actually resolves:
 
    ```bash
-   KUBECONFIG=homelab/talos/access/kubeconfig.yaml \
-     helm install lamp-argocd oci://registry.gitlab.com/from-the-lamp/infra/helm-charts/lamp-argocd \
-     --version 0.0.1 -n argocd --create-namespace -f <values extracted from hetzner's terragrunt.hcl>
+   cd homelab/talos/access
+   terragrunt output -raw kubeconfig_raw | base64 -w0 > /tmp/kubeconfig-homelab.b64
+   vault kv patch toolhive kubeconfig-homelab=@/tmp/kubeconfig-homelab.b64
+   rm /tmp/kubeconfig-homelab.b64
    ```
 
-   Then point it at `infra/argo-apps`'s `projects` chart (`platform-lamp-homelab` AppProject +
-   ApplicationSet, already committed) the same way Hetzner's root app does.
+   From that point, Hetzner's ArgoCD syncs `apps/homelab/platform/*` into this cluster the same
+   way it already does for prod-0/1 - including `vault`, `external-secrets`'s ClusterSecretStore
+   consumer apps, and `local-path-provisioner` (which needs nothing beforehand - no
+   ExternalSecret dependency, so it syncs whenever ArgoCD gets to it).
 
-8. **External Secrets + Vault.** Every app under `apps/homelab/platform` that sets
-   `externalSecrets: name: vault` needs the External Secrets Operator (`lamp-external-secrets`,
-   same chart as `hetzner/helm/external-secrets/external-secrets`) plus a ClusterSecretStore
-   named `vault` pointing at the `vault` app's Service - but `vault` itself is deployed *by*
-   ArgoCD from `apps/homelab/platform/vault`, so there's a bootstrap-order dependency (ESO before
-   most apps resolve secrets; Vault unsealed before ESO can read from it) that Hetzner's original
-   setup presumably solved with some specific sequencing. That exact sequence wasn't
-   reverse-engineered here - treat this step as the next thing to work out, not something this
-   runbook has already solved.
-
-9. Local storage (`local-path-provisioner`) doesn't need anything before ArgoCD - it's a normal
-   `apps/homelab/platform` app with no ExternalSecret dependency, so it can just sync whenever
-   ArgoCD gets to it.
+8. **Vault bootstrap-order caveat.** Most apps under `apps/homelab/platform` set
+   `externalSecrets: name: vault`, resolved against the ClusterSecretStore step 6 already
+   created - but that store only works once `apps/homelab/platform/vault` (an ordinary
+   ArgoCD-managed app, not Terraform) is actually up and unsealed. Until then those apps' synced
+   ExternalSecrets just sit unresolved and ArgoCD retries - same self-healing behavior Hetzner
+   relies on, not something unique to homelab.
 
 ## Adding node-2/3/4 later
 

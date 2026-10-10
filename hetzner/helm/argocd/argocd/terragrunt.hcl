@@ -72,6 +72,20 @@ inputs = {
           remoteKey      = "toolhive"
           remoteProperty = "kubeconfig-prod-0"
         },
+        # Homelab's single-node bare-metal Talos cluster - this ArgoCD
+        # manages it the same way as prod-0/prod-1 (remote kubeconfig, not
+        # its own ArgoCD instance - see infra/terraform/terragrunt's
+        # homelab/README.md for why). NOT YET SEEDED: `kubeconfig-homelab`
+        # doesn't exist in Vault's "toolhive" entry until the node is
+        # actually bootstrapped and its kubeconfig (homelab/talos/access's
+        # kubeconfig_raw output) is pushed there by hand. Until it is, this
+        # entry just fails to resolve - harmless, same as any other
+        # not-yet-seeded ExternalSecret property.
+        {
+          name           = "homelab"
+          remoteKey      = "toolhive"
+          remoteProperty = "kubeconfig-homelab"
+        },
       ]
       # Reuses the org's existing GitLab OAuth Application (client id/secret
       # already in Vault) — its redirect URI list needs
