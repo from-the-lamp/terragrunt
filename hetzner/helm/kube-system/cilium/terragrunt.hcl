@@ -8,5 +8,5 @@ include "common" {
 
 inputs = {
   helm_chart_name    = "lamp-cilium"
-  helm_chart_version = "0.1.3"
+  helm_chart_version = "0.1.4"
 }
