@@ -35,5 +35,24 @@ inputs = {
         { address = "10.43.93.137", use_with_exit_node = true },
       ]
     },
+    {
+      # The homelab cluster's own apps live under this subdomain
+      # specifically so this entry can be MORE SPECIFIC than the
+      # "internal.from-the-lamp.work" entry above (Tailscale split-DNS
+      # resolves by longest-match domain, so this one wins for anything
+      # under it) - without a distinct, separately-delegated subdomain,
+      # homelab's apps would resolve via Hetzner's resolver instead of their
+      # own, since both clusters can't share one delegation for the same
+      # name. PLACEHOLDER - address is homelab's own private-resolver
+      # CoreDNS ClusterIP (apps/homelab/platform/coredns, lamp-coredns),
+      # which is auto-assigned and unknowable until that app's Service
+      # actually exists - see apps/homelab/platform/kube-system/templates/
+      # coredns-internal-domain.yaml for the matching in-cluster forward
+      # target that needs the same real value once known.
+      domain = "homelab.internal.from-the-lamp.work"
+      nameservers = [
+        { address = "172.25.189.156", use_with_exit_node = true },
+      ]
+    },
   ]
 }

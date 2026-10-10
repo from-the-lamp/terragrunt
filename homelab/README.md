@@ -62,9 +62,12 @@ or Kubernetes version bump to do. Not needed to get the node running.
    CPU, plus the kernel arg `talos.config=http://192.168.8.1/config.yaml` baked in) and downloads
    the installer to `homelab/_generated/boot.iso`. `homelab:publish-config` renders node-1's
    machine config via `terragrunt output` and `scp`s it straight into the GL.iNet router's web
-   root (`uhttpd` serves `/www` as-is by default, no extra package needed) - assumes SSH is
-   enabled on the router (GL.iNet ships it on by default, `root` + the admin password; override
-   the target with `ROUTER_SSH=user@host` if different). Only ONE USB stick is needed this way -
+   root (`uhttpd` serves `/www` as-is by default, no extra package needed) - this assumes SSH is
+   reachable on the router, unverified like the NIC chipset/interface name/CIDR collision below.
+   GL.iNet ships SSH on by default (`root` + the admin password), but some firmware versions or
+   prior hardening can have it off - check with `ssh root@192.168.8.1` before relying on this; if
+   it's disabled, enable it in the GL.iNet UI (Advanced Settings -> System -> SSH) first, or
+   override the target with `ROUTER_SSH=user@host`. Only ONE USB stick is needed this way -
    the node gets a DHCP IP from the router at boot, fetches the config over the LAN, then switches
    to its static IP once the config is applied. Confirm the box's actual NIC chipset once you have
    it in hand; some Realtek 2.5GbE parts need their own extension added to `.tasks/homelab.yml`'s

@@ -9,6 +9,12 @@ vars:
     sh: grep -E '^\s*talos_version\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*"(.*)".*/\1/'
   LAN_GATEWAY:
     sh: grep -E '^\s*lan_gateway\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*"(.*)".*/\1/'
+  # env.hcl's own list syntax (["siderolabs/amd-ucode"]) is already valid
+  # JSON - read it here instead of hardcoding below, so there's one source
+  # of truth for which extensions get baked into the schematic (same reason
+  # TALOS_VERSION/LAN_GATEWAY are read this way instead of duplicated).
+  TALOS_EXTENSIONS_JSON:
+    sh: grep -E '^\s*talos_extensions\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*=\s*(\[.*\])\s*$/\1/'
   # The GL.iNet router's own SSH - override if it's not root/default LAN IP,
   # e.g. `task homelab:publish-config ROUTER_SSH=admin@192.168.8.1`.
   ROUTER_SSH: 'root@{{.LAN_GATEWAY}}'
@@ -16,12 +22,15 @@ vars:
 tasks:
 
   homelab:schematic:
-    desc: Register the homelab Image Factory schematic (amd-ucode + talos.config fetched from the router)
+    desc: Register the homelab Image Factory schematic (extensions from env.hcl + talos.config fetched from the router)
     cmds:
     - |
       set -euo pipefail
-      curl -sS -X POST -H "Content-Type: application/json" \
-        -d '{"customization":{"extraKernelArgs":["talos.config=http://{{.LAN_GATEWAY}}/config.yaml"],"systemExtensions":{"officialExtensions":["siderolabs/amd-ucode"]}}}' \
+      body=$(jq -n \
+        --argjson exts '{{.TALOS_EXTENSIONS_JSON}}' \
+        --arg karg "talos.config=http://{{.LAN_GATEWAY}}/config.yaml" \
+        '{customization:{extraKernelArgs:[$karg],systemExtensions:{officialExtensions:$exts}}}')
+      curl -sS -X POST -H "Content-Type: application/json" -d "$body" \
         https://factory.talos.dev/schematics | jq -r '.id'
 
   homelab:boot-iso:
@@ -77,6 +86,24 @@ tasks:
     cmds:
     - |
       set -euo pipefail
+      # Retyping the device path only catches fumble-fingers, not
+      # misreading which device is which in the lsblk table below - these
+      # two checks catch the cases that actually matter: writing over
+      # something currently mounted, or over the disk macOS/Linux itself
+      # booted from.
+      boot_disk=""
+      if command -v findmnt >/dev/null 2>&1; then
+        root_src=$(findmnt -no SOURCE / 2>/dev/null || true)
+        [ -n "$root_src" ] && boot_disk=$(lsblk -no PKNAME "$root_src" 2>/dev/null || true)
+      fi
+      if [ -n "$boot_disk" ] && [ "{{.DEVICE}}" = "/dev/$boot_disk" ]; then
+        echo "{{.DEVICE}} is this machine's own boot disk - refusing to touch it." >&2
+        exit 1
+      fi
+      if (mount 2>/dev/null | grep -q "^{{.DEVICE}}"); then
+        echo "{{.DEVICE}} (or a partition on it) is currently mounted - unmount it first." >&2
+        exit 1
+      fi
       echo "About to overwrite {{.DEVICE}} entirely with {{.IMG}}."
       echo "--- current block devices ---"
       (lsblk 2>/dev/null || diskutil list 2>/dev/null) | sed 's/^/  /'
