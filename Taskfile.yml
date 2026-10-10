@@ -12,6 +12,9 @@ includes:
   terragrunt:
     taskfile: .tasks/terragrunt.yml
     flatten: true
+  homelab:
+    taskfile: .tasks/homelab.yml
+    flatten: true
 
 silent: true
 tasks:

@@ -42,36 +42,45 @@ or Kubernetes version bump to do. Not needed to get the node running.
 
 ## Bootstrap
 
-1. **Register the schematic and get the installer image.** `env.hcl`'s `talos_extensions`
-   (`siderolabs/amd-ucode` for the Ryzen CPU) - confirm the box's actual NIC chipset once you have
-   it in hand; some Realtek 2.5GbE parts need their own extension to be recognized at all.
-
-   ```bash
-   curl -sS -X POST -H "Content-Type: application/json" \
-     -d '{"customization":{"systemExtensions":{"officialExtensions":["siderolabs/amd-ucode"]}}}' \
-     https://factory.talos.dev/schematics
-   # -> {"id": "<SCHEMATIC_ID>"}
-   ```
-
-2. **Generate the cluster secrets and render the machine config - no hardware needed yet:**
+1. **Generate the cluster secrets and render the machine config - no hardware needed yet:**
 
    ```bash
    cd homelab/talos/secrets && terragrunt apply
    cd ../machine_config/node-1 && terragrunt apply
-   terragrunt output -raw machine_configuration > /tmp/homelab-node-1.yaml
    ```
 
-3. **Build the boot media.** Flash
-   `https://factory.talos.dev/image/<SCHEMATIC_ID>/v1.9.0/metal-amd64.iso` to a USB stick, then add
-   a second partition/volume on the SAME stick labeled `metal-iso` containing
-   `/tmp/homelab-node-1.yaml` (as `config.yaml`) - Talos's `talos.config=metal-iso` mechanism loads
-   machine config straight from any block device with that label at first boot, no network or
-   manual `apply-config` step needed. The rendered file has real cluster secrets in it - keep the
-   USB stick itself as the only copy, don't commit `/tmp/homelab-node-1.yaml` anywhere (this repo
-   is public).
+2. **Build both boot images** (run from this repo's root, where the `Taskfile.yml` lives - needs
+   `xorriso` installed; this step runs on your own machine, not the cbox devcontainer, since it
+   needs real USB access):
 
-4. **Boot the node.** Plug in the USB stick, power on. It installs, applies the config from
-   `metal-iso`, and comes up already configured with its static IP - no console interaction.
+   ```bash
+   task homelab:media
+   ```
+
+   This registers an Image Factory schematic (`siderolabs/amd-ucode` for the Ryzen CPU, plus the
+   `talos.config=metal-iso` kernel arg baked in so Talos looks for the config automatically - no
+   manual boot-menu edit), downloads the installer as `homelab/_generated/boot.iso`, renders
+   node-1's machine config via `terragrunt output`, and packages it into a second,
+   `metal-iso`-labeled image at `homelab/_generated/config.iso`. Both files contain real cluster
+   secrets or are large binaries - `.gitignore`d, never commit them. Confirm the box's actual NIC
+   chipset once you have it in hand; some Realtek 2.5GbE parts need their own extension added to
+   `.tasks/homelab.yml`'s schematic customization to be recognized at all.
+
+3. **Flash two USB sticks** - one per image, both plugged in at boot (needs two USB ports; most
+   mini PCs have at least that many):
+
+   ```bash
+   lsblk                                              # or diskutil list on macOS - find the device paths
+   task homelab:flash-boot DEVICE=/dev/sdX            # the installer
+   task homelab:flash-config DEVICE=/dev/sdY          # the metal-iso config
+   ```
+
+   Both tasks print the target device and the current block device list, then ask you to retype
+   the device path before running `dd` - there's no way to invoke either with a device path that
+   silently goes unconfirmed.
+
+4. **Boot the node.** Plug in both USB sticks, power on. It installs, applies the config from the
+   `metal-iso` stick, and comes up already configured with its static IP - no console interaction.
 
 5. **Bootstrap etcd and fetch kubeconfig:**
 

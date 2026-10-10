@@ -13,3 +13,7 @@ terraform.tfstate
 kubeconfig.yaml
 kubeconfig.yaml.lock
 .claude
+# Rendered boot media for the homelab node - contains real cluster secrets
+# (homelab/_generated/config.yaml, config.iso) and a multi-hundred-MB ISO,
+# neither belongs in a public repo.
+homelab/_generated/

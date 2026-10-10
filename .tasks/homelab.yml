@@ -1,0 +1,107 @@
+version: '3'
+
+silent: true
+
+vars:
+  HOMELAB_DIR: "{{.ROOT_DIR}}/homelab"
+  GEN_DIR: "{{.ROOT_DIR}}/homelab/_generated"
+  TALOS_VERSION:
+    sh: grep -E '^\s*talos_version\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*"(.*)".*/\1/'
+
+tasks:
+
+  homelab:schematic:
+    desc: Register the homelab Image Factory schematic (amd-ucode + talos.config=metal-iso), print its ID
+    cmds:
+    - |
+      set -euo pipefail
+      curl -sS -X POST -H "Content-Type: application/json" \
+        -d '{"customization":{"extraKernelArgs":["talos.config=metal-iso"],"systemExtensions":{"officialExtensions":["siderolabs/amd-ucode"]}}}' \
+        https://factory.talos.dev/schematics | jq -r '.id'
+
+  homelab:boot-iso:
+    desc: Download the main homelab boot ISO (installer, talos.config=metal-iso baked in) to homelab/_generated/boot.iso
+    cmds:
+    - mkdir -p "{{.GEN_DIR}}"
+    - |
+      set -euo pipefail
+      schematic=$(task homelab:schematic)
+      echo "schematic: $schematic (talos {{.TALOS_VERSION}})"
+      curl -sSL -o "{{.GEN_DIR}}/boot.iso" \
+        "https://factory.talos.dev/image/${schematic}/{{.TALOS_VERSION}}/metal-amd64.iso"
+      echo "wrote {{.GEN_DIR}}/boot.iso"
+
+  homelab:config:
+    desc: Render node-1's machine config (requires talos/secrets and talos/machine_config/node-1 already applied) to homelab/_generated/config.yaml
+    cmds:
+    - mkdir -p "{{.GEN_DIR}}"
+    - |
+      set -euo pipefail
+      cd "{{.HOMELAB_DIR}}/talos/machine_config/node-1"
+      terragrunt output -raw machine_configuration > "{{.GEN_DIR}}/config.yaml"
+      chmod 600 "{{.GEN_DIR}}/config.yaml"
+      echo "wrote {{.GEN_DIR}}/config.yaml (contains real cluster secrets - never commit this)"
+
+  homelab:config-iso:
+    desc: Build the metal-iso-labeled config ISO from homelab/_generated/config.yaml
+    deps: [homelab:config]
+    preconditions:
+    - sh: command -v xorriso
+      msg: "xorriso not found - install it first (macOS: brew install xorriso, Debian/Ubuntu: apt install xorriso)"
+    cmds:
+    - |
+      set -euo pipefail
+      cp "{{.GEN_DIR}}/config.yaml" "{{.GEN_DIR}}/config.yaml.tmp"
+      # Talos reads a file literally named config.yaml at the volume root.
+      mv "{{.GEN_DIR}}/config.yaml.tmp" "{{.GEN_DIR}}/iso-root-config.yaml"
+      mkdir -p "{{.GEN_DIR}}/iso-root"
+      mv "{{.GEN_DIR}}/iso-root-config.yaml" "{{.GEN_DIR}}/iso-root/config.yaml"
+      xorriso -as mkisofs -V metal-iso -o "{{.GEN_DIR}}/config.iso" "{{.GEN_DIR}}/iso-root"
+      rm -rf "{{.GEN_DIR}}/iso-root"
+      echo "wrote {{.GEN_DIR}}/config.iso (contains real cluster secrets - never commit this)"
+
+  homelab:media:
+    desc: Build both boot media (boot.iso + config.iso) in one go
+    cmds:
+    - task: homelab:boot-iso
+    - task: homelab:config-iso
+    - echo "Both images are in {{.GEN_DIR}} - flash each to its own USB stick with homelab:flash-boot / homelab:flash-config"
+
+  homelab:flash-boot:
+    desc: 'dd homelab/_generated/boot.iso to a USB stick. Usage: task homelab:flash-boot DEVICE=/dev/sdX'
+    vars:
+      IMG: "{{.GEN_DIR}}/boot.iso"
+    cmds:
+    - task: .homelab:flash
+      vars: { IMG: "{{.IMG}}" }
+
+  homelab:flash-config:
+    desc: 'dd homelab/_generated/config.iso to a SECOND USB stick. Usage: task homelab:flash-config DEVICE=/dev/sdX'
+    vars:
+      IMG: "{{.GEN_DIR}}/config.iso"
+    cmds:
+    - task: .homelab:flash
+      vars: { IMG: "{{.IMG}}" }
+
+  .homelab:flash:
+    internal: true
+    preconditions:
+    - sh: test -n "{{.DEVICE}}"
+      msg: "DEVICE is required, e.g. DEVICE=/dev/sdX (Linux) or DEVICE=/dev/rdiskN (macOS) - run lsblk/diskutil list first to find it"
+    - sh: test -f "{{.IMG}}"
+      msg: "{{.IMG}} doesn't exist yet - run the task that builds it first"
+    cmds:
+    - |
+      set -euo pipefail
+      echo "About to overwrite {{.DEVICE}} entirely with {{.IMG}}."
+      echo "--- current block devices ---"
+      (lsblk 2>/dev/null || diskutil list 2>/dev/null) | sed 's/^/  /'
+      echo "------------------------------"
+      read -r -p "Type the device path again to confirm ({{.DEVICE}}): " confirm
+      if [ "$confirm" != "{{.DEVICE}}" ]; then
+        echo "Confirmation didn't match - aborting, nothing written." >&2
+        exit 1
+      fi
+      sudo dd if="{{.IMG}}" of="{{.DEVICE}}" bs=4M status=progress conv=fsync
+      sync
+      echo "done"
