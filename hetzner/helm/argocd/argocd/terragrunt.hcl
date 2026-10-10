@@ -17,7 +17,7 @@ dependency "external_secrets" {
 
 inputs = {
   helm_chart_name    = "lamp-argocd"
-  helm_chart_version = "0.0.1"
+  helm_chart_version = "0.0.2"
   # Chart default leaves this empty, which registers the in-cluster Secret
   # with no name at all — Applications in any project other than "default"
   # then fail to resolve destination.name: in-cluster (project destination
@@ -85,6 +85,25 @@ inputs = {
           name           = "homelab"
           remoteKey      = "toolhive"
           remoteProperty = "kubeconfig-homelab"
+        },
+        # Parallel, credential-less registration of prod-0/prod-1 via their
+        # Tailscale API server proxy (apiServerProxyConfig, allowImpersonation)
+        # instead of the static kubeconfig above - see
+        # infra/tailscale/acl's tag:argocd-egress grant and
+        # apps/hetzner-infra/platform/tailscale's egress Services (the
+        # tailscale.svc.cluster.local hostnames below). Deliberately a
+        # DIFFERENT cluster "name" than the existing prod-0/prod-1 entries
+        # (not yet replacing them) - lets this path be verified end-to-end
+        # before any Application's destination.name is switched over.
+        {
+          name           = "prod-0-tailscale"
+          tailscaleProxy = true
+          server         = "https://prod-0-k8s-operator.tailscale.svc.cluster.local"
+        },
+        {
+          name           = "prod-1-tailscale"
+          tailscaleProxy = true
+          server         = "https://prod-1-k8s-operator.tailscale.svc.cluster.local"
         },
       ]
       # Reuses the org's existing GitLab OAuth Application (client id/secret
