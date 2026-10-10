@@ -17,6 +17,14 @@ inputs = {
     "tag:k3s-proxy-prod-0"     = ["autogroup:admin"]
     "tag:k3s-operator-hetzner" = ["autogroup:admin"]
     "tag:k3s-proxy-hetzner"    = ["autogroup:admin"]
+    # Dedicated identity for ArgoCD's own connection to prod-0/prod-1's
+    # Tailscale API server proxy - deliberately NOT tag:k3s-proxy-hetzner
+    # (the subnet-router every pod on hetzner-cp-1 already routes through),
+    # so this capability is scoped to ArgoCD specifically rather than to
+    # everything sharing that node's network path. Not yet applied to any
+    # device - see hetzner/helm/argocd/argocd/terragrunt.hcl's comments for
+    # what still needs a live cluster to finish safely.
+    "tag:argocd-egress" = ["autogroup:admin"]
   }
 
   # Hetzner's subnet-router (Connector) needs its own auto-approved route -
@@ -51,6 +59,25 @@ inputs = {
   auto_approvers_exit_node = ["tag:exit"]
 
   grants = [
+    {
+      # Lets ArgoCD (via its dedicated tag:argocd-egress identity, not yet
+      # applied to any device - see hetzner/helm/argocd/argocd/
+      # terragrunt.hcl) reach prod-0's and prod-1's Tailscale API server
+      # proxy and have the proxy impersonate system:masters for it - the
+      # Kubernetes-side ClusterRoleBinding this requires (binding
+      # system:masters, or a narrower group, to these proxies'
+      # allowImpersonation config) still needs enabling per-cluster; see
+      # apps/oracle-prod-0 and apps/oracle-prod-1's tailscale-operator apps.
+      # tag:k3s-operator-infra is prod-1's operator tag (legacy name, kept
+      # for parity with its existing tag_owners entry).
+      src = ["tag:argocd-egress"]
+      dst = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+      app = {
+        "tailscale.com/cap/kubernetes" = [
+          { impersonate = { groups = ["system:masters"] } }
+        ]
+      }
+    },
     {
       src = ["autogroup:member"]
       dst = ["tag:k3s-proxy-infra", "tag:exit"]
