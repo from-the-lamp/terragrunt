@@ -17,7 +17,7 @@ dependency "external_secrets" {
 
 inputs = {
   helm_chart_name    = "lamp-argocd"
-  helm_chart_version = "0.0.2"
+  helm_chart_version = "0.0.3"
   # Chart default leaves this empty, which registers the in-cluster Secret
   # with no name at all — Applications in any project other than "default"
   # then fail to resolve destination.name: in-cluster (project destination
@@ -99,11 +99,17 @@ inputs = {
           name           = "prod-0-tailscale"
           tailscaleProxy = true
           server         = "https://prod-0-k8s-operator.tailscale.svc.cluster.local"
+          # The proxy's TLS listener validates SNI against its real tailnet
+          # hostname and 500s ("invalid domain") against anything else,
+          # including the in-cluster `server` hostname above - confirmed
+          # live against both prod-0's and prod-1's proxy logs.
+          tailnetFqdn = "prod-0-k8s-operator.coin-cichlid.ts.net"
         },
         {
           name           = "prod-1-tailscale"
           tailscaleProxy = true
           server         = "https://prod-1-k8s-operator.tailscale.svc.cluster.local"
+          tailnetFqdn    = "prod-1-k8s-operator.coin-cichlid.ts.net"
         },
       ]
       # Reuses the org's existing GitLab OAuth Application (client id/secret
