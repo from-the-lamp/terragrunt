@@ -80,6 +80,16 @@ inputs = {
       # for parity with its existing tag_owners entry).
       src = ["tag:argocd-egress"]
       dst = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+      # ip is required alongside app: app only grants the impersonation
+      # capability the API server proxy consults AFTER a connection is
+      # already established - the raw TCP handshake on 443 is a separate,
+      # network-level permission. Without this, tailscaled on the
+      # destination rejects the connection outright ("rejected due to acl"
+      # in the proxy's own logs), never reaching the point where the app
+      # capability would even be consulted. Confirmed live: adding the
+      # tag:argocd-egress identity without this field got exactly that
+      # rejection from both prod-0-k8s-operator and prod-1-k8s-operator.
+      ip = ["443"]
       app = {
         "tailscale.com/cap/kubernetes" = [
           { impersonate = { groups = ["system:masters"] } }
