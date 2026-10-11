@@ -55,23 +55,17 @@ inputs = {
         }
       }
       # prod-1 and prod-0 are separate physical clusters this same ArgoCD
-      # also manages. Their kubeconfigs already live in Vault (seeded for
-      # the toolhive kubernetes-mcp servers) - reused as-is rather than
-      # duplicated under new fields. prod-1's kubeconfig carries a long-lived
-      # ServiceAccount bearer token; prod-0's carries a client cert/key pair
-      # instead - the chart's external-clusters.yaml template parses
-      # whichever is present.
+      # also manages - via prod-0-tailscale/prod-1-tailscale below
+      # (credential-less, through their own Tailscale API server proxy).
+      # The static-kubeconfig "prod-0"/"prod-1" entries that used to be here
+      # are gone from ArgoCD's own registration - every app under
+      # apps/oracle-prod-0 and apps/oracle-prod-1 now points at the
+      # -tailscale names (projects/values.yaml). The underlying
+      # kubeconfig-prod-0/kubeconfig-prod-1 secrets in Vault are NOT
+      # removed - toolhive's kubernetes-mcp servers (prod-0-admin,
+      # prod-1-admin) still read those same secrets independently of
+      # ArgoCD's registration here.
       externalClusters = [
-        {
-          name           = "prod-1"
-          remoteKey      = "toolhive"
-          remoteProperty = "kubeconfig-prod-1"
-        },
-        {
-          name           = "prod-0"
-          remoteKey      = "toolhive"
-          remoteProperty = "kubeconfig-prod-0"
-        },
         # Homelab's single-node bare-metal Talos cluster - this ArgoCD
         # manages it the same way as prod-0/prod-1 (remote kubeconfig, not
         # its own ArgoCD instance - see infra/terraform/terragrunt's
@@ -86,15 +80,12 @@ inputs = {
           remoteKey      = "toolhive"
           remoteProperty = "kubeconfig-homelab"
         },
-        # Parallel, credential-less registration of prod-0/prod-1 via their
-        # Tailscale API server proxy (apiServerProxyConfig, allowImpersonation)
-        # instead of the static kubeconfig above - see
+        # Credential-less registration of prod-0/prod-1 via their Tailscale
+        # API server proxy (apiServerProxyConfig, allowImpersonation) - see
         # infra/tailscale/acl's tag:argocd-egress grant and
         # apps/hetzner-infra/platform/tailscale's egress Services (the
-        # tailscale.svc.cluster.local hostnames below). Deliberately a
-        # DIFFERENT cluster "name" than the existing prod-0/prod-1 entries
-        # (not yet replacing them) - lets this path be verified end-to-end
-        # before any Application's destination.name is switched over.
+        # tailscale.svc.cluster.local hostnames below). Verified end-to-end
+        # and now the only registration for these two clusters.
         {
           name           = "prod-0-tailscale"
           tailscaleProxy = true
