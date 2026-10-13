@@ -17,6 +17,11 @@ inputs = {
     "tag:k3s-proxy-prod-0"     = ["autogroup:admin"]
     "tag:k3s-operator-hetzner" = ["autogroup:admin"]
     "tag:k3s-proxy-hetzner"    = ["autogroup:admin"]
+    # homelab's own tailscale-operator (ArgoCD relocation) and its existing
+    # subnet-router hostNode (apps/homelab/platform/tailscale) - the latter
+    # was already referencing this tag before it was ever declared here.
+    "tag:k3s-operator-homelab" = ["autogroup:admin"]
+    "tag:k3s-proxy-homelab"    = ["autogroup:admin"]
     # Dedicated identity for ArgoCD's own connection to prod-0/prod-1's
     # Tailscale API server proxy - deliberately NOT tag:k3s-proxy-hetzner
     # (the subnet-router every pod on hetzner-cp-1 already routes through),
@@ -31,8 +36,12 @@ inputs = {
     # same-request-must-exactly-match-client-tags constraint as originally
     # assumed (that assumption was wrong - see
     # apps/hetzner-infra/platform/tailscale/values.yaml's comment for the
-    # corrected mechanism).
-    "tag:argocd-egress" = ["autogroup:admin", "tag:k3s-operator-hetzner"]
+    # corrected mechanism). tag:k3s-operator-homelab added as a second
+    # owner so ArgoCD's relocation to homelab can mint the same
+    # tag:argocd-egress identity there, independent of Hetzner's operator -
+    # the grants list below already allows ANY tag:argocd-egress device to
+    # reach prod-0/prod-1 regardless of which operator minted it.
+    "tag:argocd-egress" = ["autogroup:admin", "tag:k3s-operator-hetzner", "tag:k3s-operator-homelab"]
   }
 
   # Hetzner's subnet-router (Connector) needs its own auto-approved route -
@@ -40,6 +49,11 @@ inputs = {
   # default (10.43.0.0/16, dropped along with that cluster's connector).
   auto_approvers_routes = {
     "172.21.0.0/16"   = ["tag:k3s-proxy-hetzner"]
+    # homelab's subnet-router (apps/homelab/platform/tailscale hostNode)
+    # advertises this - without an auto-approver entry it'd sit pending
+    # manual approval in the admin console, blocking Tailscale reachability
+    # to homelab entirely (including the relocated ArgoCD's own UI).
+    "172.25.0.0/16"   = ["tag:k3s-proxy-homelab"]
     "173.245.48.0/20" = ["tag:exit"]
     "103.21.244.0/22" = ["tag:exit"]
     "103.22.200.0/22" = ["tag:exit"]
