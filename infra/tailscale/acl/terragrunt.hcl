@@ -154,5 +154,16 @@ inputs = {
       dst = ["tag:k3s-proxy-hetzner", "172.21.0.0/16"]
       ip  = ["*"]
     },
+    {
+      # Mirrors the Hetzner grant above - without this, tailnet members have
+      # no ACL path to homelab's subnet-router or its advertised
+      # 172.25.0.0/16 route at all (confirmed live: the device didn't even
+      # appear in `tailscale status`, and DNS queries forwarded to its
+      # private-resolver ClusterIP 172.25.80.94 timed out rather than
+      # SERVFAIL-ing).
+      src = ["autogroup:member"]
+      dst = ["tag:k3s-proxy-homelab", "172.25.0.0/16"]
+      ip  = ["*"]
+    },
   ]
 }
