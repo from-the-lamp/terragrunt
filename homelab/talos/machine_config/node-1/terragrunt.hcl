@@ -15,6 +15,7 @@ locals {
   hostname         = local.environment_vars.locals.node_1_hostname
   node_ip          = local.environment_vars.locals.node_1_ip
   interface        = local.environment_vars.locals.node_1_interface
+  talos_version    = local.environment_vars.locals.talos_version
 }
 
 dependency "secrets" {
@@ -56,11 +57,49 @@ inputs = {
   config_patches = [
     yamlencode({
       machine = {
+        # disk: not set anywhere else (Hetzner's cloud VMs have exactly one
+        # disk, so auto-detection is unambiguous there - this box has
+        # multiple M.2 slots, and the booting USB installer itself is also
+        # a visible block device). Confirmed via the boot dmesg on first
+        # boot: a single "nvme nvme0" device, i.e. /dev/nvme0n1.
+        # wipe: true - disk alone only picks the install TARGET, it does
+        # NOT imply wiping (that's this separate, default-false flag). The
+        # NVMe's prior contents are unknown (could be a Windows
+        # pre-install, could be residue from an earlier aborted attempt on
+        # this same box) - without this, install failed partway through
+        # partition writes with "task install ... failed: task \"upgrade\"
+        # failed: exit code 2".
+        install = {
+          disk = "/dev/nvme0n1"
+          wipe = true
+          # The talos provider auto-fills this field with its OWN default
+          # installer image/tag (observed: a schematic unrelated to ours,
+          # pinned to v1.14.0) regardless of the talos_version input - that
+          # input only affects which config schema/fields are valid to
+          # render, not this field. Left unset, the install pulled a
+          # v1.14.0 installer against a v1.9.0/Kubernetes-1.31.4 config and
+          # failed the same way the original stale-ISO version mismatch
+          # did. This schematic is amd-ucode only, no talos.config kernel
+          # arg (that's only needed for the boot-time installer medium,
+          # not the permanently-installed system).
+          image = "factory.talos.dev/metal-installer/96f8c146a67c80daad900d3fc1a6976fe11062321eee9ab6ae2a6aea88b2d26e:${local.talos_version}"
+        }
         network = {
           hostname = local.hostname
+          # Explicit nameservers + dhcp=false: without dhcp=false, DHCP
+          # stayed active alongside this static address, so the node ended
+          # up with a SECOND, DHCP-assigned IP competing as its "current"
+          # address, and DHCP-supplied resolvers (100.100.1.1/100.100.0.1 -
+          # Tailscale's reserved MagicDNS IPs, presumably pushed by the
+          # home router itself acting as a Tailscale subnet router) instead
+          # of real DNS - every lookup (image pulls, NTP, discovery.talos.dev)
+          # failed with "server misbehaving", which blocked the etcd image
+          # pull and left kubelet/etcd stuck in Preparing waiting on CRI.
+          nameservers = ["1.1.1.1", "8.8.8.8"]
           interfaces = [
             {
               interface = local.interface
+              dhcp      = false
               addresses = ["${local.node_ip}/24"]
               routes = [
                 {
@@ -79,6 +118,15 @@ inputs = {
           # (_common/talos/machine_configuration.hcl), loosened: those
           # thresholds were sized for 16GB nodes, this one has 64GB.
           extraConfig = {
+            # Default (110) is Kubernetes' own tested/supported ceiling,
+            # not a hard limit - this single node has 16 cores/64GB with
+            # plenty of headroom (3%/19% used at 136 pods). The real
+            # ceiling is the Cilium cluster-pool /24 per-node podCIDR
+            # (254 usable IPs, confirmed via `kubectl get node -o
+            # jsonpath='{.spec.podCIDRs}'`) - mask size can't be changed
+            # on an existing cluster, so 250 is the practical max without
+            # a full CIDR migration.
+            maxPods = 250
             systemReserved = {
               cpu    = "250m"
               memory = "1Gi"
