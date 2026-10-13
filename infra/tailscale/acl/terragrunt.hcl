@@ -176,12 +176,15 @@ inputs = {
     },
     {
       # Oracle prod-0/1's webhook-relay egress proxies reaching homelab's
-      # two webhook-relay Ingresses (banking-callback, windmill-webhook) -
-      # same ip= requirement as the argocd-egress grant above (raw TCP
-      # handshake is gated separately from any app= capability).
+      # two webhook-relay Services (banking-callback :80, windmill-webhook
+      # :8000) - these are plain L4 tailscale.com/expose Services (not the
+      # K8s-API-proxy case above), so unlike tag:argocd-egress there's no
+      # single fixed port to pin; ip=["*"] is safe since src/dst already
+      # narrow this to exactly the two tag groups. Confirmed live: ip=["443"]
+      # produced "rejected due to acl" on the real ports (80, 8000).
       src = ["tag:webhook-relay-egress"]
       dst = ["tag:webhook-relay-ingress"]
-      ip  = ["443"]
+      ip  = ["*"]
     },
   ]
 }
