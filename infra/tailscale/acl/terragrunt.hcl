@@ -42,6 +42,15 @@ inputs = {
     # the grants list below already allows ANY tag:argocd-egress device to
     # reach prod-0/prod-1 regardless of which operator minted it.
     "tag:argocd-egress" = ["autogroup:admin", "tag:k3s-operator-hetzner", "tag:k3s-operator-homelab"]
+    # The two webhook-relay identities (banking-callback + windmill's public
+    # hook, routed through Oracle prod-0/1 - see apps/oracle-prod-0/platform/
+    # webhook-relay and apps/homelab/platform/tailscale's new Ingresses).
+    # Ingress side: owned by homelab's operator so it can mint tags for the
+    # two Ingress-backed devices (tailscale.com/tags annotation). Egress
+    # side: owned by both Oracle operators so either region's relay proxy
+    # can mint it for its own egress Service.
+    "tag:webhook-relay-ingress" = ["tag:k3s-operator-homelab"]
+    "tag:webhook-relay-egress"  = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
   }
 
   # Hetzner's subnet-router (Connector) needs its own auto-approved route -
@@ -164,6 +173,15 @@ inputs = {
       src = ["autogroup:member"]
       dst = ["tag:k3s-proxy-homelab", "172.25.0.0/16"]
       ip  = ["*"]
+    },
+    {
+      # Oracle prod-0/1's webhook-relay egress proxies reaching homelab's
+      # two webhook-relay Ingresses (banking-callback, windmill-webhook) -
+      # same ip= requirement as the argocd-egress grant above (raw TCP
+      # handshake is gated separately from any app= capability).
+      src = ["tag:webhook-relay-egress"]
+      dst = ["tag:webhook-relay-ingress"]
+      ip  = ["443"]
     },
   ]
 }
