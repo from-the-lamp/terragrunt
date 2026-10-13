@@ -49,15 +49,14 @@ inputs = {
       # exists and answers here - see infra/argo-apps's
       # apps/homelab/platform/README.md for which names already collide
       # live (windmill.from-the-lamp.work, currently Hetzner's public
-      # Slack-webhook route). PLACEHOLDER - address is homelab's own
-      # private-resolver CoreDNS ClusterIP (apps/homelab/platform/coredns,
-      # lamp-coredns), auto-assigned and unknowable until that app's
-      # Service actually exists - see apps/homelab/platform/kube-system/
-      # templates/coredns-internal-domain.yaml for the matching in-cluster
-      # forward target that needs the same real value once known.
+      # Slack-webhook route). Real ClusterIP of homelab's own
+      # private-resolver CoreDNS Service (apps/homelab/platform/coredns,
+      # lamp-coredns) - confirmed live via `kubectl get svc -n coredns`;
+      # matches apps/homelab/platform/kube-system/templates/
+      # coredns-internal-domain.yaml's in-cluster forward target.
       domain = "from-the-lamp.work"
       nameservers = [
-        { address = "172.25.189.156", use_with_exit_node = true },
+        { address = "172.25.80.94", use_with_exit_node = true },
       ]
     },
   ]
