@@ -6,44 +6,84 @@ vars:
   HOMELAB_DIR: "{{.ROOT_DIR}}/homelab"
   GEN_DIR: "{{.ROOT_DIR}}/homelab/_generated"
   TALOS_VERSION:
-    sh: grep -E '^\s*talos_version\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*"(.*)".*/\1/'
-  LAN_GATEWAY:
-    sh: grep -E '^\s*lan_gateway\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*"(.*)".*/\1/'
+    sh: grep -E '^[[:space:]]*talos_version[[:space:]]*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*"(.*)".*/\1/'
   # env.hcl's own list syntax (["siderolabs/amd-ucode"]) is already valid
   # JSON - read it here instead of hardcoding below, so there's one source
   # of truth for which extensions get baked into the schematic (same reason
-  # TALOS_VERSION/LAN_GATEWAY are read this way instead of duplicated).
+  # TALOS_VERSION is read this way instead of duplicated).
+  # POSIX classes ([[:space:]]), not \s - this runs on macOS's BSD grep/sed
+  # too (per the README, boot-iso-http/flash/config-server run on the
+  # operator's own machine, not the GNU-coreutils devcontainer), and \s is
+  # a GNU/PCRE extension BSD tools don't understand, silently matching
+  # nothing.
   TALOS_EXTENSIONS_JSON:
-    sh: grep -E '^\s*talos_extensions\s*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*=\s*(\[.*\])\s*$/\1/'
-  # The GL.iNet router's own SSH - override if it's not root/default LAN IP,
-  # e.g. `task homelab:publish-config ROUTER_SSH=admin@192.168.8.1`.
-  ROUTER_SSH: 'root@{{.LAN_GATEWAY}}'
+    sh: grep -E '^[[:space:]]*talos_extensions[[:space:]]*=' "{{.ROOT_DIR}}/homelab/env.hcl" | sed -E 's/.*=[[:space:]]*(\[.*\])[[:space:]]*$/\1/'
 
 tasks:
 
-  homelab:schematic:
-    desc: Register the homelab Image Factory schematic (extensions from env.hcl + talos.config fetched from the router)
+  homelab:schematic-http:
+    desc: 'Register an Image Factory schematic with talos.config pointed at an explicit URL (e.g. a plain HTTP server on the operator''s own machine - see homelab:config-server). Usage: task homelab:schematic-http CONFIG_URL=http://<host>:<port>/config.yaml'
     cmds:
     - |
       set -euo pipefail
+      test -n "{{.CONFIG_URL}}" || { echo "CONFIG_URL is required, e.g. CONFIG_URL=http://192.168.1.131:8000/config.yaml" >&2; exit 1; }
       body=$(jq -n \
         --argjson exts '{{.TALOS_EXTENSIONS_JSON}}' \
-        --arg karg "talos.config=http://{{.LAN_GATEWAY}}/config.yaml" \
+        --arg karg "talos.config={{.CONFIG_URL}}" \
         '{customization:{extraKernelArgs:[$karg],systemExtensions:{officialExtensions:$exts}}}')
       curl -sS -X POST -H "Content-Type: application/json" -d "$body" \
         https://factory.talos.dev/schematics | jq -r '.id'
 
-  homelab:boot-iso:
-    desc: Download the homelab boot ISO (installer; fetches its config from the router at boot) to homelab/_generated/boot.iso
+  homelab:boot-iso-http:
+    desc: 'Download a boot ISO with talos.config pointed at an explicit URL, to homelab/_generated/boot-http.iso - pair with homelab:flash (IMG override). Usage: task homelab:boot-iso-http CONFIG_URL=http://<host>:<port>/config.yaml'
     cmds:
     - mkdir -p "{{.GEN_DIR}}"
     - |
       set -euo pipefail
-      schematic=$(task homelab:schematic)
-      echo "schematic: $schematic (talos {{.TALOS_VERSION}})"
-      curl -sSL -o "{{.GEN_DIR}}/boot.iso" \
+      test -n "{{.CONFIG_URL}}" || { echo "CONFIG_URL is required, e.g. CONFIG_URL=http://192.168.1.131:8000/config.yaml" >&2; exit 1; }
+      schematic=$(task homelab:schematic-http CONFIG_URL="{{.CONFIG_URL}}")
+      echo "schematic: $schematic (talos {{.TALOS_VERSION}}, config via {{.CONFIG_URL}})"
+      curl -L --http1.1 --retry 3 --retry-delay 5 --progress-bar -o "{{.GEN_DIR}}/boot-http.iso" \
         "https://factory.talos.dev/image/${schematic}/{{.TALOS_VERSION}}/metal-amd64.iso"
-      echo "wrote {{.GEN_DIR}}/boot.iso"
+      echo "wrote {{.GEN_DIR}}/boot-http.iso"
+
+  homelab:config-server:
+    desc: 'Build and run an nginx container serving homelab/_generated (config.yaml) over HTTP, for the boot-iso-http path. Usage: task homelab:config-server [PORT=8000]'
+    deps: [homelab:config]
+    vars:
+      PORT: '{{.PORT | default "8000"}}'
+    cmds:
+    - docker build -t homelab-config-server "{{.HOMELAB_DIR}}/talos/config-server"
+    - docker rm -f homelab-config-server >/dev/null 2>&1 || true
+    - |
+      set -euo pipefail
+      # Docker publishes to 0.0.0.0 by default (reachable from the LAN, not
+      # just this machine) and stock nginx:alpine listens on 0.0.0.0:80
+      # inside the container too - neither side needs extra config for
+      # this to be reachable from the node. What DOES need checking here
+      # (not assuming) is that the port actually answers at all, and
+      # printing the real LAN IP to use - 127.0.0.1 in CONFIG_URL would
+      # only work from this machine itself, not from the node.
+      docker run -d --name homelab-config-server \
+        -p "{{.PORT}}:80" \
+        -v "{{.GEN_DIR}}:/usr/share/nginx/html:ro" \
+        homelab-config-server >/dev/null
+      sleep 1
+      echo "--- local reachability check ---"
+      if curl -sf "http://127.0.0.1:{{.PORT}}/config.yaml" >/dev/null; then
+        echo "OK: http://127.0.0.1:{{.PORT}}/config.yaml"
+      else
+        echo "FAILED to reach the container locally - check 'docker logs homelab-config-server'" >&2
+        exit 1
+      fi
+      echo "--- LAN IP (use this in CONFIG_URL, NOT 127.0.0.1 - the node reaches this over the network, not loopback) ---"
+      if [ "{{OS}}" = "darwin" ]; then
+        ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "couldn't auto-detect - check System Settings -> Network for the active Wi-Fi interface"
+      else
+        hostname -I 2>/dev/null | awk '{print $1}' || echo "couldn't auto-detect - check 'ip addr'"
+      fi
+      echo "if the node still can't reach this: check macOS Firewall (System Settings -> Network -> Firewall) and whether the home router has client/AP isolation enabled"
+      echo "stop with: docker rm -f homelab-config-server"
 
   homelab:config:
     desc: Render node-1's machine config (requires talos/secrets and talos/machine_config/node-1 already applied) to homelab/_generated/config.yaml
@@ -56,33 +96,21 @@ tasks:
       chmod 600 "{{.GEN_DIR}}/config.yaml"
       echo "wrote {{.GEN_DIR}}/config.yaml (contains real cluster secrets - never commit this)"
 
-  homelab:publish-config:
-    desc: 'Upload config.yaml to the GL.iNet router''s web root (uhttpd serves /www as-is) so the node can fetch it over the LAN at boot'
-    deps: [homelab:config]
-    cmds:
-    - |
-      set -euo pipefail
-      scp "{{.GEN_DIR}}/config.yaml" "{{.ROUTER_SSH}}:/www/config.yaml"
-      echo "published: http://{{.LAN_GATEWAY}}/config.yaml"
-      echo "run 'task homelab:unpublish-config' once the node has bootstrapped - it carries real cluster secrets, don't leave it serving indefinitely"
-
-  homelab:unpublish-config:
-    desc: Remove config.yaml from the router once the node has successfully fetched and bootstrapped from it
-    cmds:
-    - |
-      set -euo pipefail
-      ssh "{{.ROUTER_SSH}}" 'rm -f /www/config.yaml'
-      echo "removed from {{.ROUTER_SSH}}:/www/config.yaml"
-
   homelab:flash:
-    desc: 'dd homelab/_generated/boot.iso to a USB stick. Usage: task homelab:flash DEVICE=/dev/sdX'
+    desc: 'dd an ISO (default homelab/_generated/boot.iso, override with IMG=) to a USB stick. Usage: task homelab:flash DEVICE=/dev/sdX [IMG=/path/to/other.iso]'
     vars:
-      IMG: "{{.GEN_DIR}}/boot.iso"
+      # A task-local `vars:` entry always wins over a same-named CLI
+      # variable in go-task - plain `IMG: "{{.GEN_DIR}}/boot.iso"` here
+      # silently ignored IMG=... passed on the command line. Referencing
+      # {{.IMG}} directly (never declaring it above) lets a CLI-provided
+      # value flow through untouched; `default` only supplies the fallback
+      # when nothing was passed in.
+      IMG_RESOLVED: '{{.IMG | default (printf "%s/boot.iso" .GEN_DIR)}}'
     preconditions:
     - sh: test -n "{{.DEVICE}}"
       msg: "DEVICE is required, e.g. DEVICE=/dev/sdX (Linux) or DEVICE=/dev/rdiskN (macOS) - run lsblk/diskutil list first to find it"
-    - sh: test -f "{{.IMG}}"
-      msg: "{{.IMG}} doesn't exist yet - run `task homelab:boot-iso` first"
+    - sh: test -f "{{.IMG_RESOLVED}}"
+      msg: "{{.IMG_RESOLVED}} doesn't exist yet - run `task homelab:boot-iso-http CONFIG_URL=...` first, or pass IMG=/path/to/the/iso/you/meant"
     cmds:
     - |
       set -euo pipefail
@@ -100,11 +128,21 @@ tasks:
         echo "{{.DEVICE}} is this machine's own boot disk - refusing to touch it." >&2
         exit 1
       fi
-      if (mount 2>/dev/null | grep -q "^{{.DEVICE}}"); then
-        echo "{{.DEVICE}} (or a partition on it) is currently mounted - unmount it first." >&2
+      # mount(8) always lists devices in their "buffered" form
+      # (/dev/diskNsM on macOS, never /dev/rdiskNsM) - matching {{.DEVICE}}
+      # literally misses every mounted partition when DEVICE was given as
+      # /dev/rdiskN, which is the form this task documents and macOS dd
+      # needs for speed. Strip the "r" and match the base device with an
+      # optional partition suffix (macOS "sN", Linux "N"/nvme "pN").
+      mount_base="{{.DEVICE}}"
+      if [ "{{OS}}" = "darwin" ]; then
+        mount_base=$(printf '%s' "$mount_base" | sed 's#^/dev/rdisk#/dev/disk#')
+      fi
+      if (mount 2>/dev/null | grep -qE "^${mount_base}(s?p?[0-9]+)?[[:space:]]"); then
+        echo "{{.DEVICE}} (or a partition on it) is currently mounted - unmount it first (e.g. \`diskutil unmountDisk ${mount_base}\` on macOS)." >&2
         exit 1
       fi
-      echo "About to overwrite {{.DEVICE}} entirely with {{.IMG}}."
+      echo "About to overwrite {{.DEVICE}} entirely with {{.IMG_RESOLVED}}."
       echo "--- current block devices ---"
       (lsblk 2>/dev/null || diskutil list 2>/dev/null) | sed 's/^/  /'
       echo "------------------------------"
@@ -113,6 +151,6 @@ tasks:
         echo "Confirmation didn't match - aborting, nothing written." >&2
         exit 1
       fi
-      sudo dd if="{{.IMG}}" of="{{.DEVICE}}" bs=4M status=progress conv=fsync
+      sudo dd if="{{.IMG_RESOLVED}}" of="{{.DEVICE}}" bs=4M status=progress conv=fsync
       sync
       echo "done"

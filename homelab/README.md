@@ -27,7 +27,7 @@ Not for creating the node - for everything that happens *after* it exists:
   need the node to exist at all; can be applied the moment this directory exists.
 - `homelab/talos/machine_config/node-1` - renders the full machine configuration YAML
   (`data.talos_machine_configuration`, a pure data source, no live node needed either). This
-  output is what `homelab:publish-config` serves from the router - see the bootstrap steps below.
+  output is what `homelab:config-server` serves over HTTP - see the bootstrap steps below.
 - `homelab/talos/access` - runs `talos_machine_bootstrap` (the one-time etcd init, same thing
   `talosctl bootstrap` does) and `talos_cluster_kubeconfig` (fetches kubeconfig to
   `./kubeconfig.yaml`). Needs the node already up and configured - satisfied by fetching its
@@ -49,45 +49,41 @@ or Kubernetes version bump to do. Not needed to get the node running.
    cd ../machine_config/node-1 && terragrunt apply
    ```
 
-2. **Build the boot ISO and publish the config to the router** (run from this repo's root, on
-   your own machine, not the cbox devcontainer - needs real USB access and SSH access to the
-   GL.iNet):
+2. **Serve the rendered config over HTTP from your own machine**, via a small nginx container
+   (`homelab/talos/config-server/Dockerfile`) - no router config, no USB partitioning, just a
+   plain HTTP GET at boot:
 
    ```bash
-   task homelab:boot-iso
-   task homelab:publish-config
+   task homelab:config-server   # builds + runs nginx, verifies it answers locally, prints your LAN IP
    ```
 
-   `homelab:boot-iso` registers an Image Factory schematic (`siderolabs/amd-ucode` for the Ryzen
-   CPU, plus the kernel arg `talos.config=http://192.168.8.1/config.yaml` baked in) and downloads
-   the installer to `homelab/_generated/boot.iso`. `homelab:publish-config` renders node-1's
-   machine config via `terragrunt output` and `scp`s it straight into the GL.iNet router's web
-   root (`uhttpd` serves `/www` as-is by default, no extra package needed) - this assumes SSH is
-   reachable on the router, unverified like the NIC chipset/interface name/CIDR collision below.
-   GL.iNet ships SSH on by default (`root` + the admin password), but some firmware versions or
-   prior hardening can have it off - check with `ssh root@192.168.8.1` before relying on this; if
-   it's disabled, enable it in the GL.iNet UI (Advanced Settings -> System -> SSH) first, or
-   override the target with `ROUTER_SSH=user@host`. Only ONE USB stick is needed this way -
-   the node gets a DHCP IP from the router at boot, fetches the config over the LAN, then switches
-   to its static IP once the config is applied. Confirm the box's actual NIC chipset once you have
-   it in hand; some Realtek 2.5GbE parts need their own extension added to `.tasks/homelab.yml`'s
-   schematic customization to be recognized at all.
+   Use the printed LAN IP (not `127.0.0.1` - the node fetches this over the network) as the host
+   in the next step. Stop the container once the node has bootstrapped
+   (`docker rm -f homelab-config-server`) - it serves real cluster secrets, don't leave it running
+   indefinitely. If the node can't reach it: check macOS Firewall (System Settings -> Network ->
+   Firewall) and whether your router has client/AP isolation enabled (blocks WiFi devices from
+   reaching each other, which breaks this if the node is on a different link than your machine).
 
-3. **Flash the USB stick:**
+3. **Build the boot ISO** with `talos.config` pointed at that server, and flash it:
 
    ```bash
+   task homelab:boot-iso-http CONFIG_URL=http://<your-lan-ip>:8000/config.yaml
    lsblk                                 # or diskutil list on macOS - find the device path
-   task homelab:flash DEVICE=/dev/sdX
+   task homelab:flash DEVICE=/dev/sdX IMG=homelab/_generated/boot-http.iso
    ```
 
-   This prints the target device and the current block device list, then asks you to retype the
-   device path before running `dd` - there's no way to invoke it with a device path that silently
-   goes unconfirmed.
+   `homelab:flash` prints the target device and the current block device list, then asks you to
+   retype the device path before running `dd` - there's no way to invoke it with a device path
+   that silently goes unconfirmed. Confirm the box's actual NIC chipset once you have it in hand;
+   some Realtek 2.5GbE parts need their own extension added to `.tasks/homelab.yml`'s schematic
+   customization to be recognized at all - see also the known RTL8125 PXE/iPXE incompatibility if
+   you ever want network boot instead of USB (not fixed upstream, don't rely on it for this box).
 
-4. **Boot the node.** Plug in the USB stick, power on. It installs, fetches the config from the
-   router over the LAN, applies it, and comes up already configured with its static IP - no
-   console interaction. Once it's up, run `task homelab:unpublish-config` - the file on the router
-   carries real cluster secrets and doesn't need to keep serving after this point.
+4. **Boot the node.** Plug in the USB stick, power on. It installs, fetches the config over HTTP
+   from your machine, applies it, and comes up already configured with its static IP - no console
+   interaction needed beyond watching for the real NIC interface name on first boot (update
+   `env.hcl`'s `node_1_interface` placeholder from it, re-render, and re-flash if it doesn't match
+   what you guessed).
 
 5. **Bootstrap etcd and fetch kubeconfig:**
 
@@ -147,6 +143,8 @@ or Kubernetes version bump to do. Not needed to get the node running.
 Copy the `node-1` pattern: a new `homelab/talos/machine_config/node-N` with its own
 hostname/IP/interface locals in `env.hcl`, a new `homelab/talos/apply_config/node-N`, and add the
 new node's IP to `access`'s `nodes` list (not `bootstrap_node` - that stays pointed at node-1,
-etcd only needs to be bootstrapped once). Each additional node gets its own config published to
-the router (`homelab:publish-config` would need a node-selecting variant once there's more than
-one) and its own USB stick with the same boot ISO - same process as step 2-4 above, per node.
+etcd only needs to be bootstrapped once). Each additional node needs its own rendered config
+served (re-run `homelab:config` for that node's module before `homelab:config-server`, or extend
+`config-server` to serve multiple files) and its own USB stick with its own `boot-iso-http` build
+(the config URL/path would need to be node-specific once there's more than one) - same process as
+steps 2-4 above, per node.
