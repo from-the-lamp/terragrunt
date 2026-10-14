@@ -143,13 +143,20 @@ inputs = {
       # via-based exit-node grant above (tag:exit itself has
       # advertise-exit-node=false, so it's a subnet router, not an exit
       # node - via= semantics don't apply to it).
-      src = ["tag:k3s-proxy-hetzner"]
+      # Hetzner is destroyed - tag:k3s-proxy-hetzner left in place (inert,
+      # no device left to claim it) rather than ripped out; homelab now
+      # replaces it as the cluster that needs this route. Without it,
+      # toolhive's gitlab-cas-dev/gitlab-cas-gitops MCP servers egress on
+      # homelab's own ISP IP instead of the Cloudflare-allowlisted one,
+      # and v-soft.dev/v-gitops.cc's Cloudflare in front of them returns a
+      # bare 403 "Sorry, you have been blocked".
+      src = ["tag:k3s-proxy-hetzner", "tag:k3s-proxy-homelab"]
       dst = ["autogroup:internet"]
       ip  = ["*"]
       via = ["tag:exit"]
     },
     {
-      src = ["tag:k3s-proxy-hetzner"]
+      src = ["tag:k3s-proxy-hetzner", "tag:k3s-proxy-homelab"]
       dst = [
         "173.245.48.0/20", "103.21.244.0/22", "103.22.200.0/22", "103.31.4.0/22",
         "141.101.64.0/18", "108.162.192.0/18", "190.93.240.0/20", "188.114.96.0/20",
