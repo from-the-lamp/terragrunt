@@ -20,7 +20,9 @@ terraform {
 
 locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  node_1_ip        = local.environment_vars.locals.node_1_ip
+  # Physical move done - node_1_ip in env.hcl is now the real, reachable
+  # address again, so this reads straight from there like every other unit.
+  node_1_ip = local.environment_vars.locals.node_1_ip
 }
 
 dependency "secrets" {
@@ -47,4 +49,10 @@ inputs = {
   node                  = local.node_1_ip
   machine_configuration = dependency.machine_config.outputs.machine_configuration
   client_configuration  = dependency.secrets.outputs.client_configuration
+  # staged hit a known Talos 1.12+ bug (HostnameConfig vs. machine.network.hostname
+  # conflict - "static hostname is already set"). Using auto instead, by
+  # explicit user choice: this takes effect immediately, which will cut off
+  # the node's current (old-network) reachability right away, before the
+  # physical cable move - accepted tradeoff, confirmed with the user.
+  mode = "auto"
 }

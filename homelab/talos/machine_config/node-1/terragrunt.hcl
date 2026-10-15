@@ -85,7 +85,12 @@ inputs = {
           image = "factory.talos.dev/metal-installer/96f8c146a67c80daad900d3fc1a6976fe11062321eee9ab6ae2a6aea88b2d26e:${local.talos_version}"
         }
         network = {
-          hostname = local.hostname
+          # hostname: NOT set here - Talos 1.12+ ships a default
+          # HostnameConfig document (auto: stable) that conflicts with
+          # machine.network.hostname ("static hostname is already set in
+          # v1alpha1 config", confirmed live on this node on v1.13.11).
+          # Set explicitly below instead, as its own document, with auto
+          # disabled.
           # Explicit nameservers + dhcp=false: without dhcp=false, DHCP
           # stayed active alongside this static address, so the node ended
           # up with a SECOND, DHCP-assigned IP competing as its "current"
@@ -109,6 +114,18 @@ inputs = {
               ]
             }
           ]
+        }
+        # Lets an in-cluster CronJob (apps/homelab/platform/talos-backup)
+        # call the Talos API to take etcd snapshots, scoped to the
+        # narrowest role that exists for this - os:etcd:backup grants
+        # nothing beyond "take a snapshot and read it back", not general
+        # node/API access.
+        features = {
+          kubernetesTalosAPIAccess = {
+            enabled                     = true
+            allowedRoles                = ["os:etcd:backup"]
+            allowedKubernetesNamespaces = ["talos-backup"]
+          }
         }
         kubelet = {
           nodeIP = {
@@ -175,6 +192,15 @@ inputs = {
           serviceSubnets = local.service_subnets
         }
       }
+    }),
+    # Separate v1alpha1 document, not a field under machine.network -
+    # that's the whole point: this is what replaces the old
+    # machine.network.hostname mechanism in Talos 1.12+.
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "HostnameConfig"
+      hostname   = local.hostname
+      auto       = "off"
     })
   ]
 }

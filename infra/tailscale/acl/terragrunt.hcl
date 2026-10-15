@@ -63,6 +63,10 @@ inputs = {
     # manual approval in the admin console, blocking Tailscale reachability
     # to homelab entirely (including the relocated ArgoCD's own UI).
     "172.25.0.0/16"   = ["tag:k3s-proxy-homelab"]
+    # homelab's LAN subnet - same subnet-router, added so the node itself
+    # (kube-apiserver/Talos API) is reachable over Tailscale, not just
+    # in-cluster services.
+    "192.168.8.0/24"  = ["tag:k3s-proxy-homelab"]
     "173.245.48.0/20" = ["tag:exit"]
     "103.21.244.0/22" = ["tag:exit"]
     "103.22.200.0/22" = ["tag:exit"]
@@ -178,7 +182,7 @@ inputs = {
       # private-resolver ClusterIP 172.25.80.94 timed out rather than
       # SERVFAIL-ing).
       src = ["autogroup:member"]
-      dst = ["tag:k3s-proxy-homelab", "172.25.0.0/16"]
+      dst = ["tag:k3s-proxy-homelab", "172.25.0.0/16", "192.168.8.0/24"]
       ip  = ["*"]
     },
     {
