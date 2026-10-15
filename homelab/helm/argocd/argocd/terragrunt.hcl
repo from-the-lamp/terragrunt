@@ -15,7 +15,7 @@ dependency "external_secrets" {
 
 inputs = {
   helm_chart_name    = "lamp-argocd"
-  helm_chart_version = "0.0.3"
+  helm_chart_version = "0.0.4"
   # Chart default leaves this empty, which registers the in-cluster Secret
   # with no name at all — Applications in any project other than "default"
   # then fail to resolve destination.name: in-cluster (project destination
