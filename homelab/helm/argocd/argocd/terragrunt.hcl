@@ -125,7 +125,9 @@ inputs = {
         repoServer = {
           resources = {
             requests = { cpu = "75m", memory = "128Mi" }
-            limits   = { memory = "256Mi" }
+            # 256Mi was OOMKilling repeatedly (confirmed live: 8 restarts in
+            # under 4h) - bumped with headroom instead of a second nudge.
+            limits = { memory = "512Mi" }
           }
         }
         dex = {

@@ -27,6 +27,11 @@ inputs = {
     yamlencode({
       cilium = {
         MTU = 1450
+        # Chart default (2) leaves a second operator replica permanently
+        # Pending on this single-node cluster - nothing to schedule it to.
+        operator = {
+          replicas = 1
+        }
       }
     })
   ]
