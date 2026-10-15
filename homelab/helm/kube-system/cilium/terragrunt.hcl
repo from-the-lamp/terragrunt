@@ -33,16 +33,6 @@ inputs = {
           replicas = 1
         }
       }
-      # enable-hubble was already on (agents emit flow data on :4244), but
-      # relay/UI - the actual L3/L7 service-map view - were never deployed.
-      hubble = {
-        relay = {
-          enabled = true
-        }
-        ui = {
-          enabled = true
-        }
-      }
     })
   ]
 }
