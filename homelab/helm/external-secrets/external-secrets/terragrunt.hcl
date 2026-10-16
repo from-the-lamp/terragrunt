@@ -9,4 +9,13 @@ include "common" {
 inputs = {
   helm_chart_name    = "lamp-external-secrets"
   helm_chart_version = "1.4.0"
+  helm_values = [
+    yamlencode({
+      "external-secrets" = {
+        serviceMonitor = {
+          enabled = true
+        }
+      }
+    })
+  ]
 }

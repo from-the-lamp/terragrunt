@@ -31,6 +31,17 @@ inputs = {
         # Pending on this single-node cluster - nothing to schedule it to.
         operator = {
           replicas = 1
+          prometheus = {
+            serviceMonitor = {
+              enabled = true
+            }
+          }
+        }
+        prometheus = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+          }
         }
       }
     })
