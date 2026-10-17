@@ -51,6 +51,15 @@ inputs = {
     # can mint it for its own egress Service.
     "tag:webhook-relay-ingress" = ["tag:k3s-operator-homelab"]
     "tag:webhook-relay-egress"  = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+    # Dedicated identity for toolhive's prod-0-admin/prod-1-admin kubernetes
+    # MCP servers to reach prod-0/prod-1's Tailscale API server proxy -
+    # same mechanism as tag:argocd-egress above, kept as its own tag rather
+    # than reusing argocd-egress so this capability is independently
+    # auditable/revocable from ArgoCD's own. Owned by tag:k3s-operator-homelab
+    # so homelab's existing operator OAuth client can mint it for the
+    # dedicated ProxyGroup (apps/homelab/platform/tailscale) backing the
+    # prod-0/1-k8s-operator-toolhive egress Services.
+    "tag:toolhive-egress" = ["tag:k3s-operator-homelab"]
   }
 
   # Hetzner's subnet-router (Connector) needs its own auto-approved route -
@@ -117,6 +126,20 @@ inputs = {
       # tag:argocd-egress identity without this field got exactly that
       # rejection from both prod-0-k8s-operator and prod-1-k8s-operator.
       ip = ["443"]
+      app = {
+        "tailscale.com/cap/kubernetes" = [
+          { impersonate = { groups = ["system:masters"] } }
+        ]
+      }
+    },
+    {
+      # toolhive's prod-0-admin/prod-1-admin MCP servers - same shape as the
+      # tag:argocd-egress grant above (ip=443 required alongside app for the
+      # same reason: the raw TCP handshake is checked before the
+      # impersonation capability is ever consulted).
+      src = ["tag:toolhive-egress"]
+      dst = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+      ip  = ["443"]
       app = {
         "tailscale.com/cap/kubernetes" = [
           { impersonate = { groups = ["system:masters"] } }
