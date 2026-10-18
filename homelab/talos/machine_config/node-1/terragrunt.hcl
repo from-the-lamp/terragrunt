@@ -88,7 +88,7 @@ inputs = {
           # hostname: NOT set here - Talos 1.12+ ships a default
           # HostnameConfig document (auto: stable) that conflicts with
           # machine.network.hostname ("static hostname is already set in
-          # v1alpha1 config", confirmed live on this node on v1.13.11).
+          # v1alpha1 config"), confirmed live on this node on v1.13.11).
           # Set explicitly below instead, as its own document, with auto
           # disabled.
           # Explicit nameservers + dhcp=false: without dhcp=false, DHCP
@@ -173,6 +173,15 @@ inputs = {
         }
         etcd = {
           advertisedSubnets = [local.lan_subnet]
+          # Separate unauthenticated, metrics-only listener - the normal
+          # client port (2379) requires mTLS, which would mean wiring
+          # etcd's client cert/key/ca into vmagent's scrape config for a
+          # single read-only endpoint. Paired with
+          # apps/homelab/platform/victoria-metrics kubeEtcd.endpoints in
+          # argo-apps.
+          extraArgs = {
+            "listen-metrics-urls" = "http://0.0.0.0:2381"
+          }
         }
         # The one load-bearing difference from Hetzner's own patch: no
         # hcloud-cloud-controller-manager exists here to initialize the
