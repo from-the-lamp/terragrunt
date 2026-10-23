@@ -43,6 +43,19 @@ inputs = {
             enabled = true
           }
         }
+        hubble = {
+          tls = {
+            auto = {
+              method = "cronJob"
+            }
+          }
+          metrics = {
+            enabled = ["dns", "drop", "tcp", "flow", "icmp", "http", "port-distribution"]
+            serviceMonitor = {
+              enabled = true
+            }
+          }
+        }
       }
     })
   ]
