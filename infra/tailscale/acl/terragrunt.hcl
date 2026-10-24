@@ -51,7 +51,7 @@ inputs = {
     # can mint it for its own egress Service.
     "tag:webhook-relay-ingress" = ["tag:k3s-operator-homelab"]
     "tag:webhook-relay-egress"  = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
-    # Dedicated identity for toolhive's prod-0-admin/prod-1-admin kubernetes
+    # Dedicated identity for toolhive's oracle-0/oracle-1 kubernetes
     # MCP servers to reach prod-0/prod-1's Tailscale API server proxy -
     # same mechanism as tag:argocd-egress above, kept as its own tag rather
     # than reusing argocd-egress so this capability is independently
@@ -133,7 +133,7 @@ inputs = {
       }
     },
     {
-      # toolhive's prod-0-admin/prod-1-admin MCP servers - same shape as the
+      # toolhive's oracle-0/oracle-1 MCP servers - same shape as the
       # tag:argocd-egress grant above (ip=443 required alongside app for the
       # same reason: the raw TCP handshake is checked before the
       # impersonation capability is ever consulted).
