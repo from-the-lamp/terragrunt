@@ -1,0 +1,23 @@
+version: '3'
+
+silent: true
+tasks:
+  init:
+    desc: Install the pinned toolchain (mise)
+    dir: "{{ .ROOT_DIR }}"
+    cmds:
+      - |
+        if ! command -v mise >/dev/null 2>&1; then
+          echo -e "\033[31mmise is not installed\033[0m - this repo pins its whole toolchain with it" >&2
+          echo -e "install it and re-run \033[1mtask init\033[0m: \033[4mhttps://mise.jdx.dev/installing-mise.html\033[0m" >&2
+          exit 1
+        fi
+      - echo -e "\033[36m==>\033[0m trusting mise.toml - lets mise read this repo's config and run its postinstall hook"
+      - mise trust
+      - |
+        if [ -f .env ]; then
+          echo -e "\033[36m==>\033[0m .env already exists - keeping it untouched, the hook only seeds one when it is missing"
+        fi
+      - echo -e "\033[36m==>\033[0m installing the tool versions pinned in mise.toml - the hook also seeds .env from .env.example"
+      - mise install
+      - echo -e "\033[32m==> toolchain ready\033[0m - fill in the secrets in .env before running terragrunt"

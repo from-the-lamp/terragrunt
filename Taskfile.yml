@@ -9,6 +9,9 @@ includes:
     taskfile: .tasks/custom.yml
     flatten: true
     optional: true
+  init:
+    taskfile: .tasks/init.yml
+    flatten: true
   terragrunt:
     taskfile: .tasks/terragrunt.yml
     flatten: true
