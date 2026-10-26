@@ -15,10 +15,12 @@ include "root" {
 }
 
 terraform {
-  source = "${get_repo_root()}/_modules/talos/apply_config"
+  source = "${local.modules_url}/talos/apply_config?tag=1.0.0"
 }
 
 locals {
+  common_settings  = read_terragrunt_config("${get_repo_root()}/root.hcl")
+  modules_url      = local.common_settings.locals.private_modules_base_url
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   # Physical move done - node_1_ip in env.hcl is now the real, reachable
   # address again, so this reads straight from there like every other unit.

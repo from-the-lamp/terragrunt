@@ -1,5 +1,5 @@
 terraform {
-  source = "${local.modules_url}//${local.module_dir}?ref=${local.module_version}"
+  source = "${local.modules_url}/${local.module_dir}?tag=${local.module_version}"
 }
 
 locals {
@@ -9,7 +9,7 @@ locals {
   common_settings     = read_terragrunt_config("${get_repo_root()}/root.hcl")
   modules_url         = local.common_settings.locals.private_modules_base_url
   module_dir          = "oracle/identity_dynamic_group"
-  module_version      = "main"
+  module_version      = "1.0.0"
   compartment_ocid    = run_cmd("--terragrunt-quiet", "${get_repo_root()}/.kek.sh", "compartment_ocid", "${get_env("OCI_CONFIG_PATH")}", "${local.oracle_profile_name}")
 }
 

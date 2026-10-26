@@ -26,6 +26,12 @@ tasks:
     desc: List all available tasks
     cmd: task --list-all
 
+  auth:
+    desc: Log in to the GitLab container registry that serves the oci:// module sources
+    cmds:
+    - echo -e "\033[36m==>\033[0m logging in to registry.gitlab.com as ${TF_HTTP_USERNAME} - terragrunt and tofu pull oci:// modules with the credentials oras stores"
+    - echo "${TF_HTTP_PASSWORD}" | oras login -u "${TF_HTTP_USERNAME}" --password-stdin registry.gitlab.com
+
   cleanup:
     desc: Remove temporary files
     cmds:

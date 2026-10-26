@@ -1,5 +1,10 @@
 terraform {
-  source = "${get_repo_root()}/_modules/talos/apply_config"
+  source = "${local.modules_url}/talos/apply_config?tag=1.0.0"
+}
+
+locals {
+  common_settings = read_terragrunt_config("${get_repo_root()}/root.hcl")
+  modules_url     = local.common_settings.locals.private_modules_base_url
 }
 
 dependency "secrets" {

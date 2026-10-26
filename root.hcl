@@ -3,8 +3,7 @@ locals {
   gitlab_token             = get_env("TF_HTTP_PASSWORD")
   k3s_cluster_version      = "v1.25.11+k3s1"
   infra_repo_id            = "40541314"
-  private_modules_path     = "from-the-lamp/infra/terraform/modules"
-  private_modules_base_url = "git::https://gitlab-ci-token:${local.gitlab_token}@${local.gitlab_base_url}/${local.private_modules_path}"
+  private_modules_base_url = "oci://registry.gitlab.com/from-the-lamp/infra/terraform-modules"
   infra_project_id         = "40541314"
   admin_ssh_pub            = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILtNvLcjDTFxc/v03D93cyeEa77jxNC/u2DfqM9gn0k6"
   helm_repo_user           = "gitlab-ci-token"

@@ -1,8 +1,9 @@
 terraform {
-  source = "${get_repo_root()}/../modules/oracle/instance"
+  source = "${local.modules_url}/oracle/instance?tag=1.0.0"
 }
 
 locals {
+  modules_url         = local.common_settings.locals.private_modules_base_url
   environment_vars    = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env                 = local.environment_vars.locals.environment
   oracle_profile_name = local.environment_vars.locals.oracle_profile_name

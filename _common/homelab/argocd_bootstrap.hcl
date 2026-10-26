@@ -4,10 +4,12 @@
 # load_balancer dependency: the provider talks to the node's own static IP
 # directly.
 terraform {
-  source = "${get_repo_root()}/_modules/hetzner/argocd_bootstrap"
+  source = "${local.modules_url}/kubernetes/argocd_bootstrap?tag=1.0.0"
 }
 
 locals {
+  common_settings  = read_terragrunt_config("${get_repo_root()}/root.hcl")
+  modules_url      = local.common_settings.locals.private_modules_base_url
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   node_1_ip        = local.environment_vars.locals.node_1_ip
 }

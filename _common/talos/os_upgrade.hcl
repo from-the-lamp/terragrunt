@@ -1,8 +1,10 @@
 terraform {
-  source = "${get_repo_root()}/_modules/talos/os_upgrade"
+  source = "${local.modules_url}/talos/os_upgrade?tag=1.0.0"
 }
 
 locals {
+  common_settings  = read_terragrunt_config("${get_repo_root()}/root.hcl")
+  modules_url      = local.common_settings.locals.private_modules_base_url
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   talos_version    = local.environment_vars.locals.talos_version
   talos_extensions = local.environment_vars.locals.talos_extensions

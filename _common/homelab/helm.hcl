@@ -3,7 +3,7 @@
 # Hetzner-specific in it), just no load_balancer dependency: the provider
 # talks to the node's own static IP directly.
 terraform {
-  source = "${local.modules_url}//kubernetes/helm?ref=main"
+  source = "${local.modules_url}/kubernetes/helm?tag=1.0.0"
 }
 
 locals {

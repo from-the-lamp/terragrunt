@@ -1,12 +1,12 @@
 terraform {
-  source = "${local.modules_url}//${local.module_dir}?ref=${local.module_version}"
+  source = "${local.modules_url}/${local.module_dir}?tag=${local.module_version}"
 }
 
 locals {
   common_settings  = read_terragrunt_config("${get_repo_root()}/root.hcl")
   modules_url      = local.common_settings.locals.private_modules_base_url
   module_dir       = "cloudflare/tunnel"
-  module_version   = "main"
+  module_version   = "1.0.0"
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   env              = local.environment_vars.locals.environment
 }
