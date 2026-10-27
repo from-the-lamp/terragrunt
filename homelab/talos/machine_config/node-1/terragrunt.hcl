@@ -153,8 +153,12 @@ inputs = {
               memory = "1Gi"
             }
             evictionHard = {
-              "memory.available" = "1Gi"
+              "memory.available"  = "1Gi"
+              "nodefs.available"  = "10%"
+              "nodefs.inodesFree" = "5%"
+              "imagefs.available" = "15%"
             }
+            podPidsLimit = 4096
             evictionSoft = {
               "memory.available" = "1.5Gi"
             }
@@ -169,6 +173,15 @@ inputs = {
         apiServer = {
           extraArgs = {
             "anonymous-auth" = "true"
+          }
+          resources = {
+            requests = {
+              cpu    = "1"
+              memory = "4Gi"
+            }
+            limits = {
+              memory = "8Gi"
+            }
           }
         }
         etcd = {
