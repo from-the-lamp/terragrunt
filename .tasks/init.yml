@@ -3,7 +3,7 @@ version: '3'
 silent: true
 tasks:
   init:
-    desc: Install the pinned toolchain (mise)
+    desc: Install toolchain (mise) and git hooks (pre-commit)
     dir: "{{ .ROOT_DIR }}"
     cmds:
       - |
@@ -20,4 +20,6 @@ tasks:
         fi
       - echo -e "\033[36m==>\033[0m installing the tool versions pinned in mise.toml - the hook also seeds .env from .env.example"
       - mise install
+      - echo -e "\033[36m==>\033[0m installing the pre-commit git hook"
+      - pre-commit install
       - echo -e "\033[32m==> toolchain ready\033[0m - fill in the secrets in .env before running terragrunt"
