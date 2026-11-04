@@ -234,6 +234,57 @@ inputs = {
         }
       }
     }),
+    # Talos disables anonymous kube-apiserver auth by default (CIS
+    # hardening, since v1.1.0-beta.2) via the StructuredAuthenticationConfig
+    # it always passes as --authentication-config - the legacy
+    # --anonymous-auth flag has no effect once that's set. Without this,
+    # argo-apps' own oidc-discovery-public-viewer ClusterRoleBinding (granting
+    # system:unauthenticated read on these same two paths) is dead code:
+    # an anonymous request is rejected at authentication, before RBAC is
+    # ever consulted. Needed for toolhive's vmcp to verify Kubernetes-issued
+    # subject tokens during RFC 8693 token exchange (vmcp-token-refresher
+    # CronJob) - it fetches this cluster's own JWKS unauthenticated, as a
+    # normal OIDC relying party would.
+    #
+    # The Talos v1alpha1 wrapper has exactly one field, `configuration:` -
+    # everything inside it is the verbatim upstream Kubernetes
+    # apiserver.config.k8s.io AuthenticationConfiguration object, not
+    # Talos-defined fields (confirmed against
+    # pkg/machinery/config/types/k8s/authentication.go in siderolabs/talos).
+    # `jwt: []` must stay present (no omitempty on that field upstream) even
+    # though we're not adding any JWT authenticators here.
+    #
+    # Critically, this whole `configuration:` block REPLACES Talos's own
+    # default authentication-config wholesale (merge:"replace", confirmed in
+    # the same source file) rather than merging into it - and that default
+    # (DefaultAuthenticationConfig() in
+    # internal/app/machined/pkg/controllers/k8s/render_config_static_pods.go)
+    # is what grants anonymous access to /livez, /readyz and /healthz, which
+    # kube-apiserver's own liveness/readiness/startup probes hit (see this
+    # same node's kube-apiserver pod spec). Omitting those three paths here
+    # would 401 the apiserver's own health probes and crash-loop it - they
+    # are carried forward below for that reason, not because toolhive needs
+    # them. Scoped otherwise to the minimum: these 5 paths only, nothing
+    # else; no JWT authenticators configured.
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "KubeAuthenticationConfig"
+      configuration = {
+        apiVersion = "apiserver.config.k8s.io/v1beta1"
+        kind       = "AuthenticationConfiguration"
+        jwt        = []
+        anonymous = {
+          enabled = true
+          conditions = [
+            { path = "/livez" },
+            { path = "/readyz" },
+            { path = "/healthz" },
+            { path = "/openid/v1/jwks" },
+            { path = "/.well-known/openid-configuration" }
+          ]
+        }
+      }
+    }),
     yamlencode({
       apiVersion     = "v1alpha1"
       kind           = "KubeNetworkConfig"
