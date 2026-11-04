@@ -60,6 +60,17 @@ inputs = {
     # dedicated ProxyGroup (apps/homelab/platform/tailscale) backing the
     # prod-0/1-k8s-operator-toolhive egress Services.
     "tag:toolhive-egress" = ["tag:k3s-operator-homelab"]
+    # Oracle prod-0/1's vmagent (lamp-victoria-metrics-agent) pushing metrics
+    # into homelab's vminsert over the tailnet - same egress/ingress shape as
+    # tag:webhook-relay-{egress,ingress} just reversed in purpose, kept as its
+    # own pair rather than reusing that one so it's independently auditable/
+    # revocable (same reasoning as tag:toolhive-egress vs tag:argocd-egress
+    # above). Ingress side owned by homelab's operator (mints it for the new
+    # vminsert-tailnet Service, apps/homelab/platform/tailscale); egress side
+    # owned by both Oracle operators (mints it for each cluster's own
+    # ProxyGroup, apps/oracle-prod-0|1/platform/tailscale-operator).
+    "tag:victoria-metrics-ingress" = ["tag:k3s-operator-homelab"]
+    "tag:victoria-metrics-egress"  = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
   }
 
   # Hetzner's subnet-router (Connector) needs its own auto-approved route -
@@ -219,6 +230,14 @@ inputs = {
       src = ["tag:webhook-relay-egress"]
       dst = ["tag:webhook-relay-ingress"]
       ip  = ["*"]
+    },
+    {
+      # Oracle prod-0/1's vmagent reaching homelab's vminsert (single fixed
+      # port, unlike the webhook-relay grant above which spans two different
+      # Services on two different ports).
+      src = ["tag:victoria-metrics-egress"]
+      dst = ["tag:victoria-metrics-ingress"]
+      ip  = ["8480"]
     },
   ]
 }
