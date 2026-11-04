@@ -66,39 +66,39 @@ inputs = {
   # this cluster's real service CIDR, not the old infra cluster's k3s
   # default (10.43.0.0/16, dropped along with that cluster's connector).
   auto_approvers_routes = {
-    "172.21.0.0/16"   = ["tag:k3s-proxy-hetzner"]
+    "172.21.0.0/16" = ["tag:k3s-proxy-hetzner"]
     # homelab's subnet-router (apps/homelab/platform/tailscale hostNode)
     # advertises this - without an auto-approver entry it'd sit pending
     # manual approval in the admin console, blocking Tailscale reachability
     # to homelab entirely (including the relocated ArgoCD's own UI).
-    "172.25.0.0/16"   = ["tag:k3s-proxy-homelab"]
+    "172.25.0.0/16" = ["tag:k3s-proxy-homelab"]
     # homelab's LAN subnet - same subnet-router, added so the node itself
     # (kube-apiserver/Talos API) is reachable over Tailscale, not just
     # in-cluster services.
-    "192.168.8.0/24"  = ["tag:k3s-proxy-homelab"]
-    "173.245.48.0/20" = ["tag:exit"]
-    "103.21.244.0/22" = ["tag:exit"]
-    "103.22.200.0/22" = ["tag:exit"]
-    "103.31.4.0/22"   = ["tag:exit"]
-    "141.101.64.0/18" = ["tag:exit"]
+    "192.168.8.0/24"   = ["tag:k3s-proxy-homelab"]
+    "173.245.48.0/20"  = ["tag:exit"]
+    "103.21.244.0/22"  = ["tag:exit"]
+    "103.22.200.0/22"  = ["tag:exit"]
+    "103.31.4.0/22"    = ["tag:exit"]
+    "141.101.64.0/18"  = ["tag:exit"]
     "108.162.192.0/18" = ["tag:exit"]
-    "190.93.240.0/20" = ["tag:exit"]
-    "188.114.96.0/20" = ["tag:exit"]
+    "190.93.240.0/20"  = ["tag:exit"]
+    "188.114.96.0/20"  = ["tag:exit"]
     "197.234.240.0/22" = ["tag:exit"]
-    "198.41.128.0/17" = ["tag:exit"]
-    "162.158.0.0/15"  = ["tag:exit"]
-    "104.16.0.0/13"   = ["tag:exit"]
-    "104.24.0.0/14"   = ["tag:exit"]
-    "172.64.0.0/13"   = ["tag:exit"]
-    "131.0.72.0/22"   = ["tag:exit"]
-    "5.75.242.100/32" = ["tag:exit"]
-    "2400:cb00::/32"  = ["tag:exit"]
-    "2606:4700::/32"  = ["tag:exit"]
-    "2803:f800::/32"  = ["tag:exit"]
-    "2405:b500::/32"  = ["tag:exit"]
-    "2405:8100::/32"  = ["tag:exit"]
-    "2a06:98c0::/29"  = ["tag:exit"]
-    "2c0f:f248::/32"  = ["tag:exit"]
+    "198.41.128.0/17"  = ["tag:exit"]
+    "162.158.0.0/15"   = ["tag:exit"]
+    "104.16.0.0/13"    = ["tag:exit"]
+    "104.24.0.0/14"    = ["tag:exit"]
+    "172.64.0.0/13"    = ["tag:exit"]
+    "131.0.72.0/22"    = ["tag:exit"]
+    "5.75.242.100/32"  = ["tag:exit"]
+    "2400:cb00::/32"   = ["tag:exit"]
+    "2606:4700::/32"   = ["tag:exit"]
+    "2803:f800::/32"   = ["tag:exit"]
+    "2405:b500::/32"   = ["tag:exit"]
+    "2405:8100::/32"   = ["tag:exit"]
+    "2a06:98c0::/29"   = ["tag:exit"]
+    "2c0f:f248::/32"   = ["tag:exit"]
   }
   auto_approvers_exit_node = ["tag:exit"]
 

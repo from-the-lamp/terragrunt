@@ -4,7 +4,7 @@ env:
   OCI_CONFIG_PATH: "{{.HOME}}/.oci/config"
 
 silent: true
-tasks:  
+tasks:
   .terragrunt:
     internal: true
     dir: $DIR
@@ -38,7 +38,7 @@ tasks:
       vars: {
         ACTION: "destroy",
       }
-      
+
   validate:
     desc: Run validate for all modules in subdirectories
     cmds:
@@ -60,6 +60,15 @@ tasks:
     desc: Unlock state by ID
     cmds:
       - terragrunt force-unlock {{ .CLI_ARGS }}
+
+  import:
+    dir: $DIR
+    desc: 'Import an existing resource into a single unit''s state. Usage: DIR=<unit dir> ADDRESS=<resource address> ID=<import id> task import'
+    cmds:
+      - |
+        set -euo pipefail
+        test -n "{{.ADDRESS}}" && test -n "{{.ID}}" || { echo "ADDRESS and ID are both required, e.g. ADDRESS=gitlab_project.this ID=from-the-lamp/infra/helm-charts" >&2; exit 1; }
+        terragrunt import "{{.ADDRESS}}" "{{.ID}}" --log-level {{.LOG_LEVEL}}
 
   migrate-state:
     desc: Migrate state (usually required during project initialization)

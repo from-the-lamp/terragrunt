@@ -7,8 +7,15 @@ include "common" {
 }
 
 inputs = {
-  helm_chart_name    = "lamp-cilium"
-  helm_chart_version = "0.1.1"
+  helm_chart_name = "lamp-cilium"
+  # 0.1.1 is no longer in the registry (either its push pipeline got
+  # auto-cancelled by the next version-bump commit before the push stage
+  # ran, or a registry retention policy pruned it since - either way "tofu
+  # apply" failed with "Unable to locate chart ... 0.1.1: not found").
+  # Picking up the chart's current published version instead, which also
+  # carries forward chart fixes since 0.1.1: cni.exclusive=false (istio-cni
+  # chaining), DaemonSet rollout maxUnavailable=1, cilium 1.20.3->1.20.4.
+  helm_chart_version = "0.1.4"
   # Chart default (MTU: 0) auto-detects the underlying device's MTU, but
   # devices: "" (also chart default) means Cilium can't actually find the
   # physical NIC to auto-detect from on this single-NIC bare-metal node -
@@ -36,6 +43,19 @@ inputs = {
               enabled = true
             }
           }
+          # Chart default ships cilium-operator with no resources - sized
+          # conservatively (it's a lightweight controller, not a dataplane
+          # component). No cpu limit, matching this platform's general
+          # policy of request-only CPU.
+          resources = {
+            requests = {
+              cpu    = "10m"
+              memory = "64Mi"
+            }
+            limits = {
+              memory = "192Mi"
+            }
+          }
         }
         prometheus = {
           enabled = true
@@ -54,6 +74,23 @@ inputs = {
             serviceMonitor = {
               enabled = true
             }
+          }
+        }
+        # Chart default ships cilium-agent with no resources at all - the
+        # CNI DaemonSet was BestEffort, same gap the platform/limits
+        # ValidatingAdmissionPolicy flags elsewhere but can't reach here
+        # (kube-system is exempted from that policy). Sized from one
+        # live-cluster pods_top reading (agent ~100m CPU/~500Mi memory)
+        # plus headroom - no cpu limit, matching this platform's general
+        # policy of request-only CPU. Revisit once a real DNS/connection-
+        # churn spike has been observed.
+        resources = {
+          requests = {
+            cpu    = "50m"
+            memory = "256Mi"
+          }
+          limits = {
+            memory = "768Mi"
           }
         }
       }

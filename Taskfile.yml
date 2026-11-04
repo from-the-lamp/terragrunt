@@ -5,7 +5,7 @@ vars:
   LOG_LEVEL: info
 
 includes:
-  custom: 
+  custom:
     taskfile: .tasks/custom.yml
     flatten: true
     optional: true
@@ -17,6 +17,9 @@ includes:
     flatten: true
   homelab:
     taskfile: .tasks/homelab.yml
+    flatten: true
+  vault:
+    taskfile: .tasks/vault.yml
     flatten: true
 
 silent: true

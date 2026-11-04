@@ -153,8 +153,8 @@ inputs = {
       }
     }),
     yamlencode({
-      apiVersion  = "v1alpha1"
-      kind        = "ResolverConfig"
+      apiVersion = "v1alpha1"
+      kind       = "ResolverConfig"
       nameservers = [
         { address = "1.1.1.1" },
         { address = "8.8.8.8" }
@@ -178,7 +178,7 @@ inputs = {
         validSubnets = [local.lan_subnet]
       }
       labels = {
-        "node-role.kubernetes.io/control-plane"                    = ""
+        "node-role.kubernetes.io/control-plane"                   = ""
         "node.kubernetes.io/exclude-from-external-load-balancers" = ""
       }
     }),

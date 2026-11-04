@@ -1,6 +1,6 @@
 locals {
-  environment        = "homelab"
-  cluster_name       = "homelab"
+  environment  = "homelab"
+  cluster_name = "homelab"
   # Upgraded in-place from the original v1.9.0/1.31.4 bootstrap through
   # v1.10-v1.14 via homelab/talos/{kubernetes_upgrade,os_upgrade}. v1.14.2
   # itself had been stuck (talosctl reported success but the node never

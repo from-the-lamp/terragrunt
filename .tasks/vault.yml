@@ -1,0 +1,47 @@
+version: '3'
+
+silent: true
+
+tasks:
+
+  vault:login:
+    desc: 'Log in to Vault via GitLab OIDC and write the resulting token into .env as VAULT_TOKEN. Usage: task vault:login [VAULT_ADDR=https://vault.from-the-lamp.work] [VAULT_OIDC_PATH=gitlab]'
+    vars:
+      VAULT_ADDR: '{{.VAULT_ADDR | default "https://vault.from-the-lamp.work"}}'
+      # The Vault CR's externalConfig mounts the OIDC auth method at "gitlab",
+      # not the CLI's default "oidc" mount path - without -path, `vault login`
+      # hits auth/oidc/oidc/auth_url, which doesn't exist, and Vault answers
+      # an unmounted path with a 403 "permission denied" rather than a 404.
+      VAULT_OIDC_PATH: '{{.VAULT_OIDC_PATH | default "gitlab"}}'
+    cmds:
+    - |
+      set -euo pipefail
+      if [ ! -f .env ]; then
+        echo ".env is not filled in - see .env.example, or run 'task init' to seed it" >&2
+        exit 1
+      fi
+      # vault.from-the-lamp.work is Tailscale-only (no public DNS) - this opens
+      # a browser for the OIDC flow, so it has to run somewhere with both a
+      # browser and tailnet reachability, not from a headless CI runner.
+      echo -e "\033[36m==>\033[0m logging in to {{.VAULT_ADDR}} via OIDC (path={{.VAULT_OIDC_PATH}}) - a browser window will open"
+      # -no-store: skip the CLI's own token-helper persistence entirely (it
+      # defaults to reading ~/.vault as a config file to find the helper,
+      # which breaks if ~/.vault is a directory, as it is here via this
+      # stand's own secrets.nix layout) - this task writes the token into
+      # .env itself, so the token helper's own storage was never used anyway.
+      token=$(VAULT_ADDR="{{.VAULT_ADDR}}" vault login -method=oidc -path="{{.VAULT_OIDC_PATH}}" -no-store -format=json | jq -r '.auth.client_token')
+      if [ -z "$token" ] || [ "$token" = "null" ]; then
+        echo "vault login did not return a client_token" >&2
+        exit 1
+      fi
+      if grep -q '^VAULT_TOKEN=' .env; then
+        sed -i.bak "s|^VAULT_TOKEN=.*|VAULT_TOKEN=${token}|" .env && rm -f .env.bak
+      else
+        echo "VAULT_TOKEN=${token}" >> .env
+      fi
+      if grep -q '^VAULT_ADDR=' .env; then
+        sed -i.bak "s|^VAULT_ADDR=.*|VAULT_ADDR={{.VAULT_ADDR}}|" .env && rm -f .env.bak
+      else
+        echo "VAULT_ADDR={{.VAULT_ADDR}}" >> .env
+      fi
+      echo -e "\033[32m==>\033[0m wrote VAULT_ADDR/VAULT_TOKEN into .env"
