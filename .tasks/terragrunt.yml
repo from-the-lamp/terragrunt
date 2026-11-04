@@ -63,32 +63,34 @@ tasks:
         msg: "No changed units found."
 
   plan:changed:
-    desc: Run plan for every changed unit (see list:changed)
+    desc: Run plan for every changed unit (see list:changed). A no-op (not a failure) when nothing changed - an MR touching no terragrunt unit is a normal case for the CI plan job, not an error.
     cmds:
     - |
       set -e
+      if [ -z "{{.CHANGED_UNITS}}" ]; then
+        echo "no changed units - nothing to plan"
+        exit 0
+      fi
       for d in {{.CHANGED_UNITS}}; do
         echo -e "\033[36m== plan: $d ==\033[0m"
         (cd "$d" && terragrunt plan --log-level {{.LOG_LEVEL}})
       done
-    preconditions:
-      - sh: '[ -n "{{.CHANGED_UNITS}}" ]'
-        msg: "No changed units found."
 
   apply:changed:
-    desc: Run apply for every changed unit (see list:changed). Auto-approves only when $CI is set - prompts interactively otherwise.
+    desc: Run apply for every changed unit (see list:changed). Auto-approves only when $CI is set - prompts interactively otherwise. A no-op (not a failure) when nothing changed.
     cmds:
     - |
       set -e
+      if [ -z "{{.CHANGED_UNITS}}" ]; then
+        echo "no changed units - nothing to apply"
+        exit 0
+      fi
       approve_flag=""
       [ -n "${CI:-}" ] && approve_flag="-auto-approve"
       for d in {{.CHANGED_UNITS}}; do
         echo -e "\033[36m== apply: $d ==\033[0m"
         (cd "$d" && terragrunt apply $approve_flag --log-level {{.LOG_LEVEL}})
       done
-    preconditions:
-      - sh: '[ -n "{{.CHANGED_UNITS}}" ]'
-        msg: "No changed units found."
 
   comment:plan:
     desc: 'Post a file''s content as a GitLab MR note (no-op outside a merge_request_event pipeline). Usage: FILE=<path> task comment:plan'

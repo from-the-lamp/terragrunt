@@ -18,6 +18,12 @@ tools:
   image: docker:27-cli
   tags:
     - homelab
+  variables:
+    # Matches infra/cicd's task-pipeline component (see docker-images'
+    # .gitlab-ci.yml) - a persistent BuildKit daemon, not docker-in-docker.
+    # Without --driver remote pointed at it, buildx tries the local driver
+    # against /var/run/docker.sock, which doesn't exist on this runner.
+    BUILDKIT_HOST: tcp://buildkitd.gitlab-runner.svc:1234
   rules:
     - if: $CI_PIPELINE_SOURCE == "web"
     - changes:
@@ -25,7 +31,7 @@ tools:
         - mise.toml
   script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    - docker buildx create --name tools --use
+    - docker buildx create --name tools --driver remote "$BUILDKIT_HOST" --use
     - |
       CACHE="$CI_REGISTRY_IMAGE:cache"
       PUSH_FLAG=""
