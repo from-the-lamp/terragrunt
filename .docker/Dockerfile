@@ -1,13 +1,13 @@
 FROM alpine:3.24.3
 
-# gcompat: mise's python core plugin ships prebuilt glibc binaries
-# (python-build-standalone, "...-unknown-linux-gnu...") - Alpine is musl, so
-# the interpreter would fail to even start without this. Not needed for any
-# of the other mise.toml tools (all static Go/Rust binaries). UNVERIFIED -
-# no docker available in the environment this was written in to build and
-# actually run `python3 .docker/changed_units.py` inside the image; confirm
-# with a real `task tools` build before relying on it.
-RUN apk add --no-cache curl git jq bash gcompat
+# python3 from apk, not mise: mise's python core plugin has no prebuilt
+# binary for musl, so on Alpine `mise install` falls back to compiling
+# CPython from source (python-build) - needs a full build toolchain
+# (patch, gcc, zlib-dev, openssl-dev, ...) for a script that's stdlib-only
+# (.docker/changed_units.py) and gains nothing from the exact pinned
+# version. apk's python3 is enough; mise below installs every other
+# mise.toml tool except python by naming them explicitly.
+RUN apk add --no-cache curl git jq bash python3
 RUN curl -fsSL https://mise.run | sh
 ENV PATH="/root/.local/bin:/root/.local/share/mise/shims:${PATH}"
 
@@ -18,4 +18,4 @@ COPY mise.toml ./
 # fail outright (.env.example isn't copied in above). CI=true makes the
 # hook skip itself entirely instead of papering over it with a dummy .env.
 ENV CI=true
-RUN mise trust && mise install
+RUN mise trust && mise install task opentofu terragrunt kubectl talosctl jq oras vault
