@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":disableRateLimiting",
+    ":semanticCommitTypeAll(chore)",
+    ":semanticCommitScopeDisabled"
+  ],
+  "dependencyDashboard": true,
+  "labels": ["dependencies"],
+  "schedule": ["every weekend"],
+  "timezone": "Europe/Bucharest",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "homelab/helm/**/terragrunt.hcl pins a lamp-* chart via helm_chart_name/helm_chart_version inputs, not a Chart.yaml dependency - the built-in helmv3 manager never sees it.",
+      "fileMatch": ["^homelab/helm/.*/terragrunt\\.hcl$"],
+      "matchStrings": [
+        "helm_chart_name\\s*=\\s*\"(?<depName>[^\"]+)\"[\\s\\S]*?helm_chart_version\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "packageNameTemplate": "registry.gitlab.com/from-the-lamp/infra/helm-charts/{{{depName}}}"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "lamp-* chart bumps here land as a merged MR triggers CI's apply:changed stage, which runs terragrunt apply against the real homelab cluster - keep merge a human decision, unlike argo-apps' automerge for the same charts.",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["registry.gitlab.com/from-the-lamp/infra/helm-charts/**"],
+      "automerge": false
+    }
+  ]
+}
