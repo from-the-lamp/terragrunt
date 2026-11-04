@@ -18,6 +18,12 @@ python = "3.14.4"
 [hooks]
 postinstall = '''
 set -uo pipefail
+# No-op in CI (including this repo's own .docker/Dockerfile, which sets
+# CI=true for exactly this) - the .env bootstrap below is for a human's
+# first local clone, meaningless inside a throwaway image build.
+if [ -n "${CI:-}" ]; then
+  exit 0
+fi
 if [ ! -f .env ]; then
   cp .env.example .env
   echo "mise: created .env from .env.example - fill in the secrets before running terragrunt"

@@ -13,4 +13,9 @@ ENV PATH="/root/.local/bin:/root/.local/share/mise/shims:${PATH}"
 
 WORKDIR /mise
 COPY mise.toml ./
+# mise.toml's postinstall hook bootstraps .env for a human's first local
+# clone - meaningless here (this WORKDIR isn't a real checkout) and would
+# fail outright (.env.example isn't copied in above). CI=true makes the
+# hook skip itself entirely instead of papering over it with a dummy .env.
+ENV CI=true
 RUN mise trust && mise install
