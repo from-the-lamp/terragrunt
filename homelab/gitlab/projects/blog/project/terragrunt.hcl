@@ -9,4 +9,5 @@ include "common" {
 inputs = {
   namespace_path = "from-the-lamp"
   name           = "blog"
+  description    = "Personal blog - from-the-lamp"
 }
