@@ -1,0 +1,73 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      auto_cancel:
+        on_new_commit: none
+    - if: $CI_PIPELINE_SOURCE =~ /^(web|api|schedule)$/
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+stages:
+  - plan
+  - apply
+
+tools:
+  stage: .pre
+  image: docker:27-cli
+  tags:
+    - homelab
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - changes:
+        - .docker/Dockerfile
+        - mise.toml
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker buildx create --name tools --use
+    - |
+      CACHE="$CI_REGISTRY_IMAGE:cache"
+      PUSH_FLAG=""
+      if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then PUSH_FLAG="--push"; fi
+      docker buildx build . -f .docker/Dockerfile --provenance=false --sbom=false \
+        --cache-from "type=registry,ref=$CACHE" \
+        --cache-to "type=registry,ref=$CACHE,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true" \
+        -t "$CI_REGISTRY_IMAGE:latest" $PUSH_FLAG
+
+.task:
+  image: $CI_REGISTRY_IMAGE:latest
+  tags:
+    - homelab
+
+plan:
+  stage: plan
+  extends: .task
+  interruptible: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - task auth
+    - (task plan:changed > plan_output.txt 2>&1; echo $? > plan_exit) || true
+    - cat plan_output.txt
+    - task comment:plan FILE=plan_output.txt
+    - exit "$(cat plan_exit)"
+  artifacts:
+    paths:
+      - plan_output.txt
+    when: always
+    expire_in: 1 week
+
+apply:
+  stage: apply
+  extends: .task
+  resource_group: release
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: https://vault.from-the-lamp.work
+  script:
+    - task auth
+    - task vault:login:ci
+    - task apply:changed

@@ -45,3 +45,36 @@ tasks:
         echo "VAULT_ADDR={{.VAULT_ADDR}}" >> .env
       fi
       echo -e "\033[32m==>\033[0m wrote VAULT_ADDR/VAULT_TOKEN into .env"
+
+  vault:login:ci:
+    desc: 'Log in to Vault via the GitLab CI JWT and write the resulting token into .env as VAULT_TOKEN. CI only - needs an id_tokens: VAULT_ID_TOKEN block in .gitlab-ci.yml.'
+    vars:
+      VAULT_ADDR: '{{.VAULT_ADDR | default "https://vault.from-the-lamp.work"}}'
+      VAULT_JWT_PATH: '{{.VAULT_JWT_PATH | default "jwt-gitlab-ci"}}'
+      VAULT_JWT_ROLE: '{{.VAULT_JWT_ROLE | default "gitlab-ci-terragrunt"}}'
+    cmds:
+    - |
+      set -euo pipefail
+      if [ -z "${VAULT_ID_TOKEN:-}" ]; then
+        echo "VAULT_ID_TOKEN is not set - this only works inside a GitLab CI job with an id_tokens: VAULT_ID_TOKEN block (aud must match the Vault role's boundAudiences)" >&2
+        exit 1
+      fi
+      touch .env
+      # vault write (not vault login) - no token-helper involved at all, so
+      # none of vault:login's ~/.vault workaround is needed here.
+      token=$(VAULT_ADDR="{{.VAULT_ADDR}}" vault write -field=token "auth/{{.VAULT_JWT_PATH}}/login" role="{{.VAULT_JWT_ROLE}}" jwt="$VAULT_ID_TOKEN")
+      if [ -z "$token" ] || [ "$token" = "null" ]; then
+        echo "vault write auth/{{.VAULT_JWT_PATH}}/login did not return a token" >&2
+        exit 1
+      fi
+      if grep -q '^VAULT_TOKEN=' .env; then
+        sed -i.bak "s|^VAULT_TOKEN=.*|VAULT_TOKEN=${token}|" .env && rm -f .env.bak
+      else
+        echo "VAULT_TOKEN=${token}" >> .env
+      fi
+      if grep -q '^VAULT_ADDR=' .env; then
+        sed -i.bak "s|^VAULT_ADDR=.*|VAULT_ADDR={{.VAULT_ADDR}}|" .env && rm -f .env.bak
+      else
+        echo "VAULT_ADDR={{.VAULT_ADDR}}" >> .env
+      fi
+      echo -e "\033[32m==>\033[0m wrote VAULT_ADDR/VAULT_TOKEN into .env (via GitLab CI JWT)"

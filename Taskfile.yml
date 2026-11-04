@@ -3,6 +3,26 @@ version: "3"
 dotenv: [".env"]
 vars:
   LOG_LEVEL: info
+  DIFF_BASE:
+    sh: |
+      if [ -n "${DIFF_BASE:-}" ]; then
+        echo "$DIFF_BASE"
+        exit 0
+      fi
+      for c in "${CI_MERGE_REQUEST_DIFF_BASE_SHA:-}" "${CI_COMMIT_BEFORE_SHA:-}"; do
+        if [ -n "$c" ] && [ "$c" != "0000000000000000000000000000000000000000" ] && git cat-file -e "$c^{commit}" 2>/dev/null; then
+          echo "$c"
+          exit 0
+        fi
+      done
+      echo HEAD~1
+  CHANGED_UNITS:
+    sh: |
+      if [ -n "${TARGETS:-}" ]; then
+        echo "$TARGETS"
+        exit 0
+      fi
+      git diff --name-only --diff-filter=d {{.DIFF_BASE}} | xargs -r python3 .docker/changed_units.py 2>/dev/null | sort -u | tr '\n' ' '
 
 includes:
   custom:

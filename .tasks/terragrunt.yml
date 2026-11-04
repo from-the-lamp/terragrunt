@@ -55,6 +55,61 @@ tasks:
         ACTION: "output",
       }
 
+  list:changed:
+    desc: List units changed since DIFF_BASE (direct changes + transitive _common/*.hcl dependents). Override with TARGETS="dir1 dir2".
+    cmd: echo {{.CHANGED_UNITS}} | tr ' ' '\n'
+    preconditions:
+      - sh: '[ -n "{{.CHANGED_UNITS}}" ]'
+        msg: "No changed units found."
+
+  plan:changed:
+    desc: Run plan for every changed unit (see list:changed)
+    cmds:
+    - |
+      set -e
+      for d in {{.CHANGED_UNITS}}; do
+        echo -e "\033[36m== plan: $d ==\033[0m"
+        (cd "$d" && terragrunt plan --log-level {{.LOG_LEVEL}})
+      done
+    preconditions:
+      - sh: '[ -n "{{.CHANGED_UNITS}}" ]'
+        msg: "No changed units found."
+
+  apply:changed:
+    desc: Run apply for every changed unit (see list:changed). Auto-approves only when $CI is set - prompts interactively otherwise.
+    cmds:
+    - |
+      set -e
+      approve_flag=""
+      [ -n "${CI:-}" ] && approve_flag="-auto-approve"
+      for d in {{.CHANGED_UNITS}}; do
+        echo -e "\033[36m== apply: $d ==\033[0m"
+        (cd "$d" && terragrunt apply $approve_flag --log-level {{.LOG_LEVEL}})
+      done
+    preconditions:
+      - sh: '[ -n "{{.CHANGED_UNITS}}" ]'
+        msg: "No changed units found."
+
+  comment:plan:
+    desc: 'Post a file''s content as a GitLab MR note (no-op outside a merge_request_event pipeline). Usage: FILE=<path> task comment:plan'
+    cmds:
+    - |
+      set -euo pipefail
+      if [ -z "${CI_MERGE_REQUEST_IID:-}" ]; then
+        echo "not an MR pipeline, skipping comment"
+        exit 0
+      fi
+      test -n "{{.FILE}}" || { echo "FILE is required, e.g. FILE=plan_output.txt" >&2; exit 1; }
+      # One line on purpose - a YAML block scalar can't hold a line less-indented
+      # than its own first line, which rules out unindented (i.e. valid) multi-line
+      # Python nested in here. GitLab note bodies have a size limit well above
+      # 50000 chars - truncated from the front so the end of a terragrunt run survives.
+      body=$(python3 -c "import json,sys; text=open(sys.argv[1],encoding='utf-8',errors='replace').read(); print(json.dumps('\`\`\`\n'+text[-50000:]+'\n\`\`\`'))" "{{.FILE}}")
+      curl -sf -H "PRIVATE-TOKEN: ${TF_HTTP_PASSWORD}" -H "Content-Type: application/json" \
+        -d "{\"body\": ${body}}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/notes" >/dev/null
+      echo -e "\033[32m==>\033[0m posted {{.FILE}} to MR !${CI_MERGE_REQUEST_IID}"
+
   unlock:
     dir: $DIR
     desc: Unlock state by ID
