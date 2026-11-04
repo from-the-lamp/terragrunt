@@ -12,10 +12,11 @@ locals {
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  # Reuses root.hcl's own gitlab_token (TF_HTTP_PASSWORD) - already an
-  # Owner-scoped PAT (it has to be, for the state backend's own API access),
-  # so a second, separately-named token here would be the same credential
-  # under a different name, not an actual privilege reduction.
+  # Reuses root.hcl's own gitlab_token (GITLAB_API_TOKEN) - a real
+  # Owner-level PAT, required for this provider's group-wide Service
+  # Account calls. Deliberately NOT TF_HTTP_PASSWORD: that one is the state
+  # backend's own auth and in CI resolves to gitlab-ci-token/$CI_JOB_TOKEN,
+  # scoped to this project only - nowhere near enough for this.
   contents = <<EOF
 provider "gitlab" {
   token = "${local.common_settings.locals.gitlab_token}"

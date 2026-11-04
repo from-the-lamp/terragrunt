@@ -47,8 +47,12 @@ EOT
   registries = [
     {
       url      = "${local.helm_repo}"
-      username = "${get_env("TF_HTTP_USERNAME")}"
-      password = "${get_env("TF_HTTP_PASSWORD")}"
+      # Cross-project pull (infra/helm-charts, not this repo) - root.hcl's
+      # helm_repo_user/helm_repo_pass (GITLAB_API_TOKEN), not TF_HTTP_*
+      # (the state backend's own auth, gitlab-ci-token/$CI_JOB_TOKEN in CI -
+      # scoped to this project only, would be rejected here).
+      username = "${local.common_settings.locals.helm_repo_user}"
+      password = "${local.common_settings.locals.helm_repo_pass}"
     }
   ]
 }

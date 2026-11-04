@@ -39,6 +39,12 @@ tools:
   image: $CI_REGISTRY_IMAGE:latest
   tags:
     - homelab
+  variables:
+    # State backend auth (Terraform's http backend reads these two directly
+    # from the environment) - scoped to this project's own job, no CI/CD
+    # variable needed.
+    TF_HTTP_USERNAME: gitlab-ci-token
+    TF_HTTP_PASSWORD: $CI_JOB_TOKEN
 
 plan:
   stage: plan

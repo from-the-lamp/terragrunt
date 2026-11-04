@@ -12,9 +12,10 @@ locals {
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  # Same reasoning as _common/gitlab/service_account.hcl - reuses root.hcl's own
-  # gitlab_token (TF_HTTP_PASSWORD), already Owner-scoped for the state
-  # backend's own API access.
+  # Same reasoning as _common/gitlab/service_account.hcl - reuses root.hcl's
+  # own gitlab_token (GITLAB_API_TOKEN) - deliberately NOT TF_HTTP_PASSWORD
+  # (the state backend's own auth; a CI_JOB_TOKEN there has no group-wide
+  # Owner rights, which this provider's calls genuinely need).
   contents = <<EOF
 provider "gitlab" {
   token = "${local.common_settings.locals.gitlab_token}"

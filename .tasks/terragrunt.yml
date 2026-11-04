@@ -105,7 +105,10 @@ tasks:
       # Python nested in here. GitLab note bodies have a size limit well above
       # 50000 chars - truncated from the front so the end of a terragrunt run survives.
       body=$(python3 -c "import json,sys; text=open(sys.argv[1],encoding='utf-8',errors='replace').read(); print(json.dumps('\`\`\`\n'+text[-50000:]+'\n\`\`\`'))" "{{.FILE}}")
-      curl -sf -H "PRIVATE-TOKEN: ${TF_HTTP_PASSWORD}" -H "Content-Type: application/json" \
+      # GITLAB_API_TOKEN, not TF_HTTP_PASSWORD: CI_JOB_TOKEN can only read MR
+      # notes (GET), never create one (POST) - confirmed against GitLab's
+      # own job-token fine-grained-permissions docs, not assumed.
+      curl -sf -H "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" -H "Content-Type: application/json" \
         -d "{\"body\": ${body}}" \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/notes" >/dev/null
       echo -e "\033[32m==>\033[0m posted {{.FILE}} to MR !${CI_MERGE_REQUEST_IID}"

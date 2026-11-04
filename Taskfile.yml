@@ -52,8 +52,11 @@ tasks:
   auth:
     desc: Log in to the GitLab container registry that serves the oci:// module sources
     cmds:
-    - echo -e "\033[36m==>\033[0m logging in to registry.gitlab.com as ${TF_HTTP_USERNAME} - terragrunt and tofu pull oci:// modules with the credentials oras stores"
-    - echo "${TF_HTTP_PASSWORD}" | oras login -u "${TF_HTTP_USERNAME}" --password-stdin registry.gitlab.com
+    # GITLAB_API_TOKEN, not TF_HTTP_PASSWORD - these pulls are cross-project
+    # (helm charts / terraform modules, published by OTHER projects), a
+    # same-project CI_JOB_TOKEN would not be accepted.
+    - echo -e "\033[36m==>\033[0m logging in to registry.gitlab.com - terragrunt and tofu pull oci:// modules with the credentials oras stores"
+    - echo "${GITLAB_API_TOKEN}" | oras login -u gitlab-token --password-stdin registry.gitlab.com
 
   cleanup:
     desc: Remove temporary files
