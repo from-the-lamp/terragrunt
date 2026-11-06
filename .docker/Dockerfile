@@ -1,4 +1,4 @@
-FROM alpine:3.24.3
+FROM alpine:3.24.4
 
 # python3 from apk, not mise: mise's python core plugin has no prebuilt
 # binary for musl, so on Alpine `mise install` falls back to compiling
