@@ -71,6 +71,17 @@ inputs = {
     # ProxyGroup, apps/oracle-prod-0|1/platform/tailscale-operator).
     "tag:victoria-metrics-ingress" = ["tag:k3s-operator-homelab"]
     "tag:victoria-metrics-egress"  = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+    # litellm (homelab) reaching djinn's Windows PC running LM Studio -
+    # same egress/ingress shape as tag:webhook-relay-{egress,ingress}, kept
+    # as its own pair for the same independently-auditable/revocable
+    # reasoning. Egress side owned by homelab's operator (mints it for the
+    # dedicated ProxyGroup, apps/homelab/platform/tailscale). Ingress side
+    # owned by autogroup:admin only - the Windows PC is djinn's own
+    # pre-existing tailnet device, not something an operator provisions,
+    # so the tag has to be applied by hand in the admin console (Machines
+    # -> desktop-uid8gr9 -> Edit ACL tags) rather than minted automatically.
+    "tag:lmstudio-egress"  = ["tag:k3s-operator-homelab"]
+    "tag:lmstudio-ingress" = ["autogroup:admin"]
   }
 
   # Hetzner's subnet-router (Connector) needs its own auto-approved route -
@@ -238,6 +249,16 @@ inputs = {
       src = ["tag:victoria-metrics-egress"]
       dst = ["tag:victoria-metrics-ingress"]
       ip  = ["8480"]
+    },
+    {
+      # litellm's dedicated egress ProxyGroup reaching LM Studio's OpenAI-
+      # compatible server on djinn's Windows PC - single fixed port, same
+      # shape as the victoria-metrics grant above. Requires the PC to
+      # actually be tagged tag:lmstudio-ingress in the admin console
+      # (tag_owners comment above) before this has anything to match.
+      src = ["tag:lmstudio-egress"]
+      dst = ["tag:lmstudio-ingress"]
+      ip  = ["1234"]
     },
   ]
 }
