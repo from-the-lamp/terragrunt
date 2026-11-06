@@ -98,52 +98,41 @@ inputs = {
                     groups:
                       - from-the-lamp
             EOT
-            # Kubernetes-SA-JWT-as-API-token auth, independent of the Dex
-            # GitLab SSO above (browser login only, no API-token path). Lets
-            # a pod authenticate to the ArgoCD API directly with its own
-            # ServiceAccount token as a Bearer token, by trusting the K8s
-            # API server itself as an OIDC issuer. Backs the "argocd-mcp"
-            # Toolhive MCP server (apps/homelab/platform/toolhive's
-            # lamp-toolhive-mcps.mcp.argocd, projected SA token, audience
-            # "argocd") and the FTL-111 Grafana Infinity datasource
-            # (apps/homelab/platform/grafana's datasource-argocd.yaml, a
-            # local-account API token instead - no live token-refresh path
-            # for a datasource, see that file's own comment).
+            # REVERTED (see git history for the full oidc.config attempt):
+            # ArgoCD has exactly one "oidc.config", and it drives both the
+            # API-token Bearer-JWT verification path AND the public login
+            # page's SSO button - confirmed live via GET /api/v1/settings,
+            # which returned oidcConfig alongside the existing GitLab
+            # dexConfig the moment this key was set, and the UI rendered a
+            # second, non-functional "Log in via Kubernetes SA" button for
+            # it. There is no documented way to keep one without the other -
+            # this is how ArgoCD's settings/session-manager code is wired,
+            # not a misconfiguration. A K8s-SA-JWT-as-API-token path for
+            # argocd-mcp is possible in principle, but needs its own
+            # redesign (e.g. a dedicated local account like grafana-reader
+            # below, with toolhive's lamp-toolhive-mcps chart injecting a
+            # static Vault-backed token instead of a live projected SA
+            # token) - not attempted here, left broken as it already was.
             #
-            # This key previously lived only in argo-apps's apps/homelab/
-            # platform/argocd/values.yaml, nested under a top-level "argo-cd:"
-            # values key - but that chart's only dependencies are
-            # lamp-istio-routes (alias routes) and lamp-argocd-config,
-            # neither named/aliased "argo-cd", so the whole block rendered
-            # nowhere. Confirmed live: argocd-cm had no oidc.config key at
-            # all, and calling the argocd-mcp MCP tool failed with "invalid
-            # session: failed to verify the token". Moved here, to the unit
-            # that actually deploys the argo-cd chart.
-            "oidc.config" = <<-EOT
-              name: Kubernetes SA
-              issuer: https://192.168.8.11:6443
-              clientID: argocd
-              caBundleConfigMapName: kube-root-ca.crt
-            EOT
+            # Grafana's own token (datasource-argocd.yaml in argo-apps) uses
+            # a plain ArgoCD local account instead - apiKey capability only,
+            # no login capability, so it never reaches the login page at
+            # all (local accounts show up under Settings > Accounts, never
+            # as an SSO button).
+            "accounts.grafana-reader" = "apiKey"
           }
           # configs.rbac is a sibling of configs.cm — maps to the separate
           # argocd-rbac-cm ConfigMap. (The chart's own default values wedge
           # an "rbac" key under configs.cm too, but argocd-cm has no such
           # field; that data is inert.)
           rbac = {
-            # Exposes the K8s SA JWT's "sub" claim (system:serviceaccount:
-            # <ns>:<name>) to RBAC policy matching below - chart default
-            # scopes are [email, groups], without "sub" the policy.csv "g,"
-            # bindings for argocd-mcp/grafana-reader could never match.
-            "scopes"     = "[email, groups, sub]"
+            # No "scopes" override (chart default [email, groups] is enough)
+            # - that was only needed to expose the K8s SA JWT's "sub" claim
+            # for the now-reverted oidc.config/argocd-mcp-reader approach.
+            # A local account's own name is its RBAC subject directly, no
+            # claim passthrough required.
             "policy.csv" = <<-EOT
               g, from-the-lamp, role:admin
-              p, role:argocd-mcp-reader, applications, get, */*, allow
-              p, role:argocd-mcp-reader, applications/logs, get, */*, allow
-              p, role:argocd-mcp-reader, applications/manifests, get, */*, allow
-              p, role:argocd-mcp-reader, applications, sync, */*, allow
-              p, role:argocd-mcp-reader, projects, get, *, allow
-              g, system:serviceaccount:toolhive:argocd-mcp, role:argocd-mcp-reader
               p, role:grafana-reader, applications, get, */*, allow
               p, role:grafana-reader, projects, get, *, allow
               g, grafana-reader, role:grafana-reader
