@@ -6,7 +6,7 @@ locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/root.hcl")
   modules_url     = local.common_settings.locals.private_modules_base_url
   module_dir      = "vault/secrets_managed"
-  module_version  = "1.1.0"
+  module_version  = "1.2.0"
 }
 
 generate "provider" {
