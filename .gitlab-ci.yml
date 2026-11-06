@@ -15,7 +15,7 @@ stages:
 
 tools:
   stage: .pre
-  image: docker:27-cli
+  image: docker:29-cli
   tags:
     - homelab
   variables:
