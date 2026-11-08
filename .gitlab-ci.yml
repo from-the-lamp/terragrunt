@@ -15,7 +15,7 @@ stages:
 
 tools:
   stage: .pre
-  image: docker:27-cli
+  image: docker:29-cli
   tags:
     - homelab
   variables:
@@ -58,8 +58,12 @@ plan:
   interruptible: true
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: https://vault.from-the-lamp.work
   script:
     - task auth
+    - task vault:login:ci
     - (task plan:changed > plan_output.txt 2>&1; echo $? > plan_exit) || true
     - cat plan_output.txt
     - task comment:plan FILE=plan_output.txt
