@@ -46,6 +46,14 @@ dependency "terragrunt" {
   }
 }
 
+dependency "monorepo" {
+  config_path                             = "../projects/monorepo/sa/developer"
+  mock_outputs_allowed_terraform_commands = ["plan", "validate", "output", "init", "destroy"]
+  mock_outputs = {
+    token = "fake-token-monorepo"
+  }
+}
+
 inputs = {
   path        = "platform"
   secret_path = "kelos/gitlab-bot-tokens"
@@ -55,5 +63,6 @@ inputs = {
     "docker-images"     = dependency.docker_images.outputs.token
     "terraform-modules" = dependency.terraform_modules.outputs.token
     "terragrunt"        = dependency.terragrunt.outputs.token
+    "monorepo"          = dependency.monorepo.outputs.token
   }
 }
