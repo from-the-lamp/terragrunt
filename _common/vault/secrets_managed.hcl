@@ -14,8 +14,9 @@ generate "provider" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 provider "vault" {
-  address = "${get_env("VAULT_ADDR")}"
-  token   = "${get_env("VAULT_TOKEN")}"
+  address           = "${get_env("VAULT_ADDR")}"
+  token             = "${get_env("VAULT_TOKEN")}"
+  skip_child_token  = true
 }
 EOF
 }
