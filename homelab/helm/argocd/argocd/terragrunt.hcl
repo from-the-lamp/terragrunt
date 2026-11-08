@@ -120,6 +120,18 @@ inputs = {
             # all (local accounts show up under Settings > Accounts, never
             # as an SSO button).
             "accounts.grafana-reader" = "apiKey"
+            # mcp-argocd-homelab (toolhive) used to authenticate via a live
+            # K8s ServiceAccount JWT validated against the oidc.config above
+            # this one was reverted for - that path has been dead since the
+            # revert (confirmed live: argocd-cm has no oidc.config, so every
+            # Bearer call from that SA JWT fails "invalid session: failed to
+            # verify the token"). Same fix as grafana-reader: a local
+            # apiKey-only account instead of a live token. Token generated
+            # once with `argocd account generate-token --account
+            # argocd-mcp-reader` after this syncs, then written to Vault
+            # platform/argocd#mcp_reader_token - a live, manual step, same
+            # as grafana-reader's.
+            "accounts.argocd-mcp-reader" = "apiKey"
           }
           # configs.rbac is a sibling of configs.cm — maps to the separate
           # argocd-rbac-cm ConfigMap. (The chart's own default values wedge
@@ -136,6 +148,12 @@ inputs = {
               p, role:grafana-reader, applications, get, */*, allow
               p, role:grafana-reader, projects, get, *, allow
               g, grafana-reader, role:grafana-reader
+              p, role:argocd-mcp-reader, applications, get, */*, allow
+              p, role:argocd-mcp-reader, applications/logs, get, */*, allow
+              p, role:argocd-mcp-reader, applications/manifests, get, */*, allow
+              p, role:argocd-mcp-reader, applications, sync, */*, allow
+              p, role:argocd-mcp-reader, projects, get, *, allow
+              g, argocd-mcp-reader, role:argocd-mcp-reader
             EOT
           }
         }
