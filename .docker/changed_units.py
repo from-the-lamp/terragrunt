@@ -1,27 +1,29 @@
 #!/usr/bin/env python3
-"""List the terragrunt units a CI pipeline should plan/apply for a given set of changed files.
+"""List the Terragrunt units affected by changed files, without evaluating HCL.
 
-Plain `git diff` directory-matching misses one real case: a change to a shared
-`_common/*.hcl` file touches no unit directory by itself, but every unit whose
-terragrunt.hcl includes it (directly or transitively through another _common
-file) is actually affected. This walks the repo's own _common include graph to
-catch that case too - same idea as currencycom/platform-iac's
-tools/atlantis/include_projects.py, trimmed to just "list affected units"
-(no atlantis.yaml involved here).
+Walk static HCL references transitively, including root.hcl, environment configs,
+and _common includes. Resolve find_in_parent_folders from each consuming unit so
+a shared _common file can read a different env.hcl in each environment. Arbitrary
+computed paths are not supported.
 
 Usage:
-    python3 tools/changed_units.py <changed-file> [<changed-file> ...]
+    python3 .docker/changed_units.py <changed-file> [<changed-file> ...]
+    python3 .docker/changed_units.py --diff-base <ref>
 
-Prints one unit directory per line (repo-relative, e.g. "homelab/gitlab/projects/argo-apps/project").
-Exits 0 with no output if nothing is affected. Only the standard library is used.
+Prints one repo-relative unit directory per line. Only the standard library is used.
 """
+import argparse
 import os
 import re
+import subprocess
 import sys
 
 SKIP_DIRS = {".git", ".terragrunt-cache", ".terraform", "_modules", "node_modules"}
-# A quoted string that points at a shared file: "${get_repo_root()}/_common/x.hcl" or "../../_common/x.hcl".
-REF = re.compile(r'"((?:\$\{get_repo_root\(\)\}/|(?:\.\./)+)?_common/[^"\s]+\.hcl)"')
+# Preserve strings while removing comments (including inline and block comments).
+TOKEN = re.compile(r'"(?:\\.|[^"\\])*"|//[^\n]*|\#[^\n]*|/\*[\s\S]*?\*/')
+REF = re.compile(r'"([^"\n]+\.hcl)"')
+PARENT_REF = re.compile(r'\bfind_in_parent_folders\(\s*"([^"\n]+\.hcl)"\s*\)')
+REPO_PREFIX = "${get_repo_root()}/"
 
 
 def hcl_files(root):
@@ -32,47 +34,48 @@ def hcl_files(root):
                 yield os.path.relpath(os.path.join(dirpath, name), root)
 
 
-def shared_refs(root, rel):
-    """_common/*.hcl files (repo-relative) named in one .hcl file."""
-    path = os.path.join(root, rel)
-    with open(path, encoding="utf-8", errors="replace") as fh:
-        text = fh.read()
-    # Drop comment lines so prose like "same as _common/x.hcl" isn't mistaken for a real reference.
-    text = "\n".join(l for l in text.splitlines() if not l.lstrip().startswith(("#", "//")))
+def config_refs(root, rel, unit, text, changed):
+    """Repo-relative HCL references, with parent lookups scoped to the consumer."""
     found = set()
-    for m in REF.finditer(text):
-        ref = m.group(1)
-        if ref.startswith("${get_repo_root()}/"):
-            target = ref[len("${get_repo_root()}/"):]
-        elif ref.startswith("../"):
-            target = os.path.normpath(os.path.join(os.path.dirname(rel), ref))
-        else:
+    for match in PARENT_REF.finditer(text):
+        parent = unit
+        while True:
+            target = os.path.normpath(os.path.join(parent, match.group(1)))
+            # A deleted parent config still affects the units that used to read it.
+            if target in changed or os.path.isfile(os.path.join(root, target)):
+                found.add(target)
+                break
+            if not parent:
+                break
+            parent = os.path.dirname(parent)
+
+    # The quoted filename in a parent lookup is not a relative path from _common.
+    text = PARENT_REF.sub("", text)
+    for match in REF.finditer(text):
+        ref = match.group(1)
+        if ref.startswith(REPO_PREFIX):
+            target = ref[len(REPO_PREFIX):]
+        elif ref.startswith("_common/"):
             target = ref
-        if os.path.isfile(os.path.join(root, target)):
-            found.add(target)
+        else:
+            target = os.path.join(os.path.dirname(rel), ref)
+        target = os.path.normpath(target)
+        if "${" in target or os.path.isabs(target) or target.startswith("../"):
+            continue
+        # Keep missing targets too: deleting a referenced file must not hide its readers.
+        found.add(target)
     return found
 
 
-def closure(start, refs):
-    seen, todo = set(), list(start)
-    while todo:
-        f = todo.pop()
-        if f in seen:
-            continue
-        seen.add(f)
-        todo.extend(refs.get(f, ()))
-    return seen
-
-
-def main(argv):
-    if not argv:
-        return 0
-    root = os.getcwd()
-    changed = set(argv)
-    changed_dirs = {os.path.dirname(f) for f in changed}
-
+def affected_units(root, changed):
+    changed = {os.path.normpath(f) for f in changed}
     files = list(hcl_files(root))
-    refs = {f: shared_refs(root, f) for f in files}
+    texts = {}
+    for rel in files:
+        with open(os.path.join(root, rel), encoding="utf-8", errors="replace") as fh:
+            texts[rel] = TOKEN.sub(
+                lambda m: m.group(0) if m.group(0).startswith('"') else " ", fh.read()
+            )
     units = sorted(
         os.path.dirname(f) for f in files
         if os.path.basename(f) == "terragrunt.hcl" and not f.startswith("_common/")
@@ -80,18 +83,43 @@ def main(argv):
 
     affected = []
     for unit in units:
-        tg_file = os.path.join(unit, "terragrunt.hcl")
-        # Case 1: something inside the unit's own directory changed directly.
-        if unit in changed_dirs or any(f.startswith(unit + "/") for f in changed):
+        if any(f.startswith(unit + "/") for f in changed):
             affected.append(unit)
             continue
-        # Case 2: the unit (transitively) includes a changed _common/*.hcl.
-        deps = closure(refs.get(tg_file, ()), refs)
-        if any(f in deps for f in changed if f.startswith("_common/") and f.endswith(".hcl")):
-            affected.append(unit)
 
-    for unit in affected:
-        print(unit)
+        seen, todo = set(), [os.path.join(unit, "terragrunt.hcl")]
+        while todo:
+            rel = todo.pop()
+            if rel in seen:
+                continue
+            seen.add(rel)
+            if rel in texts:
+                todo.extend(config_refs(root, rel, unit, texts[rel], changed) - seen)
+        if changed & seen:
+            affected.append(unit)
+    return affected
+
+
+def main(argv):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--diff-base", help="Read changed paths from git diff, including deletions")
+    parser.add_argument("files", nargs="*")
+    args = parser.parse_args(argv)
+    changed = args.files
+    if args.diff_base:
+        # Read NUL-delimited paths directly, without xargs or a shell pipeline that
+        # can turn a failed diff/selector into a successful empty selection.
+        try:
+            output = subprocess.check_output(
+                ["git", "diff", "--name-only", "--no-renames", "-z", args.diff_base, "--"],
+                text=True,
+            )
+        except subprocess.CalledProcessError as exc:
+            return exc.returncode
+        changed = changed + [f for f in output.split("\0") if f]
+    if changed:
+        for unit in affected_units(os.getcwd(), changed):
+            print(unit)
     return 0
 
 

@@ -18,11 +18,13 @@ vars:
       echo HEAD~1
   CHANGED_UNITS:
     sh: |
+      set -eu
       if [ -n "${TARGETS:-}" ]; then
         echo "$TARGETS"
         exit 0
       fi
-      git diff --name-only --diff-filter=d {{.DIFF_BASE}} | xargs -r python3 .docker/changed_units.py 2>/dev/null | sort -u | tr '\n' ' '
+      units=$(python3 .docker/changed_units.py --diff-base "{{.DIFF_BASE}}")
+      printf '%s\n' "$units" | tr '\n' ' '
 
 includes:
   custom:
@@ -48,6 +50,10 @@ tasks:
   default:
     desc: List all available tasks
     cmd: task --list-all
+
+  test:changed-units:
+    desc: Test changed-unit selection offline, without credentials or infrastructure access
+    cmd: python3 -B -m unittest discover -s tests -p 'test_changed_units.py'
 
   auth:
     desc: Log in to the GitLab container registry that serves the oci:// module sources

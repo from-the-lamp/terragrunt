@@ -15,6 +15,13 @@ convention here. `task plan` / `task apply` / `task destroy` / `task unlock` / `
 run `terragrunt` directly against whatever's under `homelab/`, `infra/`, `prod-0/`, `prod-1/` -
 real state, real cloud/homelab resources.
 
+`task list:changed` follows static HCL references transitively, including `root.hcl`,
+repo-relative/relative config paths, and `find_in_parent_folders("env.hcl")` resolved from each
+consuming unit. Deleted referenced configs also select their readers. Arbitrary computed HCL
+paths are not evaluated; use `TARGETS="unit1 unit2"` for those. A failed diff/selector fails the
+task instead of silently planning/applying nothing. `task test:changed-units` tests this offline
+and runs in CI before plan/apply.
+
 **`DIR=<path>` is required, always.** The underlying task has no default for it and runs
 `terragrunt <action> --all`: leave `DIR` unset and `task apply`/`task plan`/`task destroy` recurse
 over every unit in the entire repo at once - all of `homelab/`, `infra/`, `prod-0/`, `prod-1/`

@@ -10,6 +10,7 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 stages:
+  - checks
   - plan
   - apply
 
@@ -51,6 +52,12 @@ tools:
     # variable needed.
     TF_HTTP_USERNAME: gitlab-ci-token
     TF_HTTP_PASSWORD: $CI_JOB_TOKEN
+
+test:changed-units:
+  stage: checks
+  extends: .task
+  script:
+    - task test:changed-units
 
 plan:
   stage: plan

@@ -56,7 +56,7 @@ tasks:
       }
 
   list:changed:
-    desc: List units changed since DIFF_BASE (direct changes + transitive _common/*.hcl dependents). Override with TARGETS="dir1 dir2".
+    desc: List units changed since DIFF_BASE (direct changes + transitive HCL readers, including root/env configs). Override with TARGETS="dir1 dir2".
     cmd: echo {{.CHANGED_UNITS}} | tr ' ' '\n'
     preconditions:
       - sh: '[ -n "{{.CHANGED_UNITS}}" ]'
