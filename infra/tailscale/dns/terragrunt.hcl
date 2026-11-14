@@ -48,8 +48,7 @@ inputs = {
       # away from Hetzner for tailnet clients once homelab's version of it
       # exists and answers here - see infra/argo-apps's
       # apps/homelab/platform/README.md for which names already collide
-      # live (windmill.from-the-lamp.work, currently Hetzner's public
-      # Slack-webhook route). Real ClusterIP of homelab's own
+      # live. Real ClusterIP of homelab's own
       # private-resolver CoreDNS Service (apps/homelab/platform/coredns,
       # lamp-coredns) - confirmed live via `kubectl get svc -n coredns`;
       # matches apps/homelab/platform/kube-system/templates/

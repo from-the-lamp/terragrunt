@@ -42,8 +42,8 @@ inputs = {
     # the grants list below already allows ANY tag:argocd-egress device to
     # reach prod-0/prod-1 regardless of which operator minted it.
     "tag:argocd-egress" = ["autogroup:admin", "tag:k3s-operator-hetzner", "tag:k3s-operator-homelab"]
-    # The two webhook-relay identities (banking-callback + windmill's public
-    # hook, routed through Oracle prod-0/1 - see apps/oracle-prod-0/platform/
+    # The webhook-relay identity (banking-callback's public hook, routed
+    # through Oracle prod-0/1 - see apps/oracle-prod-0/platform/
     # webhook-relay and apps/homelab/platform/tailscale's new Ingresses).
     # Ingress side: owned by homelab's operator so it can mint tags for the
     # two Ingress-backed devices (tailscale.com/tags annotation). Egress
@@ -232,12 +232,12 @@ inputs = {
     },
     {
       # Oracle prod-0/1's webhook-relay egress proxies reaching homelab's
-      # two webhook-relay Services (banking-callback :80, windmill-webhook
-      # :8000) - these are plain L4 tailscale.com/expose Services (not the
-      # K8s-API-proxy case above), so unlike tag:argocd-egress there's no
-      # single fixed port to pin; ip=["*"] is safe since src/dst already
-      # narrow this to exactly the two tag groups. Confirmed live: ip=["443"]
-      # produced "rejected due to acl" on the real ports (80, 8000).
+      # webhook-relay Service (banking-callback :80) - this is a plain L4
+      # tailscale.com/expose Service (not the K8s-API-proxy case above), so
+      # unlike tag:argocd-egress there's no single fixed port to pin;
+      # ip=["*"] is safe since src/dst already narrow this to exactly the
+      # two tag groups. Confirmed live: ip=["443"] produced "rejected due
+      # to acl" on the real port (80).
       src = ["tag:webhook-relay-egress"]
       dst = ["tag:webhook-relay-ingress"]
       ip  = ["*"]
