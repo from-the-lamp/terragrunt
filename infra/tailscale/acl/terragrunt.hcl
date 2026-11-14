@@ -260,5 +260,16 @@ inputs = {
       dst = ["tag:lmstudio-ingress"]
       ip  = ["1234"]
     },
+    {
+      # djinn's own devices reaching the Windows PC's ComfyUI web UI
+      # directly - same tagged device as tag:lmstudio-ingress above, port
+      # 8188 (ComfyUI's --listen 0.0.0.0 bind). Without this grant the
+      # device doesn't even appear in `tailscale status` for other tailnet
+      # members, same symptom as the homelab subnet-router case elsewhere
+      # in this file.
+      src = ["autogroup:member"]
+      dst = ["tag:lmstudio-ingress"]
+      ip  = ["8188"]
+    },
   ]
 }
