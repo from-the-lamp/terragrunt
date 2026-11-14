@@ -10,6 +10,8 @@ inputs = {
   key_alias         = "kelos"
   vault_secret_path = "litellm"
   vault_property    = "kelos_api_key"
-  max_budget        = 20
-  budget_duration   = "30d"
+  # No budget, unlike this module's other callers - this key is shared by
+  # every Kelos agent in the cluster (taskspawner-alertmanager.yaml:156-160
+  # explains why a litellm-level cap was deliberately never put on
+  # kelos-openai-key: it would throttle all of them, not just one flow).
 }
