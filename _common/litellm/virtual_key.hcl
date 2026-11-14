@@ -6,7 +6,7 @@ locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/root.hcl")
   modules_url     = local.common_settings.locals.private_modules_base_url
   module_dir      = "litellm/virtual_key"
-  module_version  = "0.1.0"
+  module_version  = "0.1.1"
 }
 
 generate "provider" {
