@@ -82,6 +82,19 @@ inputs = {
     # -> desktop-uid8gr9 -> Edit ACL tags) rather than minted automatically.
     "tag:lmstudio-egress"  = ["tag:k3s-operator-homelab"]
     "tag:lmstudio-ingress" = ["autogroup:admin"]
+    # vmagent (homelab) scraping node_exporter on djinn's own tailnet
+    # devices - same egress/ingress shape as tag:lmstudio-{egress,ingress}
+    # above, but kept as its own pair rather than reused: lmstudio-ingress
+    # is scoped to one specific pre-existing device (the Windows PC) for
+    # one specific purpose (LM Studio + its own windows_exporter), while
+    # this tag is meant to be applied to any djinn-owned device whose
+    # node_exporter should be scraped (currently just macbook-djinn-1).
+    # Ingress side owned by autogroup:admin only, same reasoning as
+    # lmstudio-ingress - these are djinn's own pre-existing devices, not
+    # something an operator provisions, so the tag has to be applied by
+    # hand in the admin console (Machines -> <device> -> Edit ACL tags).
+    "tag:node-exporter-egress"  = ["tag:k3s-operator-homelab"]
+    "tag:node-exporter-ingress" = ["autogroup:admin"]
   }
 
   # Hetzner's subnet-router (Connector) needs its own auto-approved route -
@@ -256,9 +269,27 @@ inputs = {
       # shape as the victoria-metrics grant above. Requires the PC to
       # actually be tagged tag:lmstudio-ingress in the admin console
       # (tag_owners comment above) before this has anything to match.
+      # 9182 added alongside 1234: vmagent reuses this same egress identity
+      # (apps/homelab/platform/tailscale's windows-exporter ExternalName
+      # Service, proxy-group lmstudio-egress) to scrape windows_exporter on
+      # the same PC, same reasoning as the single victoria-metrics-egress
+      # grant above - one ProxyGroup/tag pair serving two fixed ports is
+      # cheaper than minting a second egress identity for one more port.
       src = ["tag:lmstudio-egress"]
       dst = ["tag:lmstudio-ingress"]
-      ip  = ["1234"]
+      ip  = ["1234", "9182"]
+    },
+    {
+      # vmagent's dedicated egress ProxyGroup (apps/homelab/platform/
+      # tailscale) reaching node_exporter on djinn's own tailnet devices -
+      # single fixed port, same shape as the victoria-metrics grant above.
+      # Requires each target device to actually be tagged
+      # tag:node-exporter-ingress in the admin console (tag_owners comment
+      # above) before this has anything to match - currently just
+      # macbook-djinn-1.
+      src = ["tag:node-exporter-egress"]
+      dst = ["tag:node-exporter-ingress"]
+      ip  = ["9100"]
     },
     {
       # djinn's own devices reaching the Windows PC's ComfyUI web UI
