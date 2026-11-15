@@ -56,7 +56,7 @@ inputs = {
       # prod-0/prod-1 move here from Hetzner's ArgoCD as part of the same
       # relocation - this is now the one ArgoCD managing them, via their
       # own Tailscale API server proxy (credential-less). Requires
-      # tag:argocd-egress extended to a new tag:k3s-operator-homelab
+      # tag:argocd-egress extended to a new tag:k8s-operator-homelab
       # identity (infra/tailscale/acl) so this cluster's egress is allowed
       # to reach them - see homelab/platform/tailscale's apiServerProxyConfig
       # equivalent on the Hetzner side for the egress Service pattern.

@@ -10,38 +10,27 @@ inputs = {
   overwrite_existing_content = true
 
   tag_owners = {
-    "tag:exit"                 = ["autogroup:admin"]
-    "tag:k3s-operator-infra"   = ["autogroup:admin"]
-    "tag:k3s-proxy-infra"      = ["autogroup:admin"]
-    "tag:k3s-operator-prod-0"  = ["autogroup:admin"]
-    "tag:k3s-proxy-prod-0"     = ["autogroup:admin"]
-    "tag:k3s-operator-hetzner" = ["autogroup:admin"]
-    "tag:k3s-proxy-hetzner"    = ["autogroup:admin"]
+    "tag:exit" = ["autogroup:admin"]
+    # "k8s" rather than "k3s" - these identify a cluster's own
+    # tailscale-operator/its default egress proxies, not the specific k8s
+    # distro behind it (which varies: k3s on Oracle, Talos on homelab).
+    # prod-1's pair used to be named "...-infra" (legacy - the cluster was
+    # called "infra" before oracle-prod-0/oracle-prod-1 naming settled;
+    # terraform/terragrunt's own directory layout still reflects that old
+    # name, out of scope for this rename).
+    "tag:k8s-operator-prod-0" = ["autogroup:admin"]
+    "tag:k8s-proxy-prod-0"    = ["autogroup:admin"]
+    "tag:k8s-operator-prod-1" = ["autogroup:admin"]
+    "tag:k8s-proxy-prod-1"    = ["autogroup:admin"]
     # homelab's own tailscale-operator (ArgoCD relocation) and its existing
     # subnet-router hostNode (apps/homelab/platform/tailscale) - the latter
     # was already referencing this tag before it was ever declared here.
-    "tag:k3s-operator-homelab" = ["autogroup:admin"]
-    "tag:k3s-proxy-homelab"    = ["autogroup:admin"]
+    "tag:k8s-operator-homelab" = ["autogroup:admin"]
+    "tag:k8s-proxy-homelab"    = ["autogroup:admin"]
     # Dedicated identity for ArgoCD's own connection to prod-0/prod-1's
-    # Tailscale API server proxy - deliberately NOT tag:k3s-proxy-hetzner
-    # (the subnet-router every pod on hetzner-cp-1 already routes through),
-    # so this capability is scoped to ArgoCD specifically rather than to
-    # everything sharing that node's network path. Owned by
-    # tag:k3s-operator-hetzner (not just autogroup:admin) so the operator's
-    # EXISTING OAuth client (hetzner/tailscale/oauth/client, already scoped
-    # to tag:k3s-operator-hetzner) can mint tag:argocd-egress keys for the
-    # egress proxies it creates via proxyConfig.defaultTags - no second
-    # OAuth client needed, this is the same ownership-chain mechanism as
-    # Tailscale's own docs example ("tag:k8s": ["tag:k8s-operator"]), not a
-    # same-request-must-exactly-match-client-tags constraint as originally
-    # assumed (that assumption was wrong - see
-    # apps/hetzner-infra/platform/tailscale/values.yaml's comment for the
-    # corrected mechanism). tag:k3s-operator-homelab added as a second
-    # owner so ArgoCD's relocation to homelab can mint the same
-    # tag:argocd-egress identity there, independent of Hetzner's operator -
-    # the grants list below already allows ANY tag:argocd-egress device to
-    # reach prod-0/prod-1 regardless of which operator minted it.
-    "tag:argocd-egress" = ["autogroup:admin", "tag:k3s-operator-hetzner", "tag:k3s-operator-homelab"]
+    # Tailscale API server proxy - ownership-chain minting, same mechanism
+    # as Tailscale's own docs example ("tag:k8s": ["tag:k8s-operator"]).
+    "tag:argocd-egress" = ["autogroup:admin", "tag:k8s-operator-homelab"]
     # The webhook-relay identity (banking-callback's public hook, routed
     # through Oracle prod-0/1 - see apps/oracle-prod-0/platform/
     # webhook-relay and apps/homelab/platform/tailscale's new Ingresses).
@@ -49,17 +38,17 @@ inputs = {
     # two Ingress-backed devices (tailscale.com/tags annotation). Egress
     # side: owned by both Oracle operators so either region's relay proxy
     # can mint it for its own egress Service.
-    "tag:webhook-relay-ingress" = ["tag:k3s-operator-homelab"]
-    "tag:webhook-relay-egress"  = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+    "tag:webhook-relay-ingress" = ["tag:k8s-operator-homelab"]
+    "tag:webhook-relay-egress"  = ["tag:k8s-operator-prod-0", "tag:k8s-operator-prod-1"]
     # Dedicated identity for toolhive's oracle-0/oracle-1 kubernetes
     # MCP servers to reach prod-0/prod-1's Tailscale API server proxy -
     # same mechanism as tag:argocd-egress above, kept as its own tag rather
     # than reusing argocd-egress so this capability is independently
-    # auditable/revocable from ArgoCD's own. Owned by tag:k3s-operator-homelab
+    # auditable/revocable from ArgoCD's own. Owned by tag:k8s-operator-homelab
     # so homelab's existing operator OAuth client can mint it for the
     # dedicated ProxyGroup (apps/homelab/platform/tailscale) backing the
     # prod-0/1-k8s-operator-toolhive egress Services.
-    "tag:toolhive-egress" = ["tag:k3s-operator-homelab"]
+    "tag:toolhive-egress" = ["tag:k8s-operator-homelab"]
     # Oracle prod-0/1's vmagent (lamp-victoria-metrics-agent) pushing metrics
     # into homelab's vminsert over the tailnet - same egress/ingress shape as
     # tag:webhook-relay-{egress,ingress} just reversed in purpose, kept as its
@@ -69,48 +58,53 @@ inputs = {
     # vminsert-tailnet Service, apps/homelab/platform/tailscale); egress side
     # owned by both Oracle operators (mints it for each cluster's own
     # ProxyGroup, apps/oracle-prod-0|1/platform/tailscale-operator).
-    "tag:victoria-metrics-ingress" = ["tag:k3s-operator-homelab"]
-    "tag:victoria-metrics-egress"  = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+    "tag:victoria-metrics-ingress" = ["tag:k8s-operator-homelab"]
+    "tag:victoria-metrics-egress"  = ["tag:k8s-operator-prod-0", "tag:k8s-operator-prod-1"]
     # litellm (homelab) reaching djinn's Windows PC running LM Studio -
     # same egress/ingress shape as tag:webhook-relay-{egress,ingress}, kept
     # as its own pair for the same independently-auditable/revocable
-    # reasoning. Egress side owned by homelab's operator (mints it for the
-    # dedicated ProxyGroup, apps/homelab/platform/tailscale). Ingress side
-    # owned by autogroup:admin only - the Windows PC is djinn's own
-    # pre-existing tailnet device, not something an operator provisions,
-    # so the tag has to be applied by hand in the admin console (Machines
-    # -> desktop-uid8gr9 -> Edit ACL tags) rather than minted automatically.
-    "tag:lmstudio-egress"  = ["tag:k3s-operator-homelab"]
+    # reasoning. Scoped to the LM Studio API port ONLY - scraping that same
+    # PC's windows_exporter is a different purpose/consumer (vmagent, not
+    # litellm), so it goes through tag:metrics-egress below instead of
+    # being folded in here. Egress side owned by homelab's operator (mints
+    # it for the dedicated ProxyGroup, apps/homelab/platform/tailscale).
+    # Ingress side owned by autogroup:admin only - the Windows PC is djinn's
+    # own pre-existing tailnet device, not something an operator
+    # provisions, so the tag has to be applied by hand in the admin console
+    # (Machines -> desktop-uid8gr9 -> Edit ACL tags) rather than minted
+    # automatically.
+    "tag:lmstudio-egress"  = ["tag:k8s-operator-homelab"]
     "tag:lmstudio-ingress" = ["autogroup:admin"]
-    # vmagent (homelab) scraping node_exporter on djinn's own tailnet
-    # devices - same egress/ingress shape as tag:lmstudio-{egress,ingress}
-    # above, but kept as its own pair rather than reused: lmstudio-ingress
-    # is scoped to one specific pre-existing device (the Windows PC) for
-    # one specific purpose (LM Studio + its own windows_exporter), while
-    # this tag is meant to be applied to any djinn-owned device whose
-    # node_exporter should be scraped (currently just macbook-djinn-1).
-    # Ingress side owned by autogroup:admin only, same reasoning as
-    # lmstudio-ingress - these are djinn's own pre-existing devices, not
-    # something an operator provisions, so the tag has to be applied by
-    # hand in the admin console (Machines -> <device> -> Edit ACL tags).
-    "tag:node-exporter-egress"  = ["tag:k3s-operator-homelab"]
-    "tag:node-exporter-ingress" = ["autogroup:admin"]
+    # vmagent (homelab) scraping metrics exporters on djinn's own tailnet
+    # devices - windows_exporter on the Windows PC (tag:lmstudio-ingress,
+    # already applied to that device for the grant above - a second grant
+    # below reuses it as a destination without folding into
+    # tag:lmstudio-egress, so monitoring access stays independently
+    # revocable from litellm's LLM-API access) and node_exporter on
+    # macbook-djinn-1 (by IP, not a tag - see the grant below).
+    # Deliberately NO matching ingress tag for the macbook case: unlike the
+    # Windows PC (a dedicated device with no autogroup:member traffic of
+    # its own), macbook-djinn-1 is djinn's daily-driver laptop - tagging a
+    # device that's normally autogroup:member drops it out of every
+    # "src = autogroup:member" grant in this file (confirmed live: it
+    # immediately lost visibility of every other peer in `tailscale
+    # status`, same mechanism as this file's "didn't even appear in
+    # tailscale status" comment elsewhere, just the reverse direction - the
+    # newly-tagged device losing its OWN autogroup:member-derived src
+    # grants, not others losing sight of it).
+    "tag:metrics-egress" = ["tag:k8s-operator-homelab"]
   }
 
-  # Hetzner's subnet-router (Connector) needs its own auto-approved route -
-  # this cluster's real service CIDR, not the old infra cluster's k3s
-  # default (10.43.0.0/16, dropped along with that cluster's connector).
   auto_approvers_routes = {
-    "172.21.0.0/16" = ["tag:k3s-proxy-hetzner"]
     # homelab's subnet-router (apps/homelab/platform/tailscale hostNode)
     # advertises this - without an auto-approver entry it'd sit pending
     # manual approval in the admin console, blocking Tailscale reachability
     # to homelab entirely (including the relocated ArgoCD's own UI).
-    "172.25.0.0/16" = ["tag:k3s-proxy-homelab"]
+    "172.25.0.0/16" = ["tag:k8s-proxy-homelab"]
     # homelab's LAN subnet - same subnet-router, added so the node itself
     # (kube-apiserver/Talos API) is reachable over Tailscale, not just
     # in-cluster services.
-    "192.168.8.0/24"   = ["tag:k3s-proxy-homelab"]
+    "192.168.8.0/24"   = ["tag:k8s-proxy-homelab"]
     "173.245.48.0/20"  = ["tag:exit"]
     "103.21.244.0/22"  = ["tag:exit"]
     "103.22.200.0/22"  = ["tag:exit"]
@@ -139,18 +133,15 @@ inputs = {
 
   grants = [
     {
-      # Lets ArgoCD (via its dedicated tag:argocd-egress identity, not yet
-      # applied to any device - see hetzner/helm/argocd/argocd/
-      # terragrunt.hcl) reach prod-0's and prod-1's Tailscale API server
-      # proxy and have the proxy impersonate system:masters for it - the
-      # Kubernetes-side ClusterRoleBinding this requires (binding
-      # system:masters, or a narrower group, to these proxies'
-      # allowImpersonation config) still needs enabling per-cluster; see
-      # apps/oracle-prod-0 and apps/oracle-prod-1's tailscale-operator apps.
-      # tag:k3s-operator-infra is prod-1's operator tag (legacy name, kept
-      # for parity with its existing tag_owners entry).
+      # Lets ArgoCD (via its dedicated tag:argocd-egress identity) reach
+      # prod-0's and prod-1's Tailscale API server proxy and have the
+      # proxy impersonate system:masters for it - the Kubernetes-side
+      # ClusterRoleBinding this requires (binding system:masters, or a
+      # narrower group, to these proxies' allowImpersonation config) still
+      # needs enabling per-cluster; see apps/oracle-prod-0 and
+      # apps/oracle-prod-1's tailscale-operator apps.
       src = ["tag:argocd-egress"]
-      dst = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+      dst = ["tag:k8s-operator-prod-0", "tag:k8s-operator-prod-1"]
       # ip is required alongside app: app only grants the impersonation
       # capability the API server proxy consults AFTER a connection is
       # already established - the raw TCP handshake on 443 is a separate,
@@ -173,7 +164,7 @@ inputs = {
       # same reason: the raw TCP handshake is checked before the
       # impersonation capability is ever consulted).
       src = ["tag:toolhive-egress"]
-      dst = ["tag:k3s-operator-prod-0", "tag:k3s-operator-infra"]
+      dst = ["tag:k8s-operator-prod-0", "tag:k8s-operator-prod-1"]
       ip  = ["443"]
       app = {
         "tailscale.com/cap/kubernetes" = [
@@ -183,7 +174,7 @@ inputs = {
     },
     {
       src = ["autogroup:member"]
-      dst = ["tag:k3s-proxy-infra", "tag:exit"]
+      dst = ["tag:k8s-proxy-prod-1", "tag:exit"]
       ip  = ["*"]
     },
     {
@@ -193,32 +184,29 @@ inputs = {
       via = ["tag:exit"]
     },
     {
-      src = ["tag:k3s-proxy-prod-0"]
+      src = ["tag:k8s-proxy-prod-0"]
       dst = ["tag:exit"]
       ip  = ["*"]
     },
     {
-      # Lets the Hetzner subnet-router (hostNetwork, --accept-routes) pull
-      # in tag:exit's advertised routes (Cloudflare edge ranges + the cas
+      # Lets homelab's subnet-router (hostNetwork, --accept-routes) pull in
+      # tag:exit's advertised routes (Cloudflare edge ranges + the cas
       # GitLab IP) - a plain destination grant, mirroring the
-      # autogroup:member -> 172.21.0.0/16 grant below rather than the
+      # autogroup:member -> 172.25.0.0/16 grant below rather than the
       # via-based exit-node grant above (tag:exit itself has
       # advertise-exit-node=false, so it's a subnet router, not an exit
-      # node - via= semantics don't apply to it).
-      # Hetzner is destroyed - tag:k3s-proxy-hetzner left in place (inert,
-      # no device left to claim it) rather than ripped out; homelab now
-      # replaces it as the cluster that needs this route. Without it,
-      # toolhive's gitlab-cas-dev/gitlab-cas-gitops MCP servers egress on
-      # homelab's own ISP IP instead of the Cloudflare-allowlisted one,
-      # and v-soft.dev/v-gitops.cc's Cloudflare in front of them returns a
-      # bare 403 "Sorry, you have been blocked".
-      src = ["tag:k3s-proxy-hetzner", "tag:k3s-proxy-homelab"]
+      # node - via= semantics don't apply to it). Without this, toolhive's
+      # gitlab-cas-dev/gitlab-cas-gitops MCP servers egress on homelab's
+      # own ISP IP instead of the Cloudflare-allowlisted one, and
+      # v-soft.dev/v-gitops.cc's Cloudflare in front of them returns a bare
+      # 403 "Sorry, you have been blocked".
+      src = ["tag:k8s-proxy-homelab"]
       dst = ["autogroup:internet"]
       ip  = ["*"]
       via = ["tag:exit"]
     },
     {
-      src = ["tag:k3s-proxy-hetzner", "tag:k3s-proxy-homelab"]
+      src = ["tag:k8s-proxy-homelab"]
       dst = [
         "173.245.48.0/20", "103.21.244.0/22", "103.22.200.0/22", "103.31.4.0/22",
         "141.101.64.0/18", "108.162.192.0/18", "190.93.240.0/20", "188.114.96.0/20",
@@ -228,19 +216,13 @@ inputs = {
       ip = ["*"]
     },
     {
+      # Without this, tailnet members have no ACL path to homelab's
+      # subnet-router or its advertised 172.25.0.0/16 route at all
+      # (confirmed live: the device didn't even appear in `tailscale
+      # status`, and DNS queries forwarded to its private-resolver
+      # ClusterIP 172.25.80.94 timed out rather than SERVFAIL-ing).
       src = ["autogroup:member"]
-      dst = ["tag:k3s-proxy-hetzner", "172.21.0.0/16"]
-      ip  = ["*"]
-    },
-    {
-      # Mirrors the Hetzner grant above - without this, tailnet members have
-      # no ACL path to homelab's subnet-router or its advertised
-      # 172.25.0.0/16 route at all (confirmed live: the device didn't even
-      # appear in `tailscale status`, and DNS queries forwarded to its
-      # private-resolver ClusterIP 172.25.80.94 timed out rather than
-      # SERVFAIL-ing).
-      src = ["autogroup:member"]
-      dst = ["tag:k3s-proxy-homelab", "172.25.0.0/16", "192.168.8.0/24"]
+      dst = ["tag:k8s-proxy-homelab", "172.25.0.0/16", "192.168.8.0/24"]
       ip  = ["*"]
     },
     {
@@ -269,26 +251,29 @@ inputs = {
       # shape as the victoria-metrics grant above. Requires the PC to
       # actually be tagged tag:lmstudio-ingress in the admin console
       # (tag_owners comment above) before this has anything to match.
-      # 9182 added alongside 1234: vmagent reuses this same egress identity
-      # (apps/homelab/platform/tailscale's windows-exporter ExternalName
-      # Service, proxy-group lmstudio-egress) to scrape windows_exporter on
-      # the same PC, same reasoning as the single victoria-metrics-egress
-      # grant above - one ProxyGroup/tag pair serving two fixed ports is
-      # cheaper than minting a second egress identity for one more port.
       src = ["tag:lmstudio-egress"]
       dst = ["tag:lmstudio-ingress"]
-      ip  = ["1234", "9182"]
+      ip  = ["1234"]
     },
     {
       # vmagent's dedicated egress ProxyGroup (apps/homelab/platform/
-      # tailscale) reaching node_exporter on djinn's own tailnet devices -
-      # single fixed port, same shape as the victoria-metrics grant above.
-      # Requires each target device to actually be tagged
-      # tag:node-exporter-ingress in the admin console (tag_owners comment
-      # above) before this has anything to match - currently just
-      # macbook-djinn-1.
-      src = ["tag:node-exporter-egress"]
-      dst = ["tag:node-exporter-ingress"]
+      # tailscale) scraping windows_exporter on the same Windows PC as the
+      # lmstudio grant above - same destination tag (already applied to
+      # that device), different src identity on purpose, so monitoring
+      # access stays independently revocable from litellm's own.
+      src = ["tag:metrics-egress"]
+      dst = ["tag:lmstudio-ingress"]
+      ip  = ["9182"]
+    },
+    {
+      # Same egress ProxyGroup reaching node_exporter on djinn's own
+      # daily-driver laptop - targeted by its tailnet IP, not a tag (see
+      # tag_owners comment above: tagging this device instead would pull
+      # it out of every autogroup:member grant it currently relies on for
+      # its own normal connectivity). Update this IP if macbook-djinn-1 is
+      # ever re-registered on the tailnet (`tailscale ip -4` to check).
+      src = ["tag:metrics-egress"]
+      dst = ["100.109.236.52/32"]
       ip  = ["9100"]
     },
     {
