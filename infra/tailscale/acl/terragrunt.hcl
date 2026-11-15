@@ -93,6 +93,17 @@ inputs = {
     # newly-tagged device losing its OWN autogroup:member-derived src
     # grants, not others losing sight of it).
     "tag:metrics-egress" = ["tag:k8s-operator-homelab"]
+    # Leftover from an earlier (abandoned) approach: macbook-djinn-1 was
+    # briefly tagged tag:node-exporter-ingress to let vmagent reach it,
+    # before the grant below was switched to target it by IP instead (see
+    # tag:metrics-egress's comment above) - at which point this tag
+    # stopped being functionally needed. Tailscale has no way to clear ALL
+    # tags from a device without reauthenticating it (which would change
+    # its identity/key), so rather than force that, this tag stays
+    # declared and gets added alongside autogroup:member in this file's
+    # member-scoped grants below, restoring this device's normal
+    # connectivity while it keeps carrying the tag.
+    "tag:node-exporter-ingress" = ["autogroup:admin"]
   }
 
   auto_approvers_routes = {
@@ -173,12 +184,16 @@ inputs = {
       }
     },
     {
-      src = ["autogroup:member"]
+      # tag:node-exporter-ingress included alongside autogroup:member -
+      # see that tag's tag_owners comment: macbook-djinn-1 still carries
+      # it (Tailscale can't fully untag a device without reauthenticating
+      # it), so it needs the same member-equivalent grants explicitly.
+      src = ["autogroup:member", "tag:node-exporter-ingress"]
       dst = ["tag:k8s-proxy-prod-1", "tag:exit"]
       ip  = ["*"]
     },
     {
-      src = ["autogroup:member"]
+      src = ["autogroup:member", "tag:node-exporter-ingress"]
       dst = ["autogroup:internet"]
       ip  = ["*"]
       via = ["tag:exit"]
@@ -221,7 +236,7 @@ inputs = {
       # (confirmed live: the device didn't even appear in `tailscale
       # status`, and DNS queries forwarded to its private-resolver
       # ClusterIP 172.25.80.94 timed out rather than SERVFAIL-ing).
-      src = ["autogroup:member"]
+      src = ["autogroup:member", "tag:node-exporter-ingress"]
       dst = ["tag:k8s-proxy-homelab", "172.25.0.0/16", "192.168.8.0/24"]
       ip  = ["*"]
     },
@@ -283,7 +298,7 @@ inputs = {
       # device doesn't even appear in `tailscale status` for other tailnet
       # members, same symptom as the homelab subnet-router case elsewhere
       # in this file.
-      src = ["autogroup:member"]
+      src = ["autogroup:member", "tag:node-exporter-ingress"]
       dst = ["tag:lmstudio-ingress"]
       ip  = ["8188"]
     },
