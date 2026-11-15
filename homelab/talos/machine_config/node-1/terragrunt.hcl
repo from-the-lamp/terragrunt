@@ -307,6 +307,12 @@ inputs = {
       kind       = "HostnameConfig"
       hostname   = local.hostname
       auto       = "off"
+    }),
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "UserVolumeConfig"
+      name       = "local-path-provisioner"
+      volumeType = "directory"
     })
   ]
 }
