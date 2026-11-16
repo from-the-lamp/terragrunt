@@ -19,11 +19,13 @@ locals {
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   talos_version    = local.environment_vars.locals.talos_version
   node_1_ip        = local.environment_vars.locals.node_1_ip
-  # Content-addressable hash of the amd-ucode-only customization - stable
-  # across every Talos version, already confirmed working at bootstrap
-  # (homelab/talos/machine_config/node-1's install.image). Re-derive via
-  # a live factory.talos.dev POST only if talos_extensions ever changes.
-  talos_schematic_id = "96f8c146a67c80daad900d3fc1a6976fe11062321eee9ab6ae2a6aea88b2d26e"
+  # Content-addressable hash of the amd-ucode + amdgpu customization -
+  # stable across every Talos version. Re-derived (2026-11-16) via a live
+  # factory.talos.dev POST when amdgpu was added to env.hcl's
+  # talos_extensions, matching homelab/talos/machine_config/node-1's
+  # install.image. Re-derive again via the same POST only if
+  # talos_extensions ever changes further.
+  talos_schematic_id = "9c1d1b442d73f96dcd04e81463eb20000ab014062d22e1b083e1773336bc1dd5"
 }
 
 dependency "secrets" {

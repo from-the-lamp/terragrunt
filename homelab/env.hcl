@@ -7,14 +7,21 @@ locals {
   # rebooted into it, 3x) - it turned out to just need a real power cycle,
   # which happened as a side effect of the physical network move; confirmed
   # live via `talosctl version` (Server Tag: v1.14.2) post-move.
-  talos_version      = "v1.14.2"
+  # Bumped to v1.14.6 (latest stable as of 2026-11-16, confirmed via
+  # GitHub releases) in the same os_upgrade run that adds the amdgpu
+  # extension below - already needs a reboot either way, so combining
+  # the patch bump with the extension change costs no extra downtime.
+  talos_version      = "v1.14.6"
   kubernetes_version = "1.36.5"
 
   # System extensions baked into the installer image (Image Factory slugs).
-  # amd-ucode for the UM890 Pro's Ryzen CPU - add a NIC driver extension
-  # here too if the box's chipset turns out to need one (check once the
-  # hardware is in hand).
-  talos_extensions   = ["siderolabs/amd-ucode"]
+  # amd-ucode for the UM890 Pro's Ryzen CPU. amdgpu adds the amdgpu kernel
+  # driver + linux-firmware for the Radeon 780M iGPU (Vulkan/RADV
+  # inference workloads need /dev/dri/renderD*, which only appears once
+  # this driver is loaded) - add a NIC driver extension here too if the
+  # box's chipset turns out to need one (check once the hardware is in
+  # hand).
+  talos_extensions   = ["siderolabs/amd-ucode", "siderolabs/amdgpu"]
   talos_architecture = "x86"
 
   # Pod/service subnets advertised into the same tailnet Hetzner's own

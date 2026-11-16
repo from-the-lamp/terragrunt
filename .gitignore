@@ -12,6 +12,8 @@ terraform.tfstate
 .DS_Store
 kubeconfig.yaml
 kubeconfig.yaml.lock
+talosconfig.yaml
+talosconfig.yaml.lock
 .claude
 # Rendered boot media for the homelab node - contains real cluster secrets
 # (homelab/_generated/config.yaml, config.iso) and a multi-hundred-MB ISO,

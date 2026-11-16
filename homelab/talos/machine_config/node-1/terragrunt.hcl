@@ -128,10 +128,15 @@ inputs = {
         # render, not this field. Left unset, the install pulled a
         # v1.14.0 installer against a v1.9.0/Kubernetes-1.31.4 config and
         # failed the same way the original stale-ISO version mismatch
-        # did. This schematic is amd-ucode only, no talos.config kernel
-        # arg (that's only needed for the boot-time installer medium,
-        # not the permanently-installed system).
-        image = "factory.talos.dev/metal-installer/96f8c146a67c80daad900d3fc1a6976fe11062321eee9ab6ae2a6aea88b2d26e:${local.talos_version}"
+        # did. This schematic is amd-ucode + amdgpu (adds the Radeon
+        # 780M iGPU kernel driver/firmware for Vulkan inference
+        # workloads), no talos.config kernel arg (that's only needed for
+        # the boot-time installer medium, not the permanently-installed
+        # system). Re-derived from env.hcl's talos_extensions via a live
+        # factory.talos.dev POST (2026-11-16) when amdgpu was added -
+        # confirmed matches homelab/talos/os_upgrade/node-1's
+        # talos_schematic_id, which must stay in sync with this value.
+        image = "factory.talos.dev/metal-installer/9c1d1b442d73f96dcd04e81463eb20000ab014062d22e1b083e1773336bc1dd5:${local.talos_version}"
       }
       provisioning = {
         diskSelector = {

@@ -44,6 +44,31 @@ terraform {
     run_on_error = false
   }
 
+  # Mirrors write_kubeconfig above - the talos/access module's own
+  # talos_config output was previously only reachable by hand
+  # (`terragrunt output -raw talos_config`), which is how a stale,
+  # unrelated `talos-default` context (endpoints 127.0.0.1, nodes
+  # 10.5.0.2/.3 - leftover from a local `talosctl cluster create`) ended
+  # up being the only thing `talosctl -n 192.168.8.11 ...` had to go on.
+  # Written to a repo-local file, same as kubeconfig.yaml - not merged
+  # into ~/.talos/config automatically, since that's a global dotfile
+  # outside this repo's control and merging behind the scenes could
+  # silently clobber a context for another cluster.
+  after_hook "write_talosconfig" {
+    commands = ["apply"]
+    execute = ["bash", "-c", <<-EOT
+      set -euo pipefail
+      tf_bin=tofu
+      command -v $tf_bin >/dev/null 2>&1 || tf_bin=terraform
+      out="${get_terragrunt_dir()}/talosconfig.yaml"
+      $tf_bin output -raw talos_config >"$out"
+      chmod 600 "$out"
+      echo "talosconfig written to $out - merge it with: talosctl config merge $out"
+    EOT
+    ]
+    run_on_error = false
+  }
+
   after_hook "wait_for_kube_api" {
     commands = ["apply"]
     execute = ["bash", "-c", <<-EOT
