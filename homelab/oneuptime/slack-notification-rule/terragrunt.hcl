@@ -28,5 +28,9 @@ EOF
 }
 
 inputs = {
+  name        = "Critical incidents to Slack"
+  description = "Posts critical-severity incidents into the connected Slack workspace, independent of the Kelos/alert-notifier pipeline."
+
   slack_channel_name = "alerting"
+  updates_to_post    = ["ResolvedAndReopened", "SeverityChanges"]
 }
