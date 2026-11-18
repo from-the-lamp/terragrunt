@@ -3,28 +3,18 @@ include "root" {
 }
 
 terraform {
-  source = "${get_repo_root()}/_modules/oneuptime/workspace_notification_rule"
+  source = "${local.modules_url}/${local.module_dir}?tag=${local.module_version}"
 }
 
-generate "provider" {
-  path      = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-provider "vault" {
-  address = "${get_env("VAULT_ADDR")}"
-  token   = "${get_env("VAULT_TOKEN")}"
+locals {
+  common_settings = read_terragrunt_config("${get_repo_root()}/root.hcl")
+  modules_url     = local.common_settings.locals.private_modules_base_url
+  module_dir      = "oneuptime/workspace_notification_rule"
+  module_version  = "0.1.0"
 }
 
-data "vault_kv_secret_v2" "oneuptime_creds" {
-  mount = "platform"
-  name  = "oneuptime"
-}
-
-provider "oneuptime" {
-  oneuptime_url = "https://oneuptime.from-the-lamp.work"
-  api_key       = data.vault_kv_secret_v2.oneuptime_creds.data["api-key"]
-}
-EOF
+include "oneuptime_provider" {
+  path = "${get_repo_root()}/_common/oneuptime/provider.hcl"
 }
 
 inputs = {
