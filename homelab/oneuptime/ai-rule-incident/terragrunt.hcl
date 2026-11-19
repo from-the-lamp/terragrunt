@@ -32,7 +32,7 @@ inputs = {
 
   title_pattern = "^(?!.*litellm)"
 
-  execution_mode = "FullAuto"
+  execution_mode = "Suggest"
   investigates   = true
   fixes          = true
 
