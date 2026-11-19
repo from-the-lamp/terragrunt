@@ -10,7 +10,7 @@ locals {
   common_settings = read_terragrunt_config("${get_repo_root()}/root.hcl")
   modules_url     = local.common_settings.locals.private_modules_base_url
   module_dir      = "oneuptime/ai_rule"
-  module_version  = "0.2.0"
+  module_version  = "0.3.0"
 }
 
 include "oneuptime_provider" {
@@ -32,9 +32,10 @@ inputs = {
 
   title_pattern = "^(?!.*litellm)"
 
-  execution_mode = "Suggest"
-  investigates   = true
-  fixes          = true
+  execution_mode             = "Suggest"
+  investigates               = true
+  only_if_open_after_minutes = 30
+  fixes                      = true
 
   open_code_fix_pull_requests  = true
   open_telemetry_pull_requests = false
