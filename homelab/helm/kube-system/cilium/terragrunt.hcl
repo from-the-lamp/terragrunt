@@ -75,6 +75,23 @@ inputs = {
               enabled = true
             }
           }
+          # FTL-206: writes JSON flow logs to a hostPath file so the
+          # lamp-loki-agent Alloy DaemonSet can tail and ship them to Loki.
+          # allowList keeps volume reasonable on this single node by only
+          # exporting drops/policy-audit verdicts and hard errors, not every
+          # forwarded flow. Local rotation (10MB x 5 files) is a backstop
+          # against the hostPath filling up if the Alloy pipeline stalls -
+          # real retention is Loki's own.
+          export = {
+            static = {
+              enabled = true
+              allowList = [
+                "{\"verdict\":[\"DROPPED\",\"AUDIT\",\"ERROR\"]}"
+              ]
+              fileMaxSizeMb  = 10
+              fileMaxBackups = 5
+            }
+          }
         }
         # Chart default ships cilium-agent with no resources at all - the
         # CNI DaemonSet was BestEffort, same gap the platform/limits
